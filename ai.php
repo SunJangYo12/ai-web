@@ -126,7 +126,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 						unset($_SESSION['copy']);
 						unset($_SESSION['copy_name']);
 						echo "<script>alert('sukses copy s=".$source." d=".$destin."');</script>	";
-						echo("<script>location.href = '/ai.php?path=$path';</script>");
+						echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
 				
 				} else {
 						echo "<font color='red'> copy file gagal</font>	";
@@ -188,25 +188,47 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 				echo('<pre>'.htmlspecialchars(file_get_contents($_GET['filesrc'])).'</pre>');
 
 		}
-		elseif(isset($_GET['option']) && $_POST['new'] == 'file') {
-				echo '<form method="POST">New File : <input name="newfile" type="text" size="20" value="'.$_POST['name'].'" /><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="rename"><input type="submit" value="Go" /></form>';
-		}
-		elseif(isset($_GET['option']) && $_POST['new'] == 'folder') {
-				echo '<form method="POST">New Folder : 
-								<input name="newfolder" type="text" size="20" value="'.$path.'" />
-								<input type="hidden" name="path" value="'.$_POST['path'].'">
-								<input type="hidden" name="opt" value="rename">
-								<input type="submit" value="Go" /></form>';
-				$new = $_POST['newfolder'];
-				echo $new;
-				/*if (fm_mkdir($path . '/' . $new, false) === true) {
-          echo '<font color="green">Folder created</font>';
-      } elseif (fm_mkdir($path . '/' . $new, false) === $path . '/' . $new) {
-          echo '<font color="pink">Folder already exists</font>';
+		
+		//create new folder/file
+		elseif(isset($_POST['newgofile'])) {
+				$new = $_POST['newfile'];
+				
+				if (file_exists($new)) {
+          echo '<script>alert("File already exists");</script>';
       } else {
-          echo '<font color="red">Folder not created';
-      }*/
+      			$file = fopen($new, "w");
+      			fwrite($file, "");
+      			fclose($file);
+          echo '<script>alert("File sukses created");</script>';
+      }
+      echo("<script>location.href = '/ai.php?path=$path';</script>");
 		}
+		elseif(isset($_POST['newgofolder'])) {
+				$new = $_POST['newfolder'];
+				
+				if (fm_mkdir($new, false) === true) {
+          echo '<script>alert("Folder created");</script>';
+      } elseif (fm_mkdir($new, false) === $new) {
+          echo '<script>alert("Folder already exists");</script>';
+      } else {
+          echo '<script>alert("Folder gagal dibuat");</script>';
+      }
+      echo("<script>location.href = '/ai.php?path=$path';</script>");
+		}
+		elseif(isset($_GET['option']) && $_POST['new'] == 'file' ) {
+				echo '<form method="POST" action="">New File : 
+				<input name="newfile" type="text" size="20" value="'.$path.'" />
+				<input type="hidden" name="path" value="'.$_POST['path'].'">
+				<input type="submit" name="newgofile" value="Go" /></form>';
+		}
+		elseif(isset($_GET['option']) && $_POST['new'] == 'folder' ) {
+				echo '<form method="POST" action="">New Folder : 
+				<input name="newfolder" type="text" size="20" value="'.$path.'" />
+				<input type="hidden" name="path" value="'.$_POST['path'].'">
+				<input type="submit" name="newgofolder" value="Go" /></form>';
+		}
+		
+		//action file
 		elseif(isset($_GET['option']) && $_POST['opt'] != 'delete'){
    		echo '</table><br /><center>'.$_POST['path'].'<br /><br />';
   		 if($_POST['opt'] == 'chmod'){
@@ -249,13 +271,26 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
  		  }elseif($_POST['opt'] == 'copy') {
  		  				$_SESSION['copy'] = $path.'/'.$_POST['name'];
  		  				$_SESSION['copy_name'] = $_POST['name'];
- 		  				echo("<script>location.href = '/ai.php?file_manager';</script>");
- 		  }
+ 		  				echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
  		  
- 		  elseif($_POST['opt'] == 'move') {
+ 		  }elseif($_POST['opt'] == 'move') {
  		  				$_SESSION['move'] = $path.'/'.$_POST['name'];
  		  				$_SESSION['move_name'] = $_POST['name'];
- 		  				echo("<script>location.href = '/ai.php?file_manager';</script>");
+ 		  				echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
+ 		  
+ 		  }elseif($_POST['opt'] == 'zip') {
+ 		  				$zipper = new FM_Zipper();
+ 		  				$zipsource = $path."/".$_POST['name'];
+ 		  				
+ 		  				$res = $zipper->create($zipsource.".zip", $zipsource);
+
+							if ($res) {
+									echo "<script>alert('Archive sukses ".$zipsource.".zip');</script>";
+									echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
+
+							}else{
+									echo "<font color='red'>gagal pack folder</font>";
+							}
  		  }
  		  
   		 echo '</center>';
@@ -309,8 +344,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 					<option value="delete">Delete</option>
 					<option value="chmod">Chmod</option>
 					<option value="rename">Rename</option>
-					<option value="copy">Copy</option>
-					<option value="zip">zip/tar</option>
+					<option value="zip">Zip</option>
 					</select>
 					<input type="hidden" name="type" value="dir">
 					<input type="hidden" name="name" value="'.$dir.'">
