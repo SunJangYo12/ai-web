@@ -594,6 +594,23 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			}else{
 				echo "<font color='red'>Gagal extrak archive</font>";
 			}
+		}elseif($_POST['opt'] == 'open_image') {
+			$image = $path."/".$_POST['name'];
+			echo("<script>location.href ='/ai-web/download.php?id=gambar:$image';</script>");
+
+		}elseif($_POST['opt'] == 'convert_media') {
+			$conv = $path.'/'.$_POST['name'];
+			exec('ffmpeg -i '.$conv.' -f mp3 -ab 192000 -vn '.$conv.'.mp3');
+			echo "<script>alert('sukes convert');</script>";
+
+		}elseif($_POST['opt'] == 'open_video') {
+			echo '
+			<video width="320" height="240" controls autoplay>
+			   <source src="'.$path.'/'.$_POST['name'].'" type="video/mp4">
+			   Sorry browser tidak suppport video.
+			</video>
+
+			';
 		}
 
 		echo '</center>';
@@ -698,6 +715,49 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 				<select name="opt">
 				<option value="">Select</option>
 				<option value="extrak">Extrak</option>
+				<option value="delete">Delete</option>
+				<option value="chmod">Chmod</option>
+				<option value="rename">Rename</option>
+				<option value="edit">Edit</option>
+                                <option value="editfull">Editfull</option>
+				<option value="copy">Copy</option>
+				<option value="move">Move</option>
+				<option value="download">Download</option>
+				</select>
+				<input type="hidden" name="type" value="file">
+				<input type="hidden" name="name" value="'.$file.'">
+				<input type="hidden" name="path" value="'.$path.'/'.$file.'">
+				<input type="submit" value=">">
+				</form></center></td>
+				</tr>';
+			}elseif ($mime == "3gp" || $mime == "mp4" || $mime == "mkv") {
+				echo '</center></td>
+				<td><center><form method="POST" action="?option&path='.$path.'">
+				<select name="opt">
+				<option value="">Select</option>
+				<option value="open_video">Open Video</option>
+				<option value="convert_media">Convert to mp3</option>
+				<option value="delete">Delete</option>
+				<option value="chmod">Chmod</option>
+				<option value="rename">Rename</option>
+				<option value="edit">Edit</option>
+                                <option value="editfull">Editfull</option>
+				<option value="copy">Copy</option>
+				<option value="move">Move</option>
+				<option value="download">Download</option>
+				</select>
+				<input type="hidden" name="type" value="file">
+				<input type="hidden" name="name" value="'.$file.'">
+				<input type="hidden" name="path" value="'.$path.'/'.$file.'">
+				<input type="submit" value=">">
+				</form></center></td>
+				</tr>';
+			} elseif ($mime == "jpg" || $mime == "jpeg" || $mime == "png" || $mime == "gif") {
+				echo '</center></td>
+				<td><center><form method="POST" action="?option&path='.$path.'">
+				<select name="opt">
+				<option value="">Select</option>
+				<option value="open_image">Open Image</option>
 				<option value="delete">Delete</option>
 				<option value="chmod">Chmod</option>
 				<option value="rename">Rename</option>
