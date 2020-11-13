@@ -9,3 +9,5 @@ dan save scrolling cache pada editor text tradisional
 penambahan galery untuk membuka kumpulan gambar musik dan video
 fitur ini bisa dibuka dengan klik filemanager other lalu pilih
 galery image atau yang lain.
+Bug jika membuka file atau path berspasi serta tampilan
+masih berantakan.
