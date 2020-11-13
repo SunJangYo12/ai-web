@@ -516,6 +516,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 		<option value="stime">Show Time</time>
 		<option value="file">Create File</option>
 		<option value="folder">Create Folder</option>
+		<option value="gal-image">Galery Image</option>
+		<option value="gal-video">Galery Video</option>
+		<option value="gal-musik">Galery Musik</option>
 		</select>
 		<input type="submit" value=">">
 		</form></td>';
@@ -529,7 +532,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 		echo '</tr></td></table><br />';
 		echo('<pre>'.htmlspecialchars(file_get_contents($_GET['filesrc'])).'</pre>');
 	}
-		
 	//action other
 	elseif(isset($_POST['newgofile'])) {
 		$new = $_POST['newfile'];
@@ -578,6 +580,36 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 		}
 		echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
 	}
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
+        $galscandir = scandir($path);
+
+        echo '<script>alert("Getting thumbnail please wait...");</script>';
+
+        fm_rdelete('thumbs');
+        mkdir('thumbs', 0777, true);
+        echo '<style>
+                figure {
+                    display: inline-block;
+                    margin-top: 1em;
+                    margin-bottom: 1em;
+                    margin-left: 40px;
+                    margin-right: 40px;
+                }
+            </style><p>';
+
+        foreach($galscandir as $galfile)
+        {
+            $mime = strtolower(pathinfo($path.'/'.$galfile, PATHINFO_EXTENSION));
+
+            if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif") 
+            {
+                echo shell_exec('ffmpeg -i '.$path.'/'.$galfile.' -vf scale=320:240 thumbs/'.$galfile);
+                
+                echo "<a target='_blank' href='download.php?id=gambar:".$path."/".$galfile."'><figure><img alt='The Pulpit Rock' src='thumbs/".$galfile."'/></figure></a>";
+            }
+        }
+        echo "</p>";
+    }
 		
 	//action filemanager
 	elseif(isset($_GET['option']) && $_POST['opt'] != 'delete'){
