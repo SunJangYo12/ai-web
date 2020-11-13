@@ -583,7 +583,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
         $galscandir = scandir($path);
 
-        echo '<script>alert("Getting thumbnail please wait...");</script>';
+        echo '<script>alert("Thumbnail sucess");</script>';
 
         fm_rdelete('thumbs');
         mkdir('thumbs', 0777, true);
@@ -603,9 +603,86 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
             if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif") 
             {
-                echo shell_exec('ffmpeg -i '.$path.'/'.$galfile.' -vf scale=320:240 thumbs/'.$galfile);
+                echo exec('ffmpeg -i '.$path.'/'.$galfile.' -vf scale=320:280 thumbs/'.$galfile);
                 
+                $size = filesize($path.'/'.$galfile)/1024;
+                $size = round($size,3);
+                if($size >= 1024){
+                    $size = round($size/1024,2).' MB';
+                }else{
+                    $size = $size.' KB';
+                }
+
                 echo "<a target='_blank' href='download.php?id=gambar:".$path."/".$galfile."'><figure><img alt='The Pulpit Rock' src='thumbs/".$galfile."'/></figure></a>";
+                echo $galfile." ".$size;
+            }
+        }
+        echo "</p>";
+    }
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-video') {
+        $galscandir = scandir($path);
+
+        echo '<script>alert("Thumbnail sucess");</script>';
+
+        fm_rdelete('thumbs');
+        mkdir('thumbs', 0777, true);
+        echo '<style>
+                figure {
+                    display: inline-block;
+                    margin-top: 1em;
+                    margin-bottom: 1em;
+                    margin-left: 40px;
+                    margin-right: 40px;
+                }
+            </style><p>';
+
+        foreach($galscandir as $galfile)
+        {
+            $mime = strtolower(pathinfo($path.'/'.$galfile, PATHINFO_EXTENSION));
+
+            if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv") 
+            {
+                echo shell_exec('ffmpeg -ss 30 -t 3 -i '.$path.'/'.$galfile.' -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$galfile.'.gif');
+                
+                echo "<a target='_blank' href='download.php?id=video:".$path."/".$galfile."'><figure><img alt='The Pulpit Rock' src='thumbs/".$galfile.".gif '/></figure></a>";
+            }
+        }
+        echo "</p>";
+    }
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik') {
+        $galscandir = scandir($path);
+
+        echo '<script>alert("Thumbnail sucess");</script>';
+
+        fm_rdelete('thumbs');
+        mkdir('thumbs', 0777, true);
+        echo '<style>
+                figure {
+                    display: inline-block;
+                    margin-top: 1em;
+                    margin-bottom: 1em;
+                    margin-left: 40px;
+                    margin-right: 40px;
+                }
+            </style><p>';
+
+        foreach($galscandir as $galfile)
+        {
+            $mime = strtolower(pathinfo($path.'/'.$galfile, PATHINFO_EXTENSION));
+
+            if ($mime == "m4a" || $mime == "wav" || $mime == "mp3") 
+            {
+                echo shell_exec('ffmpeg -i '.$path.'/'.$galfile.' -an -vcodec copy thumbs/'.$galfile.'.jpg');
+                $size = filesize($path.'/'.$galfile)/1024;
+                $size = round($size,3);
+                if($size >= 1024){
+                    $size = round($size/1024,2).' MB';
+                }else{
+                    $size = $size.' KB';
+                }
+
+                echo "<a target='_blank' href='download.php?id=suara:".$path."/".$galfile."'><figure><img alt='The Pulpit Rock' src='thumbs/".$galfile.".jpg '/></figure></a>";
+                echo $galfile." ".$size;
             }
         }
         echo "</p>";
@@ -718,13 +795,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 			echo "<script>alert('sukes convert');</script>";
 
 		}elseif($_POST['opt'] == 'open_video') {
-			echo '
-			<video width="320" height="240" controls autoplay>
-			   <source src="'.$path.'/'.$_POST['name'].'" type="video/mp4">
-			   Sorry browser tidak suppport video.
-			</video>
-
-			';
+            $video = $path."/".$_POST['name'];
+            echo("<script>location.href ='/ai-web/download.php?id=video:$video';</script>");
 		}
 
 		echo '</center>';

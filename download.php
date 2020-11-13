@@ -10,6 +10,20 @@
         echo $content;
         exit();
     }
+    elseif ($aksi[0] == 'video') {
+        $video = $aksi[1]; 
+        $content = file_get_contents($video); 
+        header('Content-Type: video/mp4');
+        echo $content;
+        exit();
+    }
+    elseif ($aksi[0] == 'suara') {
+        $suara = $aksi[1]; 
+        $content = file_get_contents($suara); 
+        header('Content-Type: audio/mpeg');
+        echo $content;
+        exit();
+    }
     else {
         $filename = basename($dfile);
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
