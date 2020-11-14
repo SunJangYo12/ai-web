@@ -602,7 +602,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif") 
             {
                 $xpath = preg_replace('/\s+/', '\ ', $path);
-                $xgalfile = preg_replace('/\s+/', '\ ', $galfile); /*gila susah banget nyarinya*/
+                $xgalfile = preg_replace('/\s+/', '\ ', $galfile); /* gila susah banget nyarinya*/
 
                 exec('ffmpeg -i '.$xpath.'/'.$xgalfile.' -vf scale=320:280 thumbs/'.$xgalfile); //.' > /dev/null 2> /dev/null &'
                 
