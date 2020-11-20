@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v1.6";
+$version = "v1.5";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -424,7 +424,7 @@ if (isset($_GET['uploader']))
                 function sendRequest() 
                 {
                     var http = createRequestObject();
-                    http.open("GET", "ajax-server.php?id=prog-upload");
+                    http.open("GET", "progress.php");
                     http.onreadystatechange = function () { handleResponse(http); };
                     http.send(null);
                 }
@@ -599,6 +599,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
         $galscandir = scandir($path);
 
+        echo '<script>alert("Thumbnail sucess");</script>';
+
         fm_rdelete('thumbs');
         mkdir('thumbs', 0777, true);
         echo '
@@ -608,8 +610,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     padding: 10px;
                 }
             </style>';
-        echo '<div id="galshowimg"></div>';
-        
+
         foreach($galscandir as $galfile)
         {
             $mime = strtolower(pathinfo($path.'/'.$galfile, PATHINFO_EXTENSION));
@@ -619,6 +620,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 $xpath = preg_replace('/\s+/', '\ ', $path);
                 $xgalfile = preg_replace('/\s+/', '\ ', $galfile); /* gila susah banget nyarinya*/
 
+                exec('ffmpeg -i '.$xpath.'/'.$xgalfile.' -vf scale=320:280 thumbs/'.$xgalfile); //.' > /dev/null 2> /dev/null &'
+                
                 $size = filesize($path.'/'.$galfile)/1024;
                 $size = round($size,3);
                 if($size >= 1024){
@@ -627,67 +630,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     $size = $size.' KB';
                 }
 
-                echo '<div id="'.$galfile.'"></div>';
-                echo '<img id="img'.$galfile.'"></img>';
-
-                echo '
-                <script>
-                    function procffmpeg(path, name, full)
-                    {
-                        var xhr = new XMLHttpRequest();
-                        var url = "ajax-server.php?idexl=ffmpeg:image:"+path+":"+name;
-                        
-
-                        xhr.onloadstart = function () {
-                            document.getElementById("'.$galfile.'").innerHTML = "Loading...";
-                        };
-                        xhr.onerror = function () {
-                            alert("Gagal mengambil data");
-                        };
-                        xhr.onreadystatechange = function() {
-                            if (this.responseText !== "" && this.readyState == 4) 
-                            {
-                                document.getElementById("'.$galfile.'").innerHTML = "";
-                                //var img = document.createElement("img");
-                                var img = document.getElementById("img"+this.responseText);
-                                var title = document.createElement("t");
-                                
-                                if (full == 1) {
-                                    img.src = "download.php?id=gambar:'.$xpath.'/"+this.responseText;
-                                    title.innerHTML = "<br><font color='."yellow".'>Name : "+this.responseText+"<br>Size: '.$size.'</font><br>"+
-                                    "<a id=count"+this.responseText+" onclick=small(this.id)>"+this.responseText+"</a><br><br>";
-                                }
-                                else {
-                                    img.src = "download.php?id=gambar:thumbs/"+this.responseText;
-                                    //title.innerHTML = "<br><font color='."yellow".'>Name : "+this.responseText+"<br>Size: '.$size.'</font><br>"+
-                                   // "<a id=count"+this.responseText+" onclick=full(this.id)>"+this.responseText+"</a><br><br>";
-                                    title.innerHTML = "<br><a target=_blank href=download.php?id=gambar:'.$xpath.'/"+this.responseText+">Full Image</a><br><br>";
-                                }
-
-                                document.getElementById(name).append(img, title);
-                            }
-                        };
-                        xhr.open("GET", url, true);
-                        xhr.send();
-                    }
-                    function small(id) {
-                        var fname = document.getElementById(id).text;
-                        procffmpeg('."'".$xpath."'".', fname, 0);
-                    }
-                    function full(id) {
-                        var fname = document.getElementById(id).text;
-                        procffmpeg('."'".$xpath."'".', fname, 1);
-                    }
-                    procffmpeg('."'".$xpath."'".', '."'".$xgalfile."'".', 0);
-
-                </script>';
-
-                /*echo '
-                <button id="'.$galfile.'full" onclick="procffmpeg('."'".$xpath."'".', '."'".$xgalfile."'".', 1)">Full image</button><br><br>
-                ';*/
+                echo "<a target='_blank' href='download.php?id=gambar:".$path."/".$galfile."'><img alt='The Pulpit Rock' src='thumbs/".$galfile."'/></a><br>";
+                echo "<font color='yellow'>File : </font>".$galfile."<br>";
+                echo "<font color='yellow'>Size : </font>".$size."<br><br>";
             }
         }
-        
         echo "</p>";
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-video') {
@@ -733,6 +680,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik') {
         $galscandir = scandir($path);
 
+        echo '<script>alert("Thumbnail sucess");</script>';
+
         fm_rdelete('thumbs');
         mkdir('thumbs', 0777, true);
 
@@ -753,6 +702,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 $xpath = preg_replace('/\s+/', '\ ', $path);
                 $xgalfile = preg_replace('/\s+/', '\ ', $galfile);
 
+                echo shell_exec('ffmpeg -i '.$xpath.'/'.$xgalfile.' -an -vcodec copy thumbs/'.$xgalfile.'.jpg');
                 $size = filesize($path.'/'.$galfile)/1024;
                 $size = round($size,3);
                 if($size >= 1024){
@@ -761,70 +711,12 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     $size = $size.' KB';
                 }
 
-                echo '<div id="'.$galfile.'"></div>';
-                echo '<img id="img'.$galfile.'"></img>';
+                echo "<img alt='The Pulpit Rock' src='thumbs/".$galfile.".jpg '/><br>";
+                echo "<font color='yellow'>File : </font>".$galfile."<br>";
+                echo "<font color='yellow'>Size : </font>".$size."<br>";
+                echo "<a target='_blank' href='download.php?id=suara:".$path."/".$galfile."'>Play</a><br><br>";
 
-                echo '
-                <script>
-                    function procffmpeg(path, name, full)
-                    {
-                        var xhr = new XMLHttpRequest();
-                        var url = "ajax-server.php?idexl=ffmpeg:audio:"+path+":"+name;
-
-                        xhr.onloadstart = function () {
-                            document.getElementById("'.$galfile.'").innerHTML = "Loading...";
-                        };
-                        xhr.onerror = function () {
-                            alert("Gagal mengambil data");
-                        };
-                        xhr.onreadystatechange = function() {
-                            if (this.responseText !== "" && this.readyState == 4) 
-                            {
-                                document.getElementById("'.$galfile.'").innerHTML = "";
-                                var img = document.getElementById("img"+this.responseText);
-                                var title = document.createElement("t");
-                                
-                                img.src = "download.php?id=gambar:thumbs/"+this.responseText+".jpg";
-                                title.innerHTML = "<br><font color='."yellow".'>Name : "+this.responseText+"<br>Size: '.$size.'</font><br>"+
-                                "<a id='.$xpath.'"+":"+this.responseText+" onclick=play(this.id)>Play</a><br><br>";
-
-                                document.getElementById(name).append(img, title);
-                            }
-                        };
-                        xhr.open("GET", url, true);
-                        xhr.send();
-                    }
-                    function play(name) {
-                        //alert(name);
-                        var xhr = new XMLHttpRequest();
-                        var url = "ajax-server.php?idexl=copy:"+name;
-
-                        xhr.onloadstart = function () {
-                        };
-                        xhr.onerror = function () {
-                            alert("Gagal mengambil data");
-                        };
-                        xhr.onreadystatechange = function() {
-                            if (this.responseText !== "" && this.readyState == 4) 
-                            {
-                                document.getElementById(""+name).innerHTML = "";
-                                var img = document.createElement("img");
-                                var title = document.createElement("t");
-                               
-                                title.innerHTML = "&nbsp&nbsp<audio onended=tes() controls> <source src=thumbs/"+this.responseText+" type=audio/mpeg> Browser Error </audio><br>";
-
-                                document.getElementById(name).append(img, title);
-                            }
-                        };
-                        xhr.open("GET", url, true);
-                        xhr.send();
-                    }
-                    function tes() {
-                        alert("selesai");
-                    }
-                    procffmpeg('."'".$xpath."'".', '."'".$xgalfile."'".', 0);
-
-                </script>';
+                //echo "<a target='_blank' href='download.php?id=suara:".$path."/".$galfile."'><img width='150' height='150' alt='The Pulpit Rock' src='thumbs/".$galfile.".jpg '/></a>";
             }
         }
     }
