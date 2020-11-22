@@ -745,7 +745,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 }
             </style>';
 
+        $playlist = fopen("thumbs/playlist-musik.txt", "a+");
         $files = dir_scan($path);
+
         for ($i=0; $i<count($files); $i++) 
         {
             if (is_file($files[$i])) 
@@ -753,6 +755,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
                 if ($mime == "mp3" || $mime == "wav" || $mime == "m4a" || $mime == "flac") 
                 {
+                    //fwrite($playlist, $files[$i]."\n");
+                    //fclose($playlist);
+
                     $size = filesize($files[$i])/1024;
                     $size = round($size,3);
                     if($size >= 1024){
@@ -792,7 +797,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                                 title.innerHTML = "<br><font color='."yellow".'>Name : "+data.jname+"<br>Size: '.$size.'<br>Path: '.$galpath.'</font><br>"+
                                 "<a id="+data.jyyy+":"+data.jxxx+" onclick=play(this.id)>Play</a><br><br>";
 
-                                img.src = "download.php?id=gambar:thumbs/"+data.jname+".jpg";
+                                encimg = encodeURIComponent(data.jname).replace("%20","+");
+
+                                img.src = "download.php?id=gambar:thumbs/"+encimg+".jpg";
                                 img.width = "320";
                                 img.height = "320";
                                 /*img.onload = function() {
