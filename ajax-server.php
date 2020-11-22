@@ -36,31 +36,61 @@ elseif (isset($_GET['idexl'])) {
            $xpath = $exl[2];
            $xgalfile = $exl[3];
 
+           $xpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xpath);
+           $xgalfile = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xgalfile);
+
            $iminfo = getimagesize($xpath.'/'.$xgalfile); 
            $x = $iminfo[0] / 2;
            $y = $iminfo[1] / 2;
 
-           if ($x >= 320) $x / 2;
-           if ($y >= 280) $y / 2;
+           while ($x >= 420 || $y >= 380) {
+              $x = $x / 2;
+              $y = $y / 2;
+           }
 
            exec('ffmpeg -i '.$xpath.'/'.$xgalfile.' -vf scale='.$x.':'.$y.' thumbs/'.$xgalfile);
-           echo $xgalfile;
+           echo $exl[3];
        }
        if ($exl[1] == "audio") 
        {
            $xpath = $exl[2];
            $xgalfile = $exl[3];
 
+           $xpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xpath);
+           $xgalfile = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xgalfile);
+
            exec('ffmpeg -i '.$xpath.'/'.$xgalfile.' -an -vcodec copy thumbs/'.$xgalfile.'.jpg');
-           echo $xgalfile;
+           
+           //echo $exl[3];
+          
+           $jpath = preg_replace('/\s+/', '\-jin-', $exl[2]);
+           $jname = preg_replace('/\s+/', '\-jin-', $exl[3]);
+
+           $xxx = str_replace(" ", "-jin-", $exl[3]);
+           $yyy = str_replace(" ", "-jin-", $exl[2]);
+
+           $data = [  "jpath" => $jpath,
+                      "jname"=> $exl[3],
+                      "jxxx" => $xxx,
+                      "jyyy" => $yyy,
+                      "galfile" => $exl[3],
+           ];
+
+           echo json_encode($data);
        }
     }
     elseif ($exl[0] == "copy") {
         array_map('unlink', glob("thumbs/*.mp3"));
+       
         $path = $exl[1];
         $name = $exl[2];
-        copy($path.'/'.$name, 'thumbs/'.$name);
-        echo $name;
+
+        $path = str_replace("-jin-", ' ', $path);
+        $name = str_replace("-jin-", ' ', $name);
+
+
+        copy($path.'/'.$name, 'thumbs/'.$exl[2]);
+        echo $exl[2];
     }
 }
 ?>
