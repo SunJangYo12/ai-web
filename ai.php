@@ -597,9 +597,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
-        $galscandir = scandir($path);
-
         fm_rdelete('thumbs');
+        unlink("playlist.txt");
         mkdir('thumbs', 0777, true);
         echo '
             <style>
@@ -609,35 +608,139 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 }
             </style>';
         echo '<div id="galshowimg"></div>';
-        
-        foreach($galscandir as $galfile)
+
+        $files = dir_scan($path);
+        $outfiles = array();
+        $j = 0;
+
+        for ($i=0; $i<count($files); $i++) 
         {
-            $mime = strtolower(pathinfo($path.'/'.$galfile, PATHINFO_EXTENSION));
-
-            if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif") 
+            if (is_file($files[$i])) 
             {
-               
-                $size = filesize($path.'/'.$galfile)/1024;
-                $size = round($size,3);
-                if($size >= 1024){
-                    $size = round($size/1024,2).' MB';
-                }else{
-                    $size = $size.' KB';
+                $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
+                if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif") 
+                {
+                    $size = filesize($files[$i])/1024;
+                    $size = round($size,3);
+                    if($size >= 1024){
+                        $size = round($size/1024,2).' MB';
+                    }else{
+                        $size = $size.' KB';
+                    }
+                    /*$galname = basename($files[$i]);
+                    $galpath = dirname($files[$i]);
+
+                    $arrname[$j] = $galname;
+                    $arrpath[$j] = $galpath;*/
+
+                    $outfiles[$j] = $files[$i];
+
+                    $my_file = 'playlist.txt';
+                    $handle = fopen($my_file, 'a') or die('Cannot open file:  '.$my_file);
+                    $data = $outfiles[$j]."\n";
+                    fwrite($handle, $data);
+
+                    $j++;
                 }
+            }
+        }
+        
+        $gdata = $outfiles[0];
+        
+        echo '
+        <div id=hasil></div>
 
-                echo '<div id="'.$galfile.'"></div>';
-                echo '<img id="img'.$galfile.'"></img>';
+        <script>
+        function procffmpeg(name, full)
+        {
+            var xhr = new XMLHttpRequest();
+            encname = encodeURIComponent(name).replace("%20","+");
 
-                echo '
-                <script>
+            var url = "ajax-server.php?idexl=ffmpeg:image:"+encname;
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    var data = JSON.parse(this.responseText);
+                    var title = document.createElement("p");
+
+                    //alert(""+data.tes);
+                    
+                    encname = encodeURIComponent(data.old).replace("%20","+");
+                    encref = encodeURI(data.old);
+
+                    imgsrc = "download.php?id=gambar:thumbs/"+data.encname;
+                    imgsrcfull = "download.php?id=gambar:"+data.encpath+"/"+data.encname;
+
+                    title.innerHTML = "<a target=_blank href="+imgsrcfull+"><img src="+imgsrc+" alt="+data.tes+"></img></a>";
+
+                    if (document.getElementById("hasil")) 
+                    {
+                        document.getElementById("hasil").append(title);          
+                        document.getElementById("hasil").id = data.new;
+                    } 
+                    else {
+                        document.getElementById(data.old).append(title);            
+                        document.getElementById(data.old).id = data.new;
+                    }
+
+                    if (data.new != "")
+                        procffmpeg(data.path+"/"+data.new, 0);
+
+                    //document.getElementById("hasil").append(title);
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        procffmpeg('."'".$gdata."'".', 0);
+        </script>';
+    }
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-video') {
+        fm_rdelete('thumbs');
+        mkdir('thumbs', 0777, true);
+        echo '
+            <style>
+                img {
+                    border: 4px solid #575D63;
+                    padding: 10px;
+                }
+            </style>';
+
+        $files = dir_scan($path);
+
+        for ($i=0; $i<count($files); $i++) 
+        {
+            if (is_file($files[$i])) 
+            {
+                $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
+                if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv")
+                {
+                    $size = filesize($files[$i])/1024;
+                    $size = round($size,3);
+                    if($size >= 1024){
+                        $size = round($size/1024,2).' MB';
+                    }else{
+                        $size = $size.' KB';
+                    }
+                    $galname = basename($files[$i]);
+                    $galpath = dirname($files[$i]);
+
+                    echo '<div id="'.$galname.'"></div>';
+                    echo '<img id="img'.$galname.'"></img>';
+
+                    echo '
+                    <script>
                     function procffmpeg(path, name, full)
                     {
                         var xhr = new XMLHttpRequest();
-                        var url = "ajax-server.php?idexl=ffmpeg:image:"+path+":"+name;
-                        
+                        encpath = encodeURIComponent(path).replace("%20","+");
+                        encname = encodeURIComponent(name).replace("%20","+");
+
+                        var url = "ajax-server.php?idexl=ffmpeg:video:"+encpath+":"+encname;
 
                         xhr.onloadstart = function () {
-                            document.getElementById("'.$galfile.'").innerHTML = "Loading...";
+                            document.getElementById("'.$galname.'").innerHTML = "Scanning...";
                         };
                         xhr.onerror = function () {
                             alert("Gagal mengambil data");
@@ -645,95 +748,70 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                         xhr.onreadystatechange = function() {
                             if (this.responseText !== "" && this.readyState == 4) 
                             {
-                                
-                                document.getElementById("'.$galfile.'").innerHTML = "";
-                                //var img = document.createElement("img");
-                                
-                                var img = document.getElementById("img"+this.responseText);
+                                var data = JSON.parse(this.responseText);
+                                var img = document.getElementById("img"+data.jname);
                                 var title = document.createElement("t");
+
+                                title.innerHTML = "<br><font color='."yellow".'>Name : "+data.jname+"<br>Size: '.$size.'<br>Path: '.$galpath.'</font><br>"+
+                                "<a id="+data.jyyy+":"+data.jxxx+" onclick=play(this.id)>Play</a><br><br>";
+
+                                encimg = encodeURIComponent(data.jname).replace("%20","+");
+
+                                img.src = "download.php?id=gambar:thumbs/"+encimg+".gif";
                                 
-                                if (full == 1) {
-                                    img.src = "download.php?id=gambar:'.$path.'/"+this.responseText;
-                                    title.innerHTML = "<br><font color='."yellow".'>Name : "+this.responseText+"<br>Size: '.$size.'</font><br>"+
-                                    "<a id=count"+this.responseText+" onclick=small(this.id)>"+this.responseText+"</a><br><br>";
-                                }
-                                else {
-                                    img.src = "download.php?id=gambar:thumbs/"+this.responseText;
-                                    //title.innerHTML = "<br><font color='."yellow".'>Name : "+this.responseText+"<br>Size: '.$size.'</font><br>"+
-                                   // "<a id=count"+this.responseText+" onclick=full(this.id)>"+this.responseText+"</a><br><br>";
-                                    title.innerHTML = "<br><a target=_blank href=download.php?id=gambar:'.$path.'/"+this.responseText+">Full Image</a><br><br>";
-                                }
-                                alert(""+this.responseText);
+                                
+                                document.getElementById("'.$galname.'").innerHTML = "";
                                 document.getElementById(name).append(img, title);
                             }
                         };
                         xhr.open("GET", url, true);
                         xhr.send();
                     }
-                    function small(id) {
-                        var fname = document.getElementById(id).text;
-                        procffmpeg('."'".$xpath."'".', fname, 0);
+                    function play(name) {
+                        //alert(name);
+                        var xhr = new XMLHttpRequest();
+                        var encname = encodeURIComponent(name).replace("%20","+");
+                        var url = "ajax-server.php?idexl=copyvid:"+encname;
+
+                        xhr.onloadstart = function () {
+                        };
+                        xhr.onerror = function () {
+                            alert("Gagal mengambil data");
+                        };
+                        xhr.onreadystatechange = function() {
+                            if (this.responseText !== "" && this.readyState == 4) 
+                            {
+                                encimg = encodeURIComponent(this.responseText).replace("%20","+");
+
+                                alert(""+encimg);
+                                document.getElementById(""+name).innerHTML = "";
+                                var img = document.createElement("img");
+                                var title = document.createElement("t");
+
+                               
+                              /*  title.innerHTML = "&nbsp&nbsp
+                                    <video width=450 height=170 preload=auto autoplay=autoplay>
+                                        <source src=xx/>
+                                    </video>
+                                ";*/
+
+                                document.getElementById(name).append(img, title);
+                            }
+                        };
+                        xhr.open("GET", url, true);
+                        xhr.send();
                     }
-                    function full(id) {
-                        var fname = document.getElementById(id).text;
-                        procffmpeg('."'".$xpath."'".', fname, 1);
+                    function tes() {
+                        alert("selesai");
                     }
-                    
-                    procffmpeg('."'".$path."'".', '."'".$galfile."'".', 0);
+                    procffmpeg('."'".$galpath."'".', '."'".$galname."'".', 0);
 
                 </script>';
-
-                /*echo '
-                <button id="'.$galfile.'full" onclick="procffmpeg('."'".$xpath."'".', '."'".$xgalfile."'".', 1)">Full image</button><br><br>
-                ';*/
+                }
             }
         }
-        
-        echo "</p>";
-    }
-    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-video') {
-        $galscandir = scandir($path);
-
-        echo '<script>alert("Thumbnail sucess");</script>';
-
-        fm_rdelete('thumbs');
-        mkdir('thumbs', 0777, true);
-        echo '
-            <style>
-                img {
-                    border: 4px solid #575D63;
-                    padding: 10px;
-                }
-            </style>';
-        foreach($galscandir as $galfile)
-        {
-            $mime = strtolower(pathinfo($path.'/'.$galfile, PATHINFO_EXTENSION));
-
-            if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv") 
-            {
-                $xpath = preg_replace('/\s+/', '\ ', $path);
-                $xgalfile = preg_replace('/\s+/', '\ ', $galfile);
-
-                echo shell_exec('ffmpeg -ss 30 -t 3 -i '.$xpath.'/'.$xgalfile.' -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$xgalfile.'.gif');
-                
-                $size = filesize($path.'/'.$galfile)/1024;
-                $size = round($size,3);
-                if($size >= 1024){
-                    $size = round($size/1024,2).' MB';
-                }else{
-                    $size = $size.' KB';
-                }
-
-                echo "<a target='_blank' href='download.php?id=video:".$path."/".$galfile."'><img alt='The Pulpit Rock' src='thumbs/".$galfile.".gif '/></a><br>";
-                echo "<font color='yellow'>File : </font>".$galfile."<br>";
-                echo "<font color='yellow'>Size : </font>".$size."<br><br>";
-            }
-        }
-        echo "</p>";
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik') {
-        $galscandir = scandir($path);
-
         fm_rdelete('thumbs');
         mkdir('thumbs', 0777, true);
 
@@ -745,7 +823,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 }
             </style>';
 
-        $playlist = fopen("thumbs/playlist-musik.txt", "a+");
         $files = dir_scan($path);
 
         for ($i=0; $i<count($files); $i++) 
@@ -755,9 +832,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
                 if ($mime == "mp3" || $mime == "wav" || $mime == "m4a" || $mime == "flac") 
                 {
-                    //fwrite($playlist, $files[$i]."\n");
-                    //fclose($playlist);
-
                     $size = filesize($files[$i])/1024;
                     $size = round($size,3);
                     if($size >= 1024){

@@ -33,13 +33,18 @@ elseif (isset($_GET['idexl'])) {
     {
        if ($exl[1] == "image") 
        {
-           $xpath = $exl[2];
-           $xgalfile = $exl[3];
+           $xfiles = $exl[2];
 
-           $xpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xpath);
-           $xgalfile = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xgalfile);
+           $xbase = basename($exl[2]);
+           $xdir = dirname($exl[2]);
 
-           $iminfo = getimagesize($xpath.'/'.$xgalfile); 
+           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles));
+
+           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
+           $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xbase);
+           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
+
+           $iminfo = getimagesize($xfiles); 
            $x = $iminfo[0] / 2;
            $y = $iminfo[1] / 2;
 
@@ -48,11 +53,26 @@ elseif (isset($_GET['idexl'])) {
               $y = $y / 2;
            }
 
-           exec('ffmpeg -i '.$xpath.'/'.$xgalfile.' -vf scale='.$x.':'.$y.' thumbs/'.$xgalfile);
-           echo $exl[3];
+           
+           exec('ffmpeg -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
+           
+           $tes = $xfiles.' sds';
+
+           $newtext = delete_text_line("playlist.txt", 0);
+           $newtext = basename($newtext);
+           $oldtext = $xbase;
+
+           $data = [  "new" => $newtext,
+                      "old" => $oldtext,
+                      "encpath" => $encpath,
+                      "encname" => $encname,
+                      "path" => $xdir,
+                      "tes" => fsize($xfiles),
+           ];
+
+           echo json_encode($data);
        }
-       if ($exl[1] == "audio") 
-       {
+       if ($exl[1] == "audio")  {
            $xpath = $exl[2];
            $xgalfile = $exl[3];
 
@@ -61,6 +81,32 @@ elseif (isset($_GET['idexl'])) {
 
            exec('ffmpeg -i '.$xpath.'/'.$xgalfile.' -an -vcodec copy thumbs/'.$xgalfile.'.jpg');
            
+           //echo $exl[3];
+          
+           $jpath = preg_replace('/\s+/', '\-jin-', $exl[2]);
+           $jname = preg_replace('/\s+/', '\-jin-', $exl[3]);
+
+           $xxx = str_replace(" ", "-jin-", $exl[3]);
+           $yyy = str_replace(" ", "-jin-", $exl[2]);
+
+           $data = [  "jpath" => $jpath,
+                      "jname"=> $exl[3],
+                      "jxxx" => $xxx,
+                      "jyyy" => $yyy,
+                      "galfile" => $exl[3],
+           ];
+
+           echo json_encode($data);
+       }
+       if ($exl[1] == "video")  {
+           $xpath = $exl[2];
+           $xgalfile = $exl[3];
+
+           $xpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xpath);
+           $xgalfile = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xgalfile);
+
+           exec('ffmpeg -ss 30 -t 3 -i '.$xpath.'/'.$xgalfile.' -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$xgalfile.'.gif');
+
            //echo $exl[3];
           
            $jpath = preg_replace('/\s+/', '\-jin-', $exl[2]);
@@ -92,5 +138,46 @@ elseif (isset($_GET['idexl'])) {
         copy($path.'/'.$name, 'thumbs/'.$exl[2]);
         echo $exl[2];
     }
+    elseif ($exl[0] == "copyvid") {
+        array_map('unlink', glob("thumbs/*.mp4"));
+       
+        $path = $exl[1];
+        $name = $exl[2];
+
+        $path = str_replace("-jin-", ' ', $path);
+        $name = str_replace("-jin-", ' ', $name);
+
+
+        copy($path.'/'.$name, 'thumbs/'.$exl[2]);
+        echo $exl[2];
+    }
+}
+
+function delete_text_line($filepath, $num) {
+    $row_number = $num;
+    $file_out = file($filepath);
+    unset($file_out[$row_number]);
+    unlink($filepath);
+    file_put_contents($filepath, implode("", $file_out));
+
+    $file = fopen($filepath, 'r');
+    if (!$file) {
+      die('File tidak ada');
+      return "File tidak ada";
+    }
+    else {
+      return fgets($file);
+    }
+}
+
+function fsize($input) {
+  $size = filesize($input)/1024;
+  $size = round($size,3);
+  if($size >= 1024){
+      $size = round($size/1024,2).' MB';
+  }else{
+      $size = $size.' KB';
+  }
+  return $size;
 }
 ?>
