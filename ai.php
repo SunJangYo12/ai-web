@@ -633,7 +633,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         }
         
         $gdata = $outfiles[0];
-        
+
         echo '
         <font color=yellow><h3>Total: '.count($outfiles).'</h3></font>
         <div id=hasil></div>
@@ -652,18 +652,13 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var data = JSON.parse(this.responseText);
                     var title = document.createElement("p");
 
-
                     var dataold = data.old.replace( /[\r\n]+/gm, "" );
                     encdataold = encodeURIComponent(dataold).replace("%20","+");
 
-                    //encdataold = encodeURI(data.old);
-
-                    //alert(""+encdataold);
-
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold;
-                    imgsrcfull = "download.php?id=gambar:"+data.encpath+"/"+data.encname;
+                    imgsrcfull = "download.php?id=gambar:"+data.oldpath+"/"+encdataold;
 
-                    title.innerHTML = "<a target=_blank href='."'".'"+imgsrc+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
+                    title.innerHTML = "<a target=_blank href='."'".'"+imgsrcfull+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
 
                     if (document.getElementById("hasil")) 
                     {
@@ -677,8 +672,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);
-
-                    //document.getElementById("hasil").append(title);
                 }
             };
             xhr.open("GET", url, true);
@@ -858,16 +851,13 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var data = JSON.parse(this.responseText);
                     var title = document.createElement("p");
 
-                    alert(""+data.tes);
-                    
-                    encname = encodeURIComponent(data.old).replace("%20","+");
-                    encref = encodeURI(data.old);
+                    var dataold = data.old.replace( /[\r\n]+/gm, "" );
+                    encdataold = encodeURIComponent(dataold).replace("%20","+");
 
-                    imgsrc = "download.php?id=gambar:thumbs/"+data.encname+".jpg";
+                    imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
                     imgsrcfull = "download.php?id=gambar:"+data.encpath+"/"+data.encname;
 
-                    title.innerHTML = "<a target=_blank href="+imgsrcfull+"><img src="+imgsrc+" alt="+data.tes+"></img></a>
-                                       <a id="+data.jyyy+":"+data.jxxx+" onclick=play(this.id)>Play</a>";
+                    title.innerHTML = "<a target=_blank href='."'".'"+imgsrc+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
 
                     if (document.getElementById("hasil")) 
                     {
@@ -881,7 +871,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);
-
                 }
             };
             xhr.open("GET", url, true);

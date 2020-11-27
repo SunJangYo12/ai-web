@@ -36,13 +36,11 @@ elseif (isset($_GET['idexl'])) {
            $xfiles = $exl[2];
 
            $xbase = basename($exl[2]);
-           $xdir = dirname($exl[2]);
 
            $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles));
 
            $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
            $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xbase);
-           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
 
            $iminfo = getimagesize($xfiles); 
            $x = $iminfo[0] / 2;
@@ -52,22 +50,23 @@ elseif (isset($_GET['idexl'])) {
               $x = $x / 2;
               $y = $y / 2;
            }
-
            
            exec('ffmpeg -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
            
-           $tes = "download.php?id=gambar:thumbs/$xbase";
-
            $newtext = delete_text_line("playlist.txt", 0);
+           $xdir = dirname($newtext);
            $newtext = basename($newtext);
            $oldtext = $xbase;
+
+           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
 
            $data = [  "new" => $newtext,
                       "old" => $oldtext,
                       "encpath" => $encpath,
                       "encname" => $encname,
                       "path" => $xdir,
-                      "tes" => $tes,
+                      "oldpath" => urlencode(dirname($exl[2])),
+                      "tes" => $xdir,
            ];
 
            echo json_encode($data);
@@ -95,7 +94,7 @@ elseif (isset($_GET['idexl'])) {
                       "encpath" => $encpath,
                       "encname" => $encname,
                       "path" => $xdir,
-                      "size" => fsize($xfiles),
+                      "tes" => $tes,
            ];
 
            echo json_encode($data);
