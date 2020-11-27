@@ -620,19 +620,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
                 if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif") 
                 {
-                    $size = filesize($files[$i])/1024;
-                    $size = round($size,3);
-                    if($size >= 1024){
-                        $size = round($size/1024,2).' MB';
-                    }else{
-                        $size = $size.' KB';
-                    }
-                    /*$galname = basename($files[$i]);
-                    $galpath = dirname($files[$i]);
-
-                    $arrname[$j] = $galname;
-                    $arrpath[$j] = $galpath;*/
-
                     $outfiles[$j] = $files[$i];
 
                     $my_file = 'playlist.txt';
@@ -648,6 +635,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         $gdata = $outfiles[0];
         
         echo '
+        <font color=yellow><h3>Total: '.count($outfiles).'</h3></font>
         <div id=hasil></div>
 
         <script>
@@ -664,15 +652,18 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var data = JSON.parse(this.responseText);
                     var title = document.createElement("p");
 
-                    //alert(""+data.tes);
-                    
-                    encname = encodeURIComponent(data.old).replace("%20","+");
-                    encref = encodeURI(data.old);
 
-                    imgsrc = "download.php?id=gambar:thumbs/"+data.encname;
+                    var dataold = data.old.replace( /[\r\n]+/gm, "" );
+                    encdataold = encodeURIComponent(dataold).replace("%20","+");
+
+                    //encdataold = encodeURI(data.old);
+
+                    //alert(""+encdataold);
+
+                    imgsrc = "download.php?id=gambar:thumbs/"+encdataold;
                     imgsrcfull = "download.php?id=gambar:"+data.encpath+"/"+data.encname;
 
-                    title.innerHTML = "<a target=_blank href="+imgsrcfull+"><img src="+imgsrc+" alt="+data.tes+"></img></a>";
+                    title.innerHTML = "<a target=_blank href='."'".'"+imgsrc+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
 
                     if (document.getElementById("hasil")) 
                     {
@@ -813,8 +804,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik') {
         fm_rdelete('thumbs');
+        unlink("playlist.txt");
         mkdir('thumbs', 0777, true);
-
         echo '
             <style>
                 img {
@@ -822,8 +813,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     padding: 10px;
                 }
             </style>';
+        echo '<div id="galshowimg"></div>';
 
         $files = dir_scan($path);
+        $outfiles = array();
+        $j = 0;
 
         for ($i=0; $i<count($files); $i++) 
         {
@@ -832,97 +826,69 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
                 if ($mime == "mp3" || $mime == "wav" || $mime == "m4a" || $mime == "flac") 
                 {
-                    $size = filesize($files[$i])/1024;
-                    $size = round($size,3);
-                    if($size >= 1024){
-                        $size = round($size/1024,2).' MB';
-                    }else{
-                        $size = $size.' KB';
-                    }
-                    $galname = basename($files[$i]);
-                    $galpath = dirname($files[$i]);
+                   $outfiles[$j] = $files[$i];
 
-                    echo '<div id="'.$galname.'"></div>';
-                    echo '<img id="img'.$galname.'"></img>';
+                    $my_file = 'playlist.txt';
+                    $handle = fopen($my_file, 'a') or die('Cannot open file:  '.$my_file);
+                    $data = $outfiles[$j]."\n";
+                    fwrite($handle, $data);
 
-                    echo '
-                    <script>
-                    function procffmpeg(path, name, full)
-                    {
-                        var xhr = new XMLHttpRequest();
-                        encpath = encodeURIComponent(path).replace("%20","+");
-                        encname = encodeURIComponent(name).replace("%20","+");
-
-                        var url = "ajax-server.php?idexl=ffmpeg:audio:"+encpath+":"+encname;
-
-                        xhr.onloadstart = function () {
-                            document.getElementById("'.$galname.'").innerHTML = "Scanning...";
-                        };
-                        xhr.onerror = function () {
-                            alert("Gagal mengambil data");
-                        };
-                        xhr.onreadystatechange = function() {
-                            if (this.responseText !== "" && this.readyState == 4) 
-                            {
-                                var data = JSON.parse(this.responseText);
-                                var img = document.getElementById("img"+data.jname);
-                                var title = document.createElement("t");
-
-                                title.innerHTML = "<br><font color='."yellow".'>Name : "+data.jname+"<br>Size: '.$size.'<br>Path: '.$galpath.'</font><br>"+
-                                "<a id="+data.jyyy+":"+data.jxxx+" onclick=play(this.id)>Play</a><br><br>";
-
-                                encimg = encodeURIComponent(data.jname).replace("%20","+");
-
-                                img.src = "download.php?id=gambar:thumbs/"+encimg+".jpg";
-                                img.width = "320";
-                                img.height = "320";
-                                /*img.onload = function() {
-                                    img.width = this.width / 2;
-                                    img.height = this.height / 2;
-                                }*/
-                                
-                                document.getElementById("'.$galname.'").innerHTML = "";
-                                document.getElementById(name).append(img, title);
-                            }
-                        };
-                        xhr.open("GET", url, true);
-                        xhr.send();
-                    }
-                    function play(name) {
-                        //alert(name);
-                        var xhr = new XMLHttpRequest();
-                        var encname = encodeURIComponent(name).replace("%20","+");
-                        var url = "ajax-server.php?idexl=copy:"+encname;
-
-                        xhr.onloadstart = function () {
-                        };
-                        xhr.onerror = function () {
-                            alert("Gagal mengambil data");
-                        };
-                        xhr.onreadystatechange = function() {
-                            if (this.responseText !== "" && this.readyState == 4) 
-                            {
-                                document.getElementById(""+name).innerHTML = "";
-                                var img = document.createElement("img");
-                                var title = document.createElement("t");
-                               
-                                title.innerHTML = "&nbsp&nbsp<audio onended=tes() controls> <source src=thumbs/"+this.responseText+" type=audio/mpeg> Browser Error </audio><br>";
-
-                                document.getElementById(name).append(img, title);
-                            }
-                        };
-                        xhr.open("GET", url, true);
-                        xhr.send();
-                    }
-                    function tes() {
-                        alert("selesai");
-                    }
-                    procffmpeg('."'".$galpath."'".', '."'".$galname."'".', 0);
-
-                </script>';
+                    $j++;
                 }
             }
         }
+        
+        $gdata = $outfiles[0];
+        
+        echo '
+        <font color=yellow><h3>Total: '.count($outfiles).'</h3></font>
+        <div id=hasil></div>
+
+        <script>
+        function procffmpeg(name, full)
+        {
+            var xhr = new XMLHttpRequest();
+            encname = encodeURIComponent(name).replace("%20","+");
+
+            var url = "ajax-server.php?idexl=ffmpeg:audio:"+encname;
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    var data = JSON.parse(this.responseText);
+                    var title = document.createElement("p");
+
+                    alert(""+data.tes);
+                    
+                    encname = encodeURIComponent(data.old).replace("%20","+");
+                    encref = encodeURI(data.old);
+
+                    imgsrc = "download.php?id=gambar:thumbs/"+data.encname+".jpg";
+                    imgsrcfull = "download.php?id=gambar:"+data.encpath+"/"+data.encname;
+
+                    title.innerHTML = "<a target=_blank href="+imgsrcfull+"><img src="+imgsrc+" alt="+data.tes+"></img></a>
+                                       <a id="+data.jyyy+":"+data.jxxx+" onclick=play(this.id)>Play</a>";
+
+                    if (document.getElementById("hasil")) 
+                    {
+                        document.getElementById("hasil").append(title);          
+                        document.getElementById("hasil").id = data.new;
+                    } 
+                    else {
+                        document.getElementById(data.old).append(title);            
+                        document.getElementById(data.old).id = data.new;
+                    }
+
+                    if (data.new != "")
+                        procffmpeg(data.path+"/"+data.new, 0);
+
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        procffmpeg('."'".$gdata."'".', 0);
+        </script>';
     }
         
     //action filemanager

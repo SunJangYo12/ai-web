@@ -56,7 +56,7 @@ elseif (isset($_GET['idexl'])) {
            
            exec('ffmpeg -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
            
-           $tes = $xfiles.' sds';
+           $tes = "download.php?id=gambar:thumbs/$xbase";
 
            $newtext = delete_text_line("playlist.txt", 0);
            $newtext = basename($newtext);
@@ -67,33 +67,35 @@ elseif (isset($_GET['idexl'])) {
                       "encpath" => $encpath,
                       "encname" => $encname,
                       "path" => $xdir,
-                      "tes" => fsize($xfiles),
+                      "tes" => $tes,
            ];
 
            echo json_encode($data);
        }
        if ($exl[1] == "audio")  {
-           $xpath = $exl[2];
-           $xgalfile = $exl[3];
+           $xfiles = $exl[2];
 
-           $xpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xpath);
-           $xgalfile = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xgalfile);
+           $xbase = basename($exl[2]);
+           $xdir = dirname($exl[2]);
 
-           exec('ffmpeg -i '.$xpath.'/'.$xgalfile.' -an -vcodec copy thumbs/'.$xgalfile.'.jpg');
+           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles));
+
+           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
+           $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xbase);
+           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
+
+           exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$xbase.'.jpg');
            
-           //echo $exl[3];
-          
-           $jpath = preg_replace('/\s+/', '\-jin-', $exl[2]);
-           $jname = preg_replace('/\s+/', '\-jin-', $exl[3]);
+           $newtext = delete_text_line("playlist.txt", 0);
+           $newtext = basename($newtext);
+           $oldtext = $xbase;
 
-           $xxx = str_replace(" ", "-jin-", $exl[3]);
-           $yyy = str_replace(" ", "-jin-", $exl[2]);
-
-           $data = [  "jpath" => $jpath,
-                      "jname"=> $exl[3],
-                      "jxxx" => $xxx,
-                      "jyyy" => $yyy,
-                      "galfile" => $exl[3],
+           $data = [  "new" => $newtext,
+                      "old" => $oldtext,
+                      "encpath" => $encpath,
+                      "encname" => $encname,
+                      "path" => $xdir,
+                      "size" => fsize($xfiles),
            ];
 
            echo json_encode($data);
