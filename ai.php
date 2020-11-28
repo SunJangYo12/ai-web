@@ -855,9 +855,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     encdataold = encodeURIComponent(dataold).replace("%20","+");
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
-                    imgsrcfull = "download.php?id=gambar:"+data.encpath+"/"+data.encname;
 
-                    title.innerHTML = "<a target=_blank href='."'".'"+imgsrc+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
+                    title.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURI(data.old)+" onclick=play(this.id)><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
 
                     if (document.getElementById("hasil")) 
                     {
@@ -875,6 +874,30 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             };
             xhr.open("GET", url, true);
             xhr.send();
+        }
+        function play(xname) {
+            zname = xname.split("-jin-");
+            name = zname[0];
+            id = decodeURI(zname[1]);
+
+            var xhr = new XMLHttpRequest();
+            var encname = encodeURIComponent(name).replace("%20","+");
+            var url = "ajax-server.php?idexl=copymus:"+encname;
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    alert(1);
+                    document.getElementById(id).innerHTML += "&nbsp&nbsp<audio onended=sukses() controls> <source src='."'".'thumbs/"+this.responseText+"'."'".' type=audio/mpeg> Browser Error </audio><br>";
+
+                
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        function sukses() {
+            alert("play sukses");
         }
         procffmpeg('."'".$gdata."'".', 0);
         </script>';

@@ -75,26 +75,31 @@ elseif (isset($_GET['idexl'])) {
            $xfiles = $exl[2];
 
            $xbase = basename($exl[2]);
-           $xdir = dirname($exl[2]);
+           $encbase = basename($exl[2]);
 
            $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles));
+           $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
 
            $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
-           $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xbase);
-           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
+           $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $encbase);
 
-           exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$xbase.'.jpg');
+           exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$encname.'.jpg');
            
            $newtext = delete_text_line("playlist.txt", 0);
+           $xdir = dirname($newtext);
            $newtext = basename($newtext);
            $oldtext = $xbase;
+
+           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
 
            $data = [  "new" => $newtext,
                       "old" => $oldtext,
                       "encpath" => $encpath,
                       "encname" => $encname,
                       "path" => $xdir,
-                      "tes" => $tes,
+                      "urlencpath" =>  urlencode(dirname($exl[2])),
+                      "urlencname" =>  urlencode(basename($exl[2])),
+                      "tes" => $encname,
            ];
 
            echo json_encode($data);
@@ -126,18 +131,19 @@ elseif (isset($_GET['idexl'])) {
            echo json_encode($data);
        }
     }
-    elseif ($exl[0] == "copy") {
+    elseif ($exl[0] == "copymus") {
         array_map('unlink', glob("thumbs/*.mp3"));
        
         $path = $exl[1];
         $name = $exl[2];
 
-        $path = str_replace("-jin-", ' ', $path);
-        $name = str_replace("-jin-", ' ', $name);
+        $path = urldecode($path);
+        $name = urldecode($name);
 
+        $name = trim(preg_replace('/\s\s+/', ' ', $name));
+        copy($path.'/'.$name, 'thumbs/'.$name);
 
-        copy($path.'/'.$name, 'thumbs/'.$exl[2]);
-        echo $exl[2];
+        echo $name;
     }
     elseif ($exl[0] == "copyvid") {
         array_map('unlink', glob("thumbs/*.mp4"));
