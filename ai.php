@@ -860,8 +860,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     childencdataold.id = btoa(data.old);
                     
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
-                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+btoa(data.old)+" onclick=play(this.id)><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
-                             "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font><br>";
+                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+btoa(data.old)+" onclick=play(this.id)><img width=300 height=300 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
+                             "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font>";
                     
                     hasil.appendChild(childencdataold);
 
@@ -884,12 +884,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
-                    //document.getElementById(id).innerHTML = "&nbsp&nbsp<audio onended=sukses() controls> <source src='."'".'thumbs/"+this.responseText+"'."'".' type=audio/mpeg> Browser Error </audio><br>";
-                    document.getElementById(id).innerHTML = "<font color=red><h2>zzzzz</h2></font>";
-                    //document.getElementById(id).innerHTML = "<img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img>"+
-                            // "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font><br>"+
-                             //"&nbsp&nbsp<audio onended=sukses() controls> <source src='."'".'thumbs/"+this.responseText+"'."'".' type=audio/mpeg> Browser Error </audio><br>";
-                    
+                     document.getElementById(id).innerHTML += "<audio onended=sukses() controls> <source src='."'".'thumbs/"+this.responseText+"'."'".' type=audio/mpeg> Browser Error </audio><br><br>";
                 }
             };
             xhr.open("GET", url, true);
