@@ -77,23 +77,32 @@ elseif (isset($_GET['idexl'])) {
            $xbase = basename($exl[2]);
            $encbase = basename($exl[2]);
 
-           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles));
+           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
            $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
 
-           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
+           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles); // replace unicode path and name
            $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $encbase);
 
            exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$encname.'.jpg');
            
-           $newtext = delete_text_line("playlist.txt", 0);
+           $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $xdir = dirname($newtext);
            $newtext = basename($newtext);
            $oldtext = $xbase;
 
            $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
 
+           $size = filesize($xfiles)/1024;
+           $size = round($size,3);
+           if($size >= 1024){
+              $size = round($size/1024,2).' MB';
+           }else{
+              $size = $size.' KB';
+           }
+
            $data = [  "new" => $newtext,
                       "old" => $oldtext,
+                      "size" => $size,
                       "encpath" => $encpath,
                       "encname" => $encname,
                       "path" => $xdir,

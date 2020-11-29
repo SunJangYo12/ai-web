@@ -660,6 +660,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     title.innerHTML = "<a target=_blank href='."'".'"+imgsrcfull+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
 
+                    document.title = "AI Gallery Image total: "+'.count($outfiles).';
+                    
                     if (document.getElementById("hasil")) 
                     {
                         document.getElementById("hasil").append(title);          
@@ -849,24 +851,19 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
                     var data = JSON.parse(this.responseText);
-                    var title = document.createElement("p");
-
                     var dataold = data.old.replace( /[\r\n]+/gm, "" );
-                    encdataold = encodeURIComponent(dataold).replace("%20","+");
+                    var encdataold = encodeURIComponent(dataold).replace("%20","+");
+                    var childencdataold = encodeURIComponent(dataold).replace("%20","+");
 
+                    var hasil = document.getElementById("hasil");
+                    childencdataold = document.createElement("div");
+                    childencdataold.id = btoa(data.old);
+                    
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
-
-                    title.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURI(data.old)+" onclick=play(this.id)><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
-
-                    if (document.getElementById("hasil")) 
-                    {
-                        document.getElementById("hasil").append(title);          
-                        document.getElementById("hasil").id = data.new;
-                    } 
-                    else {
-                        document.getElementById(data.old).append(title);            
-                        document.getElementById(data.old).id = data.new;
-                    }
+                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+btoa(data.old)+" onclick=play(this.id)><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
+                             "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font><br>";
+                    
+                    hasil.appendChild(childencdataold);
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);
@@ -878,7 +875,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         function play(xname) {
             zname = xname.split("-jin-");
             name = zname[0];
-            id = decodeURI(zname[1]);
+            id = zname[1];
 
             var xhr = new XMLHttpRequest();
             var encname = encodeURIComponent(name).replace("%20","+");
@@ -887,10 +884,12 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
-                    alert(1);
-                    document.getElementById(id).innerHTML += "&nbsp&nbsp<audio onended=sukses() controls> <source src='."'".'thumbs/"+this.responseText+"'."'".' type=audio/mpeg> Browser Error </audio><br>";
-
-                
+                    //document.getElementById(id).innerHTML = "&nbsp&nbsp<audio onended=sukses() controls> <source src='."'".'thumbs/"+this.responseText+"'."'".' type=audio/mpeg> Browser Error </audio><br>";
+                    document.getElementById(id).innerHTML = "<font color=red><h2>zzzzz</h2></font>";
+                    //document.getElementById(id).innerHTML = "<img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img>"+
+                            // "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font><br>"+
+                             //"&nbsp&nbsp<audio onended=sukses() controls> <source src='."'".'thumbs/"+this.responseText+"'."'".' type=audio/mpeg> Browser Error </audio><br>";
+                    
                 }
             };
             xhr.open("GET", url, true);
