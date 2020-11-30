@@ -881,7 +881,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
                     childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id)><img width=300 height=300 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
-                             "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font>";
+                             "<font color=yellow><h5>"+
+                             data.jalbum+
+                             "<br>Size: "+data.size+"</h5></font><br>";
                     
                     hasil.appendChild(childencdataold);
                     proccount += 1;

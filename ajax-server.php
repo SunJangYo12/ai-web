@@ -92,9 +92,11 @@ elseif (isset($_GET['idexl'])) {
 
            $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
 
-           $data = [  "new" => $newtext,
+           $data = [  
+                      "new" => $newtext,
                       "old" => $oldtext,
                       "size" => fsize($exl[2]),
+                      "jalbum" => getinfomedia($xfiles),
                       "encpath" => $encpath,
                       "encname" => $encname,
                       "path" => $xdir,
@@ -169,6 +171,32 @@ elseif (isset($_GET['idexl'])) {
         copy($path.'/'.$name, 'thumbs/'.$exl[2]);
         echo $exl[2];
     }
+}
+
+function getinfomedia($input) {
+    $output = "";
+    $objmusic = json_decode(shell_exec('ffprobe -v quiet -print_format json -show_format -show_streams '.$input));  
+    $title = $objmusic->{'format'}->{'tags'}->{'title'};
+    $artist = $objmusic->{'format'}->{'tags'}->{'artist'};
+    $album_artist = $objmusic->{'format'}->{'tags'}->{'album_artist'};
+    $album = $objmusic->{'format'}->{'tags'}->{'album'};
+    $track = $objmusic->{'format'}->{'tags'}->{'track'};
+    $disk = $objmusic->{'format'}->{'tags'}->{'disc'};
+    $comment = $objmusic->{'format'}->{'tags'}->{'comment'};
+    $genre = $objmusic->{'format'}->{'tags'}->{'genre'};
+    $date = $objmusic->{'format'}->{'tags'}->{'date'};
+
+    if ($title != null) $output .= "Tittle: ".$title."<br>";
+    if ($artist != null) $output .= "Artist: ".$artist."<br>";
+    if ($album_artist != null) $output .= "Album Artist: ".$album_artist."<br>";
+    if ($album != null) $output .= "Album: ".$album."<br>";
+    if ($track != null) $output .= "Track: ".$track."<br>";
+    if ($disk != null) $output .= "Disk: ".$disk."<br>";
+    if ($comment != null) $output .= "Comment: ".$comment."<br>";
+    if ($genre != null) $output .= "Genre: ".$genre."<br>";
+    if ($date != null) $output .= "Date: ".$date."<br>";
+
+    return $output;
 }
 
 function delete_text_line($filepath, $num) {
