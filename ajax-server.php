@@ -92,23 +92,15 @@ elseif (isset($_GET['idexl'])) {
 
            $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
 
-           $size = filesize($xfiles)/1024;
-           $size = round($size,3);
-           if($size >= 1024){
-              $size = round($size/1024,2).' MB';
-           }else{
-              $size = $size.' KB';
-           }
-
            $data = [  "new" => $newtext,
                       "old" => $oldtext,
-                      "size" => $size,
+                      "size" => fsize($exl[2]),
                       "encpath" => $encpath,
                       "encname" => $encname,
                       "path" => $xdir,
                       "urlencpath" =>  urlencode(dirname($exl[2])),
                       "urlencname" =>  urlencode(basename($exl[2])),
-                      "tes" => $encname,
+                      "tes" => $exl[2],
            ];
 
            echo json_encode($data);
@@ -187,13 +179,15 @@ function delete_text_line($filepath, $num) {
 }
 
 function fsize($input) {
-  $size = filesize($input)/1024;
-  $size = round($size,3);
-  if($size >= 1024){
-      $size = round($size/1024,2).' MB';
-  }else{
-      $size = $size.' KB';
-  }
-  return $size;
+    $sizedata = trim(preg_replace('/\s\s+/', ' ', $input)); //hapus enter
+    $size = filesize($sizedata)/1024;
+    $size = round($size,3);
+    if($size >= 1024){
+       $size = round($size/1024,2).' MB';
+    }else{
+       $size = $size.' KB';
+    }
+
+    return $size;
 }
 ?>
