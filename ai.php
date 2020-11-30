@@ -639,12 +639,17 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <div id=hasil></div>
 
         <script>
+        var proccount = 0;
         function procffmpeg(name, full)
         {
             var xhr = new XMLHttpRequest();
             encname = encodeURIComponent(name).replace("%20","+");
 
             var url = "ajax-server.php?idexl=ffmpeg:image:"+encname;
+
+            xhr.onloadstart = function () {
+                document.title = "Loading...["+proccount+"/'.count($outfiles).'] Image AI Gallery total: "+'.count($outfiles).' ;
+            }
 
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
@@ -671,6 +676,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                         document.getElementById(data.old).append(title);            
                         document.getElementById(data.old).id = data.new;
                     }
+
+                    proccount += 1;
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);
@@ -725,8 +732,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <div id=hasil></div>
 
         <script>
+        var proccount = 0;
+
         function procffmpeg(name, full)
-        {
+        {            
             var xhr = new XMLHttpRequest();
             encname = encodeURIComponent(name).replace("%20","+");
 
@@ -734,7 +743,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var idhasil = "kosong";
 
             xhr.onloadstart = function () {
-                document.title = "Loading.. Video AI Gallery total: "+'.count($outfiles).' ;
+                document.title = "Loading...["+proccount+"/'.count($outfiles).'] Video AI Gallery total: "+'.count($outfiles).' ;
             }
 
             xhr.onreadystatechange = function() {
@@ -744,6 +753,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var dataold = data.old.replace( /[\r\n]+/gm, "" );
                     var encdataold = encodeURIComponent(dataold).replace("%20","+");
                     var childencdataold = encodeURIComponent(dataold).replace("%20","+");
+                    var playname = encodeURI(data.old);
 
                     var hasil = document.getElementById("hasil");
                     childencdataold = document.createElement("div");
@@ -753,10 +763,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     document.title = "Video AI Gallery total: "+'.count($outfiles).';
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".gif";
-                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+"-jin-"+data.old+"-jin-"+data.size+" onclick=play(this.id)><img width=300 height=230 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
-                             "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font>";
+                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+"-jin-"+playname+"-jin-"+data.size+" onclick=play(this.id)><img width=300 height=230 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
+                             "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+atob(data.size)+"</h5></font>";
                     
                     hasil.appendChild(childencdataold);
+                    proccount += 1;
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);
@@ -766,11 +777,13 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.send();
         }
         function play(xname) {
+            alert("Copying... Please wait");
+
             zname = xname.split("-jin-");
             name = zname[0];
             id = zname[1];
-            vname = zname[2];
-            vsize = zname[3];
+            vname = decodeURI(zname[2]);
+            vsize = atob(zname[3]);
 
             var xhr = new XMLHttpRequest();
             var encname = encodeURIComponent(name).replace("%20","+");
@@ -784,8 +797,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
                     document.title = "Video play: "+vname;
-                    document.getElementById(id).innerHTML = "<video controls><source src='."'".'thumbs/"+this.responseText+"'."'".'/></video>"+
-                    "<font color=yellow><h5>Title: "+vname+"<br>Size: "+vsize+"</h5></font>";
+                    document.getElementById(id).innerHTML = "<video width=340 height=280  controls><source src='."'".'thumbs/"+this.responseText+"'."'".'/></video>"+
+                    "<font color=pink><p>Title: "+vname+"<br>Size: "+vsize+"</p></font><br><br>";
                 }
             };
             xhr.open("GET", url, true);
@@ -840,12 +853,17 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <div id=hasil></div>
 
         <script>
+        var proccount = 0;
         function procffmpeg(name, full)
         {
             var xhr = new XMLHttpRequest();
             encname = encodeURIComponent(name).replace("%20","+");
 
             var url = "ajax-server.php?idexl=ffmpeg:audio:"+encname;
+
+            xhr.onloadstart = function () {
+                document.title = "Loading...["+proccount+"/'.count($outfiles).'] Music AI Gallery total: "+'.count($outfiles).' ;
+            }
 
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
@@ -866,6 +884,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font>";
                     
                     hasil.appendChild(childencdataold);
+                    proccount += 1;
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);

@@ -130,7 +130,7 @@ elseif (isset($_GET['idexl'])) {
 
            $data = [  "new" => $newtext,
                       "old" => $oldtext,
-                      "size" => fsize($exl[2]),
+                      "size" => base64_encode(fsize($exl[2])),
                       "encpath" => $encpath,
                       "encname" => $encname,
                       "path" => $xdir,
