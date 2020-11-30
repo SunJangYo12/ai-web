@@ -857,10 +857,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     var hasil = document.getElementById("hasil");
                     childencdataold = document.createElement("div");
-                    childencdataold.id = btoa(data.old);
-                    
+                    childencdataold.id = encodeURIComponent(data.old);
+
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
-                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+btoa(data.old)+" onclick=play(this.id)><img width=300 height=300 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
+                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id)><img width=300 height=300 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
                              "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font>";
                     
                     hasil.appendChild(childencdataold);
