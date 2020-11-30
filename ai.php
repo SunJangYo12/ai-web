@@ -660,7 +660,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     title.innerHTML = "<a target=_blank href='."'".'"+imgsrcfull+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
 
-                    document.title = "AI Gallery Image total: "+'.count($outfiles).';
+                    document.title = "Image AI Gallery total: "+'.count($outfiles).';
                     
                     if (document.getElementById("hasil")) 
                     {
@@ -684,6 +684,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-video') {
         fm_rdelete('thumbs');
+        unlink("playlist.txt");
         mkdir('thumbs', 0777, true);
         echo '
             <style>
@@ -692,110 +693,109 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     padding: 10px;
                 }
             </style>';
+        echo '<div id="galshowimg"></div>';
 
         $files = dir_scan($path);
+        $outfiles = array();
+        $j = 0;
 
         for ($i=0; $i<count($files); $i++) 
         {
             if (is_file($files[$i])) 
             {
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
-                if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv")
+                if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv") 
                 {
-                    $size = filesize($files[$i])/1024;
-                    $size = round($size,3);
-                    if($size >= 1024){
-                        $size = round($size/1024,2).' MB';
-                    }else{
-                        $size = $size.' KB';
-                    }
-                    $galname = basename($files[$i]);
-                    $galpath = dirname($files[$i]);
+                    $outfiles[$j] = $files[$i];
 
-                    echo '<div id="'.$galname.'"></div>';
-                    echo '<img id="img'.$galname.'"></img>';
+                    $my_file = 'playlist.txt';
+                    $handle = fopen($my_file, 'a') or die('Cannot open file:  '.$my_file);
+                    $data = $outfiles[$j]."\n";
+                    fwrite($handle, $data);
 
-                    echo '
-                    <script>
-                    function procffmpeg(path, name, full)
-                    {
-                        var xhr = new XMLHttpRequest();
-                        encpath = encodeURIComponent(path).replace("%20","+");
-                        encname = encodeURIComponent(name).replace("%20","+");
-
-                        var url = "ajax-server.php?idexl=ffmpeg:video:"+encpath+":"+encname;
-
-                        xhr.onloadstart = function () {
-                            document.getElementById("'.$galname.'").innerHTML = "Scanning...";
-                        };
-                        xhr.onerror = function () {
-                            alert("Gagal mengambil data");
-                        };
-                        xhr.onreadystatechange = function() {
-                            if (this.responseText !== "" && this.readyState == 4) 
-                            {
-                                var data = JSON.parse(this.responseText);
-                                var img = document.getElementById("img"+data.jname);
-                                var title = document.createElement("t");
-
-                                title.innerHTML = "<br><font color='."yellow".'>Name : "+data.jname+"<br>Size: '.$size.'<br>Path: '.$galpath.'</font><br>"+
-                                "<a id="+data.jyyy+":"+data.jxxx+" onclick=play(this.id)>Play</a><br><br>";
-
-                                encimg = encodeURIComponent(data.jname).replace("%20","+");
-
-                                img.src = "download.php?id=gambar:thumbs/"+encimg+".gif";
-                                
-                                
-                                document.getElementById("'.$galname.'").innerHTML = "";
-                                document.getElementById(name).append(img, title);
-                            }
-                        };
-                        xhr.open("GET", url, true);
-                        xhr.send();
-                    }
-                    function play(name) {
-                        //alert(name);
-                        var xhr = new XMLHttpRequest();
-                        var encname = encodeURIComponent(name).replace("%20","+");
-                        var url = "ajax-server.php?idexl=copyvid:"+encname;
-
-                        xhr.onloadstart = function () {
-                        };
-                        xhr.onerror = function () {
-                            alert("Gagal mengambil data");
-                        };
-                        xhr.onreadystatechange = function() {
-                            if (this.responseText !== "" && this.readyState == 4) 
-                            {
-                                encimg = encodeURIComponent(this.responseText).replace("%20","+");
-
-                                alert(""+encimg);
-                                document.getElementById(""+name).innerHTML = "";
-                                var img = document.createElement("img");
-                                var title = document.createElement("t");
-
-                               
-                              /*  title.innerHTML = "&nbsp&nbsp
-                                    <video width=450 height=170 preload=auto autoplay=autoplay>
-                                        <source src=xx/>
-                                    </video>
-                                ";*/
-
-                                document.getElementById(name).append(img, title);
-                            }
-                        };
-                        xhr.open("GET", url, true);
-                        xhr.send();
-                    }
-                    function tes() {
-                        alert("selesai");
-                    }
-                    procffmpeg('."'".$galpath."'".', '."'".$galname."'".', 0);
-
-                </script>';
+                    $j++;
                 }
             }
         }
+        
+        $gdata = $outfiles[0];
+        
+        echo '
+        <font color=yellow><h3>Total: '.count($outfiles).'</h3></font>
+        <div id=hasil></div>
+
+        <script>
+        function procffmpeg(name, full)
+        {
+            var xhr = new XMLHttpRequest();
+            encname = encodeURIComponent(name).replace("%20","+");
+
+            var url = "ajax-server.php?idexl=ffmpeg:video:"+encname;
+            var idhasil = "kosong";
+
+            xhr.onloadstart = function () {
+                document.title = "Loading.. Video AI Gallery total: "+'.count($outfiles).' ;
+            }
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    var data = JSON.parse(this.responseText);
+                    var dataold = data.old.replace( /[\r\n]+/gm, "" );
+                    var encdataold = encodeURIComponent(dataold).replace("%20","+");
+                    var childencdataold = encodeURIComponent(dataold).replace("%20","+");
+
+                    var hasil = document.getElementById("hasil");
+                    childencdataold = document.createElement("div");
+                    childencdataold.id = encodeURIComponent(data.old);
+                    idhasil = encodeURIComponent(data.old);
+
+                    document.title = "Video AI Gallery total: "+'.count($outfiles).';
+
+                    imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".gif";
+                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+"-jin-"+data.old+"-jin-"+data.size+" onclick=play(this.id)><img width=300 height=230 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
+                             "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+data.size+"</h5></font>";
+                    
+                    hasil.appendChild(childencdataold);
+
+                    if (data.new != "")
+                        procffmpeg(data.path+"/"+data.new, 0);
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        function play(xname) {
+            zname = xname.split("-jin-");
+            name = zname[0];
+            id = zname[1];
+            vname = zname[2];
+            vsize = zname[3];
+
+            var xhr = new XMLHttpRequest();
+            var encname = encodeURIComponent(name).replace("%20","+");
+            var url = "ajax-server.php?idexl=copymus:"+encname;
+
+            xhr.onloadstart = function () {
+                document.title = "Copying...";
+            }
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    document.title = "Video play: "+vname;
+                    document.getElementById(id).innerHTML = "<video controls><source src='."'".'thumbs/"+this.responseText+"'."'".'/></video>"+
+                    "<font color=yellow><h5>Title: "+vname+"<br>Size: "+vsize+"</h5></font>";
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        function sukses() {
+            alert("play sukses");
+        }
+        procffmpeg('."'".$gdata."'".', 0);
+        </script>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik') {
         fm_rdelete('thumbs');
@@ -858,6 +858,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var hasil = document.getElementById("hasil");
                     childencdataold = document.createElement("div");
                     childencdataold.id = encodeURIComponent(data.old);
+
+                    document.title = "Music AI Gallery total: "+'.count($outfiles).';
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
                     childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id)><img width=300 height=300 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+

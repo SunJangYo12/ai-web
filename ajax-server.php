@@ -106,27 +106,37 @@ elseif (isset($_GET['idexl'])) {
            echo json_encode($data);
        }
        if ($exl[1] == "video")  {
-           $xpath = $exl[2];
-           $xgalfile = $exl[3];
+           $xfiles = $exl[2];
 
-           $xpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xpath);
-           $xgalfile = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xgalfile);
+           $xbase = basename($exl[2]);
+           $encbase = basename($exl[2]);
 
-           exec('ffmpeg -ss 30 -t 3 -i '.$xpath.'/'.$xgalfile.' -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$xgalfile.'.gif');
+           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
+           $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
+
+           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles); // replace unicode path and name
+           $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $encbase);
+
+           exec('ffmpeg -ss 30 -t 3 -i '.$xfiles.' -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
 
            //echo $exl[3];
           
-           $jpath = preg_replace('/\s+/', '\-jin-', $exl[2]);
-           $jname = preg_replace('/\s+/', '\-jin-', $exl[3]);
+           $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
+           $xdir = dirname($newtext);
+           $newtext = basename($newtext);
+           $oldtext = $xbase;
 
-           $xxx = str_replace(" ", "-jin-", $exl[3]);
-           $yyy = str_replace(" ", "-jin-", $exl[2]);
+           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
 
-           $data = [  "jpath" => $jpath,
-                      "jname"=> $exl[3],
-                      "jxxx" => $xxx,
-                      "jyyy" => $yyy,
-                      "galfile" => $exl[3],
+           $data = [  "new" => $newtext,
+                      "old" => $oldtext,
+                      "size" => fsize($exl[2]),
+                      "encpath" => $encpath,
+                      "encname" => $encname,
+                      "path" => $xdir,
+                      "urlencpath" =>  urlencode(dirname($exl[2])),
+                      "urlencname" =>  urlencode(basename($exl[2])),
+                      "tes" => $exl[2],
            ];
 
            echo json_encode($data);
