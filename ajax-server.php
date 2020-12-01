@@ -77,13 +77,15 @@ elseif (isset($_GET['idexl'])) {
            $xbase = basename($exl[2]);
            $encbase = basename($exl[2]);
 
-           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
            $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
+           
 
            $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles); // replace unicode path and name
            $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $encbase);
 
-           exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$encname.'.jpg');
+           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
+          
+           exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.basename($xfiles).'.jpg');
            
            $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $xdir = dirname($newtext);
@@ -102,7 +104,7 @@ elseif (isset($_GET['idexl'])) {
                       "path" => $xdir,
                       "urlencpath" =>  urlencode(dirname($exl[2])),
                       "urlencname" =>  urlencode(basename($exl[2])),
-                      "tes" => $exl[2],
+                      "tes" => $execname,
            ];
 
            echo json_encode($data);

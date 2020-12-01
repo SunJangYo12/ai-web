@@ -877,6 +877,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     childencdataold = document.createElement("div");
                     childencdataold.id = encodeURIComponent(data.old);
 
+                    
                     document.title = "Music AI Gallery total: "+'.count($outfiles).';
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
