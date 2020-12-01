@@ -877,14 +877,17 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     childencdataold = document.createElement("div");
                     childencdataold.id = encodeURIComponent(data.old);
 
-                    
                     document.title = "Music AI Gallery total: "+'.count($outfiles).';
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
-                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id)><img width=300 height=300 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
+                    childencdataold.innerHTML = "<br><a id="+encdataold+".jpg onclick=saveimg(this.id)><img width=300 height=300 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
                              "<font color=yellow><h5>"+
                              data.jalbum+
-                             "<br>Size: "+data.size+"</h5></font><br>";
+                             "</h5><b>Size: "+data.size+"</b></font>"+
+                             "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />"+
+                             "&nbsp&nbsp<input type=submit value=Favorite />"+
+                             "&nbsp&nbsp<input type=submit value=Edit />"+
+                             "&nbsp&nbsp<input type=submit value=Rincian id="+data.urlencpath+":"+data.urlencname+" onclick=rincian(this.id) />";
                     
                     hasil.appendChild(childencdataold);
                     proccount += 1;
@@ -896,7 +899,39 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.open("GET", url, true);
             xhr.send();
         }
+        function rincian(name) {
+            var encname = encodeURIComponent(name).replace("%20","+");
+
+            window.open(
+                    "ajax-server.php?idexl=infomedia:"+encname,
+                    "_blank"
+                );
+            
+            /*alert("Request Music to server... Please wait");
+
+            var xhr = new XMLHttpRequest();
+            var url = "ajax-server.php?idexl=infomedia:"+encname;
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                   // alert(this.responseText);
+                    prompt("Data json", this.responseText);
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();*/
+        }
+        function saveimg(name) {
+            if (confirm("Simpan Gambar ini?")) {
+                window.open(
+                    "download.php?id=thumbs/"+name,
+                    "_blank"
+                );
+            }  
+        }
         function play(xname) {
+            alert("Copying... Please wait");
             zname = xname.split("-jin-");
             name = zname[0];
             id = zname[1];

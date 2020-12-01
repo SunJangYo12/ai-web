@@ -80,8 +80,8 @@ elseif (isset($_GET['idexl'])) {
            $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
            
 
-           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles); // replace unicode path and name
-           $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $encbase);
+           $xfiles = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $xfiles); // replace unicode path and name
+           $encname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $encbase);
 
            $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
           
@@ -104,7 +104,7 @@ elseif (isset($_GET['idexl'])) {
                       "path" => $xdir,
                       "urlencpath" =>  urlencode(dirname($exl[2])),
                       "urlencname" =>  urlencode(basename($exl[2])),
-                      "tes" => $execname,
+                      "tes" => dirname($xfiles),
            ];
 
            echo json_encode($data);
@@ -173,7 +173,27 @@ elseif (isset($_GET['idexl'])) {
         copy($path.'/'.$name, 'thumbs/'.$exl[2]);
         echo $exl[2];
     }
+    elseif ($exl[0] == "infomedia") {
+        $path = urldecode($exl[1]);
+        $name = urldecode($exl[2]);
+
+        $path = trim(preg_replace('/\s\s+/', ' ', $path));
+        $name = trim(preg_replace('/\s\s+/', ' ', $name));
+
+        $input = $path."/".$name;
+        $input = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $input);
+        $objmusic = json_decode(shell_exec('ffprobe -v quiet -print_format json -show_format -show_streams '.$input));  
+
+        /*foreach ($objmusic->{'format'} as $value) {
+              foreach ($value as $key) {
+                $output .= $key."\r";
+              }
+        }*/
+        echo "<pre>";
+        print_r($objmusic);
+    }
 }
+
 
 function getinfomedia($input) {
     $output = "";
@@ -188,15 +208,15 @@ function getinfomedia($input) {
     $genre = $objmusic->{'format'}->{'tags'}->{'genre'};
     $date = $objmusic->{'format'}->{'tags'}->{'date'};
 
-    if ($title != null) $output .= "Tittle: ".$title."<br>";
-    if ($artist != null) $output .= "Artist: ".$artist."<br>";
-    if ($album_artist != null) $output .= "Album Artist: ".$album_artist."<br>";
-    if ($album != null) $output .= "Album: ".$album."<br>";
-    if ($track != null) $output .= "Track: ".$track."<br>";
-    if ($disk != null) $output .= "Disk: ".$disk."<br>";
-    if ($comment != null) $output .= "Comment: ".$comment."<br>";
-    if ($genre != null) $output .= "Genre: ".$genre."<br>";
-    if ($date != null) $output .= "Date: ".$date."<br>";
+    if ($title != null) $output .= "<font color=white>Tittle : </font>".$title."<br>";
+    if ($artist != null) $output .= "<font color=white>Artist : </font>".$artist."<br>";
+    if ($album != null) $output .= "<font color=white>Album : </font>".$album."<br>";
+    if ($track != null) $output .= "<font color=white>Track : </font>".$track."<br>";
+    if ($disk != null) $output .= "<font color=white>Disk : </font>".$disk."<br>";
+    if ($comment != null) $output .= "<font color=white>Comment : </font>".$comment."<br>";
+    if ($album_artist != null) $output .= "<font color=white>Album Artist : </font>".$album_artist."<br>";
+    if ($genre != null) $output .= "<font color=white>Genre : </font>".$genre."<br>";
+    if ($date != null) $output .= "<font color=white>Date : </font>".$date."<br>";
 
     return $output;
 }
