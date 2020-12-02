@@ -880,7 +880,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     document.title = "Music AI Gallery total: "+'.count($outfiles).';
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
-                    childencdataold.innerHTML = "<br><a id="+encdataold+".jpg onclick=saveimg(this.id)><img width=300 height=300 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
+                    childencdataold.innerHTML = "<br><a id="+encdataold+".jpg onclick=saveimg(this.id)>"+';
+                             echo "
+                             '<img width=300 height=300 src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+";
+                             echo '
                              "<font color=yellow><h5>"+
                              data.jalbum+
                              "</h5><b>Size: "+data.size+"</b></font>"+
@@ -939,7 +942,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             }  
         }
         function play(xname) {
-            alert("Copying... Please wait");
+          //  alert("Copying... Please wait");
             zname = xname.split("-jin-");
             name = zname[0];
             id = zname[1];
@@ -951,7 +954,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
-                     document.getElementById(id).innerHTML += "<audio onended=sukses() controls> <source src='."'".'thumbs/"+this.responseText+"'."'".' type=audio/mpeg> Browser Error </audio><br><br>";
+                     ';
+                     echo "
+                     document.getElementById(id).innerHTML += '<audio onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
+                     ";
+                     echo '
                 }
             };
             xhr.open("GET", url, true);
