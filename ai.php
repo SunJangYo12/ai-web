@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v1.7";
+$version = "v1.8";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -1496,7 +1496,7 @@ function dir_scan($folder) {
     $files = glob($folder);
     foreach ($files as $f) {
         if (is_dir($f)) {
-            $files = array_merge($files, dir_scan($f .'/*')); // scan subfolder
+            $files = array_merge($files, dir_scan($folder.'/*')); // scan subfolder
         }
     }
     return $files;
