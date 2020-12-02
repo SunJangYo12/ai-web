@@ -886,7 +886,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              "</h5><b>Size: "+data.size+"</b></font>"+
                              "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />"+
                              "&nbsp&nbsp<input type=submit value=Favorite />"+
-                             "&nbsp&nbsp<input type=submit value=Edit />"+
+                             "&nbsp&nbsp<input type=submit value=Edit id="+data.urlencpath+":"+data.urlencname+" onclick=edit(this.id) />"+
                              "&nbsp&nbsp<input type=submit value=Rincian id="+data.urlencpath+":"+data.urlencname+" onclick=rincian(this.id) />";
                     
                     hasil.appendChild(childencdataold);
@@ -898,6 +898,14 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             };
             xhr.open("GET", url, true);
             xhr.send();
+        }
+        function edit(name) {
+            var encname = encodeURIComponent(name).replace("%20","+");
+
+            window.open(
+                    "ajax-server.php?idexl=musedit:"+encname,
+                    "_blank"
+                );
         }
         function rincian(name) {
             var encname = encodeURIComponent(name).replace("%20","+");

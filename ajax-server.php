@@ -192,6 +192,65 @@ elseif (isset($_GET['idexl'])) {
         echo "<pre>";
         print_r($objmusic);
     }
+    elseif ($exl[0] == "musedit") {
+        $path = urldecode($exl[1]);
+        $name = urldecode($exl[2]);
+
+        $path = trim(preg_replace('/\s\s+/', ' ', $path));
+        $name = trim(preg_replace('/\s\s+/', ' ', $name));
+
+        $input = $path."/".$name;
+        $input = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $input);
+        $objmusic = json_decode(shell_exec('ffprobe -v quiet -print_format json -show_format -show_streams '.$input));  
+        $title = $objmusic->{'format'}->{'tags'}->{'title'};
+        $artist = $objmusic->{'format'}->{'tags'}->{'artist'};
+        $album_artist = $objmusic->{'format'}->{'tags'}->{'album_artist'};
+        $album = $objmusic->{'format'}->{'tags'}->{'album'};
+        $track = $objmusic->{'format'}->{'tags'}->{'track'};
+        $disk = $objmusic->{'format'}->{'tags'}->{'disc'};
+        $comment = $objmusic->{'format'}->{'tags'}->{'comment'};
+        $genre = $objmusic->{'format'}->{'tags'}->{'genre'};
+        $date = $objmusic->{'format'}->{'tags'}->{'date'};
+
+        echo "<form method=POST action=''>";
+        echo "<h3>Song info editing<h3/>";
+        echo "<pre><b>";
+        if ($title != null) echo "Title<br><input type=edit name=title value=".$title." /><br><br>";
+        if ($artist != null) echo "Artist<br><input type=edit name=artist value=".$artist." /><br><br>";
+        if ($album != null) echo "Album<br><input type=edit name=album value=".$album." /><br><br>";
+        if ($album_artist != null) echo "Album artist<br><input type=edit name=album_artist value=".$album_artist." /><br><br>";
+        if ($track != null) echo "Track<br><input type=edit name=track value=".$track." /><br><br>";
+        if ($disk != null) echo "Disk<br><input type=edit name=disk value=".$disk." /><br><br>";
+        if ($comment != null) echo "Comment<br><input type=edit name=comment value=".$comment." /><br><br>";
+        if ($genre != null) echo "Genre<br><input type=edit name=genre value=".$genre." /><br><br>";
+        if ($date != null) echo "Date<br><input type=edit name=date value=".$date." /><br><br>";
+        echo "<h3><input type=submit name=mussave value=Save </input></h3>";
+        echo "<h3><input type=hidden name=pathname value=".$input." </input></h3>";
+        echo "</pre></b>";
+        echo "</form>";
+    }
+}
+
+if (isset($_POST['mussave'])) {
+    if (isset($_POST['artist'])) $artist = $_POST['artist'];
+    if (isset($_POST['album'])) $album = $_POST['album'];
+    if (isset($_POST['album_artist'])) $album_artist = $_POST['album_artist'];
+    if (isset($_POST['track'])) $track = $_POST['track'];
+    if (isset($_POST['disk'])) $disk = $_POST['disk'];
+    if (isset($_POST['comment'])) $comment = $_POST['comment'];
+    if (isset($_POST['genre'])) $genre = $_POST['genre'];
+    if (isset($_POST['date'])) $date = $_POST['date'];
+
+    $pathname = $_POST['pathname'];
+
+    if ($artist != null) {
+        echo "<script>alert('Edit Artist: ".$artist."');</script>";
+        //exec('ffmpeg -y -i "'.$pathname.'" -c copy -metadata artist="'.$artist.'" "'.$pathname.'"');
+    }
+    if ($album != null) {
+        echo "<script>alert('Edit Album: ".$album."');</script>";
+    }
+
 }
 
 
