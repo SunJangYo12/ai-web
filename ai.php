@@ -1496,7 +1496,7 @@ function dir_scan($folder) {
     $files = glob($folder);
     foreach ($files as $f) {
         if (is_dir($f)) {
-            $files = array_merge($files, dir_scan($folder.'/*')); // scan subfolder
+            $files = array_merge($files, dir_scan($f.'/*')); // scan subfolder
         }
     }
     return $files;
