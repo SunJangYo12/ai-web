@@ -777,7 +777,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.send();
         }
         function play(xname) {
-            alert("Copying... Please wait");
+            //alert("Copying... Please wait");
 
             zname = xname.split("-jin-");
             name = zname[0];
@@ -798,11 +798,23 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 {
                     document.title = "Video play: "+vname;
                     document.getElementById(id).innerHTML = "<video width=340 height=280  controls><source src='."'".'thumbs/"+this.responseText+"'."'".'/></video>"+
-                    "<font color=pink><p>Title: "+vname+"<br>Size: "+vsize+"</p></font><br><br>";
+                    "<font color=yellow><p>Title: "+vname+
+                    "<br>Size: "+vsize+
+                    "&nbsp&nbsp<input type=submit value=Rincian id="+name+" onclick=rincian(this.id) />"+
+                    "</p></font><br><br>";
                 }
             };
             xhr.open("GET", url, true);
             xhr.send();
+        }
+        function rincian(name) {
+            var encname = encodeURIComponent(name).replace("%20","+");
+
+            window.open(
+                    "ajax-server.php?idexl=infomedia:"+encname,
+                    "_blank"
+                );
+            
         }
         function sukses() {
             alert("play sukses");
@@ -950,15 +962,17 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var xhr = new XMLHttpRequest();
             var encname = encodeURIComponent(name).replace("%20","+");
             var url = "ajax-server.php?idexl=copymus:"+encname;
+            
 
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
                      ';
                      echo "
-                     document.getElementById(id).innerHTML += '<audio onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
+                     document.getElementById(id).innerHTML += '<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
                      ";
                      echo '
+                     
                 }
             };
             xhr.open("GET", url, true);
