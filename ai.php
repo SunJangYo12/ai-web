@@ -899,10 +899,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              "<font color=yellow><h5>"+
                              data.jalbum+
                              "</h5><b>Size: "+data.size+"</b></font>"+
-                             "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />"+
-                             "&nbsp&nbsp<input type=submit value=Favorite />"+
-                             "&nbsp&nbsp<input type=submit value=Edit id="+data.urlencpath+":"+data.urlencname+" onclick=edit(this.id) />"+
-                             "&nbsp&nbsp<input type=submit value=Rincian id="+data.urlencpath+":"+data.urlencname+" onclick=rincian(this.id) />";
+                             "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />";
                     
                     hasil.appendChild(childencdataold);
                     proccount += 1;
@@ -913,6 +910,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             };
             xhr.open("GET", url, true);
             xhr.send();
+        }
+        function favorite(name) {
+            alert("ntar bikinya!");
         }
         function edit(name) {
             var encname = encodeURIComponent(name).replace("%20","+");
@@ -969,6 +969,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 {
                      ';
                      echo "
+                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
+                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
+                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
                      document.getElementById(id).innerHTML += '<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
                      ";
                      echo '
