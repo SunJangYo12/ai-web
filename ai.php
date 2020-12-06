@@ -863,7 +863,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         $gdata = $outfiles[0];
         
         echo '
-        <font color=yellow><h3>Total: '.count($outfiles).'</h3></font>
+        <font color=yellow><h3><marquee>Total: '.count($outfiles).'</marquee></h3></font>
         <div id=hasil></div>
 
         <script>
@@ -955,8 +955,16 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 );
             }  
         }
+        position = 0;
+        title = "";
+        function scrolltitle() {
+            document.title = title.substring(position, title.length) + title.substring(0, position); 
+            position++;
+            if (position > title.length) position = 0;
+        
+            titleScroll = window.setTimeout(scrolltitle,170);
+        }
         function play(xname) {
-          //  alert("Copying... Please wait");
             zname = xname.split("-jin-");
             name = zname[0];
             id = zname[1];
@@ -965,12 +973,17 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var encname = encodeURIComponent(name).replace("%20","+");
             var url = "ajax-server.php?idexl=copymus:"+encname;
             
+            xhr.onloadstart = function () {
+                document.title = "Copying...";
+            }
 
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
                      ';
                      echo "
+                     title = this.responseText+'                              ';
+                     scrolltitle();
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
@@ -983,8 +996,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.open("GET", url, true);
             xhr.send();
         }
+        var countsuk = 0;
         function sukses() {
-            alert("play sukses");
+            alert("play sukses: "+countsuk);
+            countsuk += 1;
         }
         procffmpeg('."'".$gdata."'".', 0);
         </script>';
