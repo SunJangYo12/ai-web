@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v1.8";
+$version = "v1.9";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -765,7 +765,14 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     document.title = "Video AI Gallery total: "+'.count($outfiles).';
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".gif";
-                    childencdataold.innerHTML = "<a id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+"-jin-"+playname+"-jin-"+data.size+" onclick=play(this.id)><img width=300 height=230 src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>"+
+                    ';
+
+                    echo "
+                    childencdataold.innerHTML = '<a id='+data.urlencpath+':'+data.urlencname+'-jin-'+encodeURIComponent(data.old)+'-jin-'+playname+'-jin-'+data.size+' onclick=play(this.id)>'+
+                                                '<img width=300 height=230 src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+
+                    ";
+
+                    echo '
                              "<font color=yellow><h5>Title: "+data.old+"<br>Size: "+atob(data.size)+"</h5></font>";
                     
                     hasil.appendChild(childencdataold);
@@ -779,8 +786,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.send();
         }
         function play(xname) {
-            //alert("Copying... Please wait");
-
             zname = xname.split("-jin-");
             name = zname[0];
             id = zname[1];
@@ -799,9 +804,15 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
                     document.title = "Video play: "+vname;
-                    document.getElementById(id).innerHTML = "<video width=340 height=280  controls><source src='."'".'thumbs/"+this.responseText+"'."'".'/></video>"+
-                    "<font color=yellow><p>Title: "+vname+
-                    "<br>Size: "+vsize+
+                    ';
+                    
+                    echo "
+                    document.getElementById(id).innerHTML = '<video width=340 height=280  controls><source src=".'"'."thumbs/'+this.responseText+'".'"'."/></video>'+
+                    ";
+
+                    echo '
+                    "<font color=yellow><p>Title: <marquee>"+vname+"</marquee>"+
+                    "<br><br>Size: "+vsize+
                     "&nbsp&nbsp<input type=submit value=Rincian id="+name+" onclick=rincian(this.id) />"+
                     "</p></font><br><br>";
                 }
