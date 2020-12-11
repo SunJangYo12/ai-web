@@ -470,10 +470,14 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
     $_SESSION['path'] = $path;
 
-    if (isset($_SESSION['copy']) || isset($_SESSION['move'])) {
+    if (isset($_SESSION['copy']) || isset($_SESSION['move']) || isset($_SESSION['copy_dir'])) {
         if (isset($_SESSION['copy'])) {
             echo "<form method='post' action=''><input type='submit' name='paste' value='Paste Copy'></input></form><br><br>";
-        } else {
+        }
+        else if(isset($_SESSION['copy_dir'])) {
+            echo "<form method='post' action=''><input type='submit' name='paste' value='Paste Dir Copy'></input></form><br><br>";
+        }
+        else {
             echo "<form method='post' action=''><input type='submit' name='paste' value='Paste Move'></input></form><br><br>";
         }
     }
@@ -490,6 +494,15 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         } else {
             echo "<font color='red'> copy file gagal</font> ";
         }
+    }
+    elseif (isset($_SESSION['copy_dir']) && isset($_POST['paste'])){
+        $source = $_SESSION['copy_dir'];
+        $destin = $path."/".$_SESSION['copy_name_dir'];
+        
+        //xcopy($source, $destin);
+        exec("cp -R ".$source." ".$path);
+        unset($_SESSION['copy_dir']);
+        unset($_SESSION['copy_name_dir']);
     }
     elseif (isset($_SESSION['move']) && isset($_POST['paste'])){
         $source = $_SESSION['move'];
@@ -1126,6 +1139,21 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             $video = $path."/".$_POST['name'];
             echo("<script>location.href ='/ai-web/download.php?id=video:$video';</script>");
         }
+        elseif($_POST['opt'] == 'open_pdf') {
+            $pdf = $path."/".$_POST['name'];
+            echo '
+                <script>
+                document.body.innerHTML += "<embed type=application/pdf src='.$pdf.' width=600 height=400></embed>";
+
+                </script>
+
+            ';
+        }
+        elseif($_POST['opt'] == 'copy_dir') {
+            $_SESSION['copy_dir'] = $path.'/'.$_POST['name'];
+            $_SESSION['copy_name_dir'] = $_POST['name'];
+            echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
+        }
 
         echo '</center>';
     }else{
@@ -1201,6 +1229,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             <option value="delete">Delete</option>
             <option value="chmod">Chmod</option>
             <option value="rename">Rename</option>
+            <option value="copy_dir">Copy</option>
             <option value="zip">Zip</option>
             </select>
             <input type="hidden" name="type" value="dir">
@@ -1309,7 +1338,29 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <input type="submit" value=">">
                 </form></center></td>
                 </tr>';
-            } else {
+            }elseif ($mime == "pdf") {
+                echo '</center></td>
+                <td><center><form method="POST" action="?option&path='.$path.'">
+                <select name="opt">
+                <option value="">Select</option>
+                <option value="open_pdf">Open Pdf</option>
+                <option value="delete">Delete</option>
+                <option value="chmod">Chmod</option>
+                <option value="rename">Rename</option>
+                <option value="edit">Edit</option>
+                                <option value="editfull">Editfull</option>
+                <option value="copy">Copy</option>
+                <option value="move">Move</option>
+                <option value="download">Download</option>
+                </select>
+                <input type="hidden" name="type" value="file">
+                <input type="hidden" name="name" value="'.$file.'">
+                <input type="hidden" name="path" value="'.$path.'/'.$file.'">
+                <input type="submit" value=">">
+                </form></center></td>
+                </tr>';
+            }
+            else {
                 echo '</center></td>
                 <td><center><form method="POST" action="?option&path='.$path.'">
                 <select name="opt">
@@ -1545,6 +1596,17 @@ function dir_scan($folder) {
         }
     }
     return $files;
+}
+function xcopy($src, $dest) {
+    foreach (scandir($src) as $file) {
+        if (!is_readable($src . '/' . $file)) continue;
+        if (is_dir($src .'/' . $file) && ($file != '.') && ($file != '..') ) {
+            mkdir($dest . '/' . $file);
+            xcopy($src . '/' . $file, $dest . '/' . $file);
+        } else {
+            copy($src . '/' . $file, $dest . '/' . $file);
+        }
+    }
 }
 
 function color($bold = 1, $colorid = null, $string = null) {

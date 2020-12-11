@@ -24,6 +24,11 @@
         echo $content;
         exit();
     }
+    elseif ($aksi[0] == 'pdf') {
+        $pdf = $aksi[1];
+        echo "sdsd";
+        echo '<embed type="application/pdf" src="'.$pdf.'" width="600" height="400"></embed>';
+    }
     else {
         $mime = strtolower(pathinfo($dfile, PATHINFO_EXTENSION));
         $filename = basename($dfile);
