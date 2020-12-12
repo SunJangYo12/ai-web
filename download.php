@@ -43,7 +43,34 @@
                 </div>
                 <script type="text/javascript" src="pdf.js"></script>
                 <script type="text/javascript" src="pdfuse.js"></script>
+
+                <div class="fab-container">
+                    <span onclick=onPrevPage() class="fab-label">Prev</span><br><br>
+                    <span onclick=onNextPage() class="fab-label">Next</span><br><br>
+                </div>
             </body>
+
+            <style>
+                .fab-container {
+                    position: fixed;
+                    top: 50px;
+                    right: 50px;
+                    z-index: 999;
+                    cursor: pointer;
+                }
+                .fab-label {
+                    padding: 2px 5px;
+                    align-self: center;
+                    user-select: none;
+                    white-space: nowrap;
+                    border-radius: 3px;
+                    font-size: 16px;
+                    background: #666666;
+                    color: #ffffff;
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+                    margin-right: 10px;
+                }
+            </style>
         ';
     }
     else {

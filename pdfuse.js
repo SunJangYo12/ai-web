@@ -67,6 +67,10 @@
       }
     }
 
+    function tes() {
+      alert(1);
+    }
+
     /**
      * Displays previous page.
      */
