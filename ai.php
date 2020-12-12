@@ -1141,13 +1141,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         }
         elseif($_POST['opt'] == 'open_pdf') {
             $pdf = $path."/".$_POST['name'];
-            echo '
-                <script>
-                document.body.innerHTML += "<embed type=application/pdf src='.$pdf.' width=600 height=400></embed>";
-
-                </script>
-
-            ';
+            echo("<script>location.href ='/ai-web/download.php?id=pdf:$pdf';</script>");
         }
         elseif($_POST['opt'] == 'copy_dir') {
             $_SESSION['copy_dir'] = $path.'/'.$_POST['name'];

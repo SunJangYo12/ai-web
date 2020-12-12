@@ -26,8 +26,25 @@
     }
     elseif ($aksi[0] == 'pdf') {
         $pdf = $aksi[1];
-        echo "sdsd";
-        echo '<embed type="application/pdf" src="'.$pdf.'" width="600" height="400"></embed>';
+        echo '
+            <script type="text/javascript">
+                var url = "../tes.pdf";
+            </script>
+            <body>
+                <div>
+                    <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+                    &nbsp&nbsp<input type="submit" value="<" onclick="onPrevPage()">
+                    &nbsp<input type="submit" value=">" onclick="onNextPage()">
+                    &nbsp<input type="number" id="edtgo">
+                    &nbsp<input type="submit" value="Go" onclick="onGotoPage()">
+                </div>
+                <div>
+                    <canvas id="the-canvas" style="border:0px solid black"></canvas>
+                </div>
+                <script type="text/javascript" src="pdf.js"></script>
+                <script type="text/javascript" src="pdfuse.js"></script>
+            </body>
+        ';
     }
     else {
         $mime = strtolower(pathinfo($dfile, PATHINFO_EXTENSION));
