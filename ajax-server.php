@@ -207,9 +207,9 @@ elseif (isset($_GET['idexl'])) {
         $name = urldecode($name);
 
         $name = trim(preg_replace('/\s\s+/', ' ', $name));
-        copy($path.'/'.$name, 'thumbs/'.$name);
+        copy($path.'/'.$name, 'thumbs/open.pdf');
 
-        echo $name;
+        echo 'open.pdf';
     }
     elseif ($exl[0] == "copyvid") {
         array_map('unlink', glob("thumbs/*.mp4"));
