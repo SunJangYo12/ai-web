@@ -550,6 +550,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <option value="gal-image">Galery Image</option>
         <option value="gal-video">Galery Video</option>
         <option value="gal-musik">Galery Musik</option>
+        <option value="gal-doc">Galery Document</option>
         </select>
         <input type="submit" value=">">
         </form></td>';
@@ -1025,6 +1026,150 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             alert("play sukses: "+countsuk);
             countsuk += 1;
         }
+        procffmpeg('."'".$gdata."'".', 0);
+        </script>';
+    }
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-doc') {
+        fm_rdelete('thumbs');
+        unlink("playlist.txt");
+        mkdir('thumbs', 0777, true);
+        echo '
+            <style>
+                img {
+                    border: 4px solid #575D63;
+                    padding: 10px;
+                }
+            </style>';
+        echo '<div id="galshowimg"></div>';
+
+        $files = dir_scan($path);
+        $outfiles = array();
+        $j = 0;
+
+        for ($i=0; $i<count($files); $i++) 
+        {
+            if (is_file($files[$i])) 
+            {
+                $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
+                if ($mime == "pdf") 
+                {
+                   $outfiles[$j] = $files[$i];
+
+                    $my_file = 'playlist.txt';
+                    $handle = fopen($my_file, 'a') or die('Cannot open file:  '.$my_file);
+                    $data = $outfiles[$j]."\n";
+                    fwrite($handle, $data);
+
+                    $j++;
+                }
+            }
+        }
+        
+        $gdata = $outfiles[0];
+        
+        echo '
+        <font color=yellow><h3><marquee>Total: '.count($outfiles).'</marquee></h3></font>
+        <div id=hasil></div>
+
+        <script>
+        var proccount = 0;
+        function procffmpeg(name, full)
+        {
+            var xhr = new XMLHttpRequest();
+            encname = encodeURIComponent(name).replace("%20","+");
+
+            var url = "ajax-server.php?idexl=ffmpeg:doc:"+encname;
+
+            xhr.onloadstart = function () {
+                document.title = "Loading...["+proccount+"/'.count($outfiles).'] Document Viewer"+'.count($outfiles).' ;
+            }
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    var data = JSON.parse(this.responseText);
+                    var dataold = data.old.replace( /[\r\n]+/gm, "" );
+                    var encdataold = encodeURIComponent(dataold).replace("%20","+");
+                    var childencdataold = encodeURIComponent(dataold).replace("%20","+");
+
+                    var hasil = document.getElementById("hasil");
+                    childencdataold = document.createElement("div");
+                    childencdataold.id = encodeURIComponent(data.old);
+
+                    document.title = "Document Viewer "+'.count($outfiles).';
+
+                    imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
+                    childencdataold.innerHTML = "<br><a id="+encdataold+".jpg onclick=saveimg(this.id)>"+';
+                             echo "
+                             '<img width=300 height=300 src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+";
+                             echo '
+                             "<font color=yellow><h5>"+
+                             data.old+
+                             "</h5><b>Size: "+data.size+"</b></font>"+
+                             "&nbsp&nbsp<input type=submit value=Open id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />";
+                    
+                    hasil.appendChild(childencdataold);
+                    proccount += 1;
+
+                    if (data.new != "")
+                        procffmpeg(data.path+"/"+data.new, 0);
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        position = 0;
+        title = "";
+        function scrolltitle() {
+            document.title = title.substring(position, title.length) + title.substring(0, position); 
+            position++;
+            if (position > title.length) position = 0;
+        
+            titleScroll = window.setTimeout(scrolltitle,170);
+        }
+        function saveimg(name) {
+            if (confirm("Simpan Gambar ini?")) {
+                window.open(
+                    "download.php?id=thumbs/"+name,
+                    "_blank"
+                );
+            }  
+        }
+        function play(xname) {
+            zname = xname.split("-jin-");
+            name = zname[0];
+            id = zname[1];
+
+            var xhr = new XMLHttpRequest();
+            var encname = encodeURIComponent(name).replace("%20","+");
+            var url = "ajax-server.php?idexl=copydoc:"+encname;
+            
+            xhr.onloadstart = function () {
+                document.title = "Copying...";
+            }
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                     ';
+                     echo "
+                     title = this.responseText+'                              ';
+                     scrolltitle();
+                     if (confirm('Open Document?')) {
+                        window.open(
+                            'download.php?id=pdf:thumbs/'+this.responseText,
+                            '_blank'
+                        );
+                     }  
+                     ";
+                     echo '
+                     
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        
         procffmpeg('."'".$gdata."'".', 0);
         </script>';
     }

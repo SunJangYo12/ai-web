@@ -28,7 +28,7 @@
         $pdf = $aksi[1];
         echo '
             <script type="text/javascript">
-                var url = "../tes.pdf";
+                var url = "'.$pdf.'";
             </script>
             <body>
                 <div>

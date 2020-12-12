@@ -109,6 +109,43 @@ elseif (isset($_GET['idexl'])) {
 
            echo json_encode($data);
        }
+       if ($exl[1] == "doc")  {
+           $xfiles = $exl[2];
+
+           $xbase = basename($exl[2]);
+           $encbase = basename($exl[2]);
+
+           $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
+           
+
+           $xfiles = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $xfiles); // replace unicode path and name
+           $encname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $encbase);
+
+           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
+          
+           exec('pdftoppm -l 1 -scale-to 500 -jpeg '.$xfiles.' > thumbs/'.basename($xfiles).'.jpg');
+
+           $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
+           $xdir = dirname($newtext);
+           $newtext = basename($newtext);
+           $oldtext = $xbase;
+
+           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
+
+           $data = [  
+                      "new" => $newtext,
+                      "old" => $oldtext,
+                      "size" => fsize($exl[2]),
+                      "encpath" => $encpath,
+                      "encname" => $encname,
+                      "path" => $xdir,
+                      "urlencpath" =>  urlencode(dirname($exl[2])),
+                      "urlencname" =>  urlencode(basename($exl[2])),
+                      "tes" => dirname($xfiles),
+           ];
+
+           echo json_encode($data);
+       }
        if ($exl[1] == "video")  {
            $xfiles = $exl[2];
 
@@ -148,6 +185,20 @@ elseif (isset($_GET['idexl'])) {
     }
     elseif ($exl[0] == "copymus") {
         array_map('unlink', glob("thumbs/*.mp3"));
+       
+        $path = $exl[1];
+        $name = $exl[2];
+
+        $path = urldecode($path);
+        $name = urldecode($name);
+
+        $name = trim(preg_replace('/\s\s+/', ' ', $name));
+        copy($path.'/'.$name, 'thumbs/'.$name);
+
+        echo $name;
+    }
+    elseif ($exl[0] == "copydoc") {
+        array_map('unlink', glob("thumbs/*.pdf"));
        
         $path = $exl[1];
         $name = $exl[2];
