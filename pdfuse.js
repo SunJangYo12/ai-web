@@ -53,6 +53,7 @@
 
       // Update page counters
       document.getElementById('page_num').textContent = pageNum;
+      document.title = 'Page: '+pageNum;
     }
     
     /**
