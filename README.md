@@ -13,7 +13,17 @@ galery image atau yang lain.
 
 ![](output.gif)
 
+# Requitments
+1). php 7 keatas <br>
+2). ffmpeg <br>
+3). pdftoppm <br>
+
 # Install 
 1). copy folder ai-web ke server <br>
 2). tes menggunakan localhost/ai-web/ai.php <br>
 3). finish <br>
+
+#Update aiv1.10
+Penambahan gallery document untuk membuka file pdf, fitur ini
+bisa dibuka di filemanager sama seperti gallery yang lain
+

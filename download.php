@@ -30,6 +30,11 @@
             <script type="text/javascript">
                 var url = "'.$pdf.'";
             </script>
+            <!DOCTYPE HTML>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabe=no"/>
+            </head>
             <body>
                 <div>
                     <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>

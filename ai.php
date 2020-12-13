@@ -1153,8 +1153,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 {
                      ';
                      echo "
-                     title = this.responseText+'                              ';
-                     scrolltitle();
+                     document.title = 'Ai Document Viewer';
                      if (confirm('Open Document?')) {
                         window.open(
                             'download.php?id=pdf:thumbs/'+this.responseText,
