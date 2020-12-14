@@ -48,6 +48,7 @@
                 </div>
                 <script type="text/javascript" src="pdf.js"></script>
                 <script type="text/javascript" src="pdfuse.js"></script>
+                <script type="text/javascript" src="toast.js"></script>
 
                 <div class="fab-container">
                     <span onclick=onPrevPage() class="fab-label">Prev</span><br><br>

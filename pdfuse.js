@@ -8,6 +8,16 @@ var pdfDoc = null,
   canvas = document.getElementById('the-canvas'),
   ctx = canvas.getContext('2d');
 
+  canvas.addEventListener("mousedown", function (e) {
+      if (e.clientX < 200) {
+          onPrevPage();
+      }
+      if (e.clientX > 800) {
+          onNextPage();
+      }
+  }, false);
+
+
   function renderPage(num) 
   {
       pageRendering = true;
@@ -27,7 +37,7 @@ var pdfDoc = null,
           renderTask.promise.then(function () 
           {
               document.title = 'Page: '+pageNum;
-              
+
               pageRendering = false;
               if (pageNumPending !== null) 
               {
