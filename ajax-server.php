@@ -88,8 +88,9 @@ elseif (isset($_GET['idexl'])) {
            exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.basename($xfiles).'.jpg');
            
            $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
+           $tes = $newtext;
            $xdir = dirname($newtext);
-           $newtext = basename($newtext);
+           $newtext = get_basename($newtext);
            $oldtext = $xbase;
 
            $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
@@ -103,8 +104,8 @@ elseif (isset($_GET['idexl'])) {
                       "encname" => $encname,
                       "path" => $xdir,
                       "urlencpath" =>  urlencode(dirname($exl[2])),
-                      "urlencname" =>  urlencode(basename($exl[2])),
-                      "tes" => dirname($xfiles),
+                      "urlencname" =>  urlencode(get_basename($exl[2])),
+                      "tes" => get_basename($tes),
            ];
 
            echo json_encode($data);
@@ -263,18 +264,22 @@ elseif (isset($_GET['idexl'])) {
         $genre = $objmusic->{'format'}->{'tags'}->{'genre'};
         $date = $objmusic->{'format'}->{'tags'}->{'date'};
 
+        echo '<head>
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabe=no"/>
+            </head>';
         echo "<form method=POST action=''>";
         echo "<h3>Song info editing<h3/>";
+
         echo "<pre><b>";
-        if ($title != null) echo "Title<br><input type=edit name=title value=".$title." /><br><br>";
-        if ($artist != null) echo "Artist<br><input type=edit name=artist value=".$artist." /><br><br>";
-        if ($album != null) echo "Album<br><input type=edit name=album value=".$album." /><br><br>";
-        if ($album_artist != null) echo "Album artist<br><input type=edit name=album_artist value=".$album_artist." /><br><br>";
-        if ($track != null) echo "Track<br><input type=edit name=track value=".$track." /><br><br>";
-        if ($disk != null) echo "Disk<br><input type=edit name=disk value=".$disk." /><br><br>";
-        if ($comment != null) echo "Comment<br><input type=edit name=comment value=".$comment." /><br><br>";
-        if ($genre != null) echo "Genre<br><input type=edit name=genre value=".$genre." /><br><br>";
-        if ($date != null) echo "Date<br><input type=edit name=date value=".$date." /><br><br>";
+        if ($title != null) echo "Title<br><input type=edit name=title value=".'"'.$title.'"'." /><br><br>";
+        if ($artist != null) echo "Artist<br><input type=edit name=artist value=".'"'.$artist.'"'." /><br><br>";
+        if ($album != null) echo "Album<br><input type=edit name=album value=".'"'.$album.'"'." /><br><br>";
+        if ($album_artist != null) echo "Album artist<br><input type=edit name=album_artist value=".'"'.$album_artist.'"'." /><br><br>";
+        if ($track != null) echo "Track<br><input type=edit name=track value=".'"'.$track.'"'." /><br><br>";
+        if ($disk != null) echo "Disk<br><input type=edit name=disk value=".'"'.$disk.'"'." /><br><br>";
+        if ($comment != null) echo "Comment<br><input type=edit name=comment value=".'"'.$comment.'"'." /><br><br>";
+        if ($genre != null) echo "Genre<br><input type=edit name=genre value=".'"'.$genre.'"'." /><br><br>";
+        if ($date != null) echo "Date<br><input type=edit name=date value=".'"'.$date.'"'." /><br><br>";
         echo "<h3><input type=submit name=mussave value=Save </input></h3>";
         echo "<h3><input type=hidden name=pathname value=".$input." </input></h3>";
         echo "</pre></b>";
@@ -348,6 +353,11 @@ function delete_text_line($filepath, $num) {
     else {
       return fgets($file);
     }
+}
+
+function get_basename($filename)
+{
+    return preg_replace('/^.+[\\\\\\/]/', '', $filename);
 }
 
 function fsize($input) {

@@ -9,10 +9,10 @@ var pdfDoc = null,
   ctx = canvas.getContext('2d');
 
   canvas.addEventListener("mousedown", function (e) {
-      if (e.clientX < 200) {
+      if (e.clientX < 500) {
           onPrevPage();
       }
-      if (e.clientX > 800) {
+      if (e.clientX > 500) {
           onNextPage();
       }
   }, false);
