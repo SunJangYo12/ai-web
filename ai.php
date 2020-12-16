@@ -778,8 +778,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     document.title = "Video AI Gallery total: "+'.count($outfiles).';
 
-                    alert(data.tes);
-
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".gif";
                     ';
 
