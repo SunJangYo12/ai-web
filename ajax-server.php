@@ -150,8 +150,8 @@ elseif (isset($_GET['idexl'])) {
        if ($exl[1] == "video")  {
            $xfiles = $exl[2];
 
-           $xbase = basename($exl[2]);
-           $encbase = basename($exl[2]);
+           $xbase = get_basename($exl[2]);
+           $encbase = get_basename($exl[2]);
 
            $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
            $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
@@ -161,11 +161,9 @@ elseif (isset($_GET['idexl'])) {
 
            exec('ffmpeg -ss 30 -t 3 -i '.$xfiles.' -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
 
-           //echo $exl[3];
-          
            $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $xdir = dirname($newtext);
-           $newtext = basename($newtext);
+           $newtext = get_basename($newtext);
            $oldtext = $xbase;
 
            $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
@@ -177,8 +175,8 @@ elseif (isset($_GET['idexl'])) {
                       "encname" => $encname,
                       "path" => $xdir,
                       "urlencpath" =>  urlencode(dirname($exl[2])),
-                      "urlencname" =>  urlencode(basename($exl[2])),
-                      "tes" => $exl[2],
+                      "urlencname" =>  urlencode(get_basename($exl[2])),
+                      "tes" => $xfiles,
            ];
 
            echo json_encode($data);
