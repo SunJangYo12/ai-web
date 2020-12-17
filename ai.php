@@ -1171,7 +1171,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                      
                      if (confirm('Open Document?')) {
                         window.open(
-                            'download.php?id=pdf:thumbs/'+this.responseText,
+                            'download.php?id=pdf:thumbs/open.pdf:'+this.responseText,
                             '_blank'
                         );
                      }  

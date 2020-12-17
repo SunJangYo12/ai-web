@@ -60,20 +60,20 @@ var pdfDoc = null,
   }
 
   function onPrevPage() {
-      document.title = 'Rendering...';
       if (pageNum <= 1) {
           return;
       }
       pageNum--;
+      document.title = 'Rendering...';
       queueRenderPage(pageNum);
   }
 
   function onNextPage() {
-      document.title = 'Rendering...';
       if (pageNum >= pdfDoc.numPages) {
           return;
       }
       pageNum++;
+      document.title = 'Rendering...';
       queueRenderPage(pageNum);
   }
 
@@ -82,10 +82,14 @@ var pdfDoc = null,
       if (pageNo < 1 || pageNo > pdfDoc.numPages) {
           return;
       }
-      pageNum = pageNo;
+      document.title = 'Rendering...';
+      pageNum = parseFloat(pageNo);
       queueRenderPage(pageNum);
   }
-
+  function onSavePage() {
+      window.open("ajax-server.php?idexl=pdfhissave:"+hissave+":"+pageNum, "_blank");
+     
+  }
   
     
   function callGetDocment (response) {  
@@ -107,3 +111,16 @@ var pdfDoc = null,
       alert("The pdf may not be downloded or it may be xhr error.Please be patient as we are working on this issue.");
   }
   xhr.send();
+
+  if (parseFloat(hispage) > 0) {
+      var hisproc = parseFloat(hispage);
+      if (confirm("History tersimpan Page: "+hisproc+" Buka sekarang?")) {
+           /*var pageNo = hisproc;
+           if (pageNo < 1 || pageNo > pdfDoc.numPages) {
+               return;
+           }
+           document.title = 'Rendering...';
+           pageNum = pageNo;
+           queueRenderPage(pageNum);*/
+      }  
+  }

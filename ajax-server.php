@@ -208,7 +208,7 @@ elseif (isset($_GET['idexl'])) {
         $name = trim(preg_replace('/\s\s+/', ' ', $name));
         copy($path.'/'.$name, 'thumbs/open.pdf');
 
-        echo 'open.pdf';
+        echo $name;
     }
     elseif ($exl[0] == "copyvid") {
         array_map('unlink', glob("thumbs/*.mp4"));
@@ -282,6 +282,19 @@ elseif (isset($_GET['idexl'])) {
         echo "<h3><input type=hidden name=pathname value=".$input." </input></h3>";
         echo "</pre></b>";
         echo "</form>";
+    }
+    elseif ($exl[0] == "pdfhissave") {
+        $name = $exl[1];
+        $page = $exl[2];
+
+        if (!file_exists("pdfhistory")) {
+            mkdir("pdfhistory", 0777, true);
+        }
+        $file = fopen("pdfhistory/".$name, "w");
+        fwrite($file, $page);
+        fclose($file);
+
+        echo '<script>alert("Saved");</script>';
     }
 }
 

@@ -26,9 +26,28 @@
     }
     elseif ($aksi[0] == 'pdf') {
         $pdf = $aksi[1];
+        $his = $aksi[2];
+        $hispage = "";
+
+        $scandir = scandir("pdfhistory");
+        foreach($scandir as $dir){
+           if ($dir == $his) {
+               $file = fopen("pdfhistory/".$dir, 'r');
+               if (!$file) {
+                   die('File tidak ada');
+               }
+               else {
+                   $hispage = fgets($file);
+               }
+           }
+        }
+    
         echo '
             <script type="text/javascript">
+                //alert("'.$yosh.'");
                 var url = "'.$pdf.'";
+                var hissave = "'.$aksi[2].'";
+                var hispage = "'.$hispage.'";
             </script>
             <!DOCTYPE HTML>
             <html>
@@ -42,6 +61,7 @@
                     &nbsp<input type="submit" value=">" onclick="onNextPage()">
                     &nbsp<input type="number" id="edtgo">
                     &nbsp<input type="submit" value="Go" onclick="onGotoPage()">
+                    &nbsp<input type="submit" value="Save Current Page to History" onclick="onSavePage()">
                 </div>
                 <div>
                     <canvas id="the-canvas" style="border:0px solid black"></canvas>
