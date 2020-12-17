@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v1.10";
+$version = "v2.0";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -749,6 +749,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
         <script>
         var proccount = 0;
+        var ubahtitle = false;
 
         function procffmpeg(name, full)
         {            
@@ -759,7 +760,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var idhasil = "kosong";
 
             xhr.onloadstart = function () {
-                document.title = "Loading...["+proccount+"/'.count($outfiles).'] Video AI Gallery total: "+'.count($outfiles).' ;
+                document.title = "Loading...["+proccount+"/'.count($outfiles).'] Video AI Gallery";
             }
 
             xhr.onreadystatechange = function() {
@@ -794,6 +795,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);
+                    else
+                        ubahtitle = true;
                 }
             };
             xhr.open("GET", url, true);
@@ -817,7 +820,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
-                    document.title = "Video play: "+vname;
+                    if (ubahtitle)
+                        document.title = vname;
                     ';
                     
                     echo "
@@ -893,6 +897,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
         <script>
         var proccount = 0;
+        var ubahtitle = false;
         function procffmpeg(name, full)
         {
             var xhr = new XMLHttpRequest();
@@ -933,6 +938,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);
+                    else 
+                        ubahtitle = true;
                 }
             };
             xhr.open("GET", url, true);
@@ -1007,8 +1014,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 {
                      ';
                      echo "
-                     title = this.responseText+'                              ';
-                     scrolltitle();
+                     if (ubahtitle) {
+                        title = this.responseText+'                              ';
+                        scrolltitle();
+                     }
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
@@ -1073,6 +1082,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
         <script>
         var proccount = 0;
+        var ubahtitle = false;
+
         function procffmpeg(name, full)
         {
             var xhr = new XMLHttpRequest();
@@ -1113,6 +1124,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     if (data.new != "")
                         procffmpeg(data.path+"/"+data.new, 0);
+                    else
+                        ubahtitle = true;
                 }
             };
             xhr.open("GET", url, true);
@@ -1153,7 +1166,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 {
                      ';
                      echo "
-                     document.title = 'Ai Document Viewer';
+                     if (ubahtitle)
+                        document.title = 'Ai Document Viewer';
+                     
                      if (confirm('Open Document?')) {
                         window.open(
                             'download.php?id=pdf:thumbs/'+this.responseText,
