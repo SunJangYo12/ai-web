@@ -44,7 +44,6 @@
     
         echo '
             <script type="text/javascript">
-                //alert("'.$yosh.'");
                 var url = "'.$pdf.'";
                 var hissave = "'.$aksi[2].'";
                 var hispage = "'.$hispage.'";
@@ -61,14 +60,12 @@
                     &nbsp<input type="submit" value=">" onclick="onNextPage()">
                     &nbsp<input type="number" id="edtgo">
                     &nbsp<input type="submit" value="Go" onclick="onGotoPage()">
-                    &nbsp<input type="submit" value="Save Current Page to History" onclick="onSavePage()">
                 </div>
                 <div>
                     <canvas id="the-canvas" style="border:0px solid black"></canvas>
                 </div>
                 <script type="text/javascript" src="pdf.js"></script>
                 <script type="text/javascript" src="pdfuse.js"></script>
-                <script type="text/javascript" src="toast.js"></script>
 
                 <div class="fab-container">
                     <span onclick=onPrevPage() class="fab-label">Prev</span><br><br>

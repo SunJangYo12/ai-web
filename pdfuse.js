@@ -75,6 +75,7 @@ var pdfDoc = null,
       pageNum++;
       document.title = 'Rendering...';
       queueRenderPage(pageNum);
+      onSavePage();
   }
 
   function onGotoPage() {
@@ -85,10 +86,14 @@ var pdfDoc = null,
       document.title = 'Rendering...';
       pageNum = parseFloat(pageNo);
       queueRenderPage(pageNum);
+      onSavePage();
   }
   function onSavePage() {
-      window.open("ajax-server.php?idexl=pdfhissave:"+hissave+":"+pageNum, "_blank");
-     
+      var xhr = new XMLHttpRequest();
+      var savehisurl = "ajax-server.php?idexl=pdfhissave:"+hissave+":"+pageNum;
+        
+      xhr.open("GET", savehisurl, true);
+      xhr.send();
   }
   
     
@@ -114,7 +119,5 @@ var pdfDoc = null,
 
   if (parseFloat(hispage) > 0) {
       var hisproc = parseFloat(hispage);
-      if (confirm("History tersimpan Page: "+hisproc+" Buka sekarang?")) {
-           pageNum = hisproc
-      }  
+      pageNum = hisproc
   }

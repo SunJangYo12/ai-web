@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v2.0";
+$version = "v2.1";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";

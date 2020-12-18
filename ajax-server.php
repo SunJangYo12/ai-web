@@ -294,7 +294,7 @@ elseif (isset($_GET['idexl'])) {
         fwrite($file, $page);
         fclose($file);
 
-        echo '<script>alert("Saved");</script>';
+        echo "saved";
     }
 }
 
