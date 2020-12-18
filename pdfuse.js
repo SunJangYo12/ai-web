@@ -115,12 +115,6 @@ var pdfDoc = null,
   if (parseFloat(hispage) > 0) {
       var hisproc = parseFloat(hispage);
       if (confirm("History tersimpan Page: "+hisproc+" Buka sekarang?")) {
-           /*var pageNo = hisproc;
-           if (pageNo < 1 || pageNo > pdfDoc.numPages) {
-               return;
-           }
-           document.title = 'Rendering...';
-           pageNum = pageNo;
-           queueRenderPage(pageNum);*/
+           pageNum = hisproc
       }  
   }
