@@ -33,7 +33,6 @@ var pdfDoc = null,
           };
         
           var renderTask = page.render(renderContext);
-
           renderTask.promise.then(function () 
           {
               document.title = 'Page: '+pageNum;

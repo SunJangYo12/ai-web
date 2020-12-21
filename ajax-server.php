@@ -150,33 +150,26 @@ elseif (isset($_GET['idexl'])) {
        if ($exl[1] == "video")  {
            $xfiles = $exl[2];
 
-           $xbase = get_basename($exl[2]);
-           $encbase = get_basename($exl[2]);
+           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
+           $xbase = get_basename($xfiles);
+           $encname = get_basename($xfiles);
 
-           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
-           $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
-
-           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles); // replace unicode path and name
-           $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $encbase);
+           $encname = trim(preg_replace('/\s\s+/', ' ', $encname));
 
            exec('ffmpeg -ss 30 -t 3 -i '.$xfiles.' -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
 
-           $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
-           $xdir = dirname($newtext);
-           $newtext = get_basename($newtext);
-           $oldtext = $xbase;
+           $newname = delete_text_line("playlist.txt", 0); // jangan akses dua kali
+           $newdir = get_dirname($newname);
+           $newname = get_basename($newname);
+           $oldtext = get_basename($exl[2]);
 
-           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
-
-           $data = [  "new" => $newtext,
+           $data = [  "new" => $newname,
                       "old" => $oldtext,
                       "size" => base64_encode(fsize($exl[2])),
-                      "encpath" => $encpath,
-                      "encname" => $encname,
-                      "path" => $xdir,
-                      "urlencpath" =>  urlencode(dirname($exl[2])),
+                      "path" => $newdir,
+                      "urlencpath" =>  urlencode(get_dirname($exl[2])),
                       "urlencname" =>  urlencode(get_basename($exl[2])),
-                      "tes" => $xfiles,
+                      "tes" => get_dirname($exl[2]),
            ];
 
            echo json_encode($data);
@@ -216,12 +209,15 @@ elseif (isset($_GET['idexl'])) {
         $path = $exl[1];
         $name = $exl[2];
 
+        $path = urldecode($path);
+        $name = urldecode($name);
+
         $path = str_replace("-jin-", ' ', $path);
         $name = str_replace("-jin-", ' ', $name);
 
 
-        copy($path.'/'.$name, 'thumbs/'.$exl[2]);
-        echo $exl[2];
+        copy($path.'/'.$name, 'thumbs/'.$name);
+        echo $name;
     }
     elseif ($exl[0] == "infomedia") {
         $path = urldecode($exl[1]);
@@ -368,12 +364,33 @@ function delete_text_line($filepath, $num) {
 
 function get_basename($filename)
 {
-    return preg_replace('/^.+[\\\\\\/]/', '', $filename);
+    $exl = explode('/', $filename);
+    $count = count($exl);
+
+    $out = $exl[$count - 1];
+    $delent = explode("\n", $out);
+    $out = $delent[0];
+
+    return $out;
+}
+function get_dirname($filename)
+{
+  $exl = explode('/', $filename);
+  $count = count($exl);
+  $out = "";
+
+  for($i=0; $i<$count; $i++) {
+    if ($i != $count -1) {
+      $out .= $exl[$i]."/";
+    }
+  }
+  $out = substr($out, 0, -1); // delete last string
+
+  return $out;
 }
 
 function fsize($input) {
-    $sizedata = trim(preg_replace('/\s\s+/', ' ', $input)); //hapus enter
-    $size = filesize($sizedata)/1024;
+    $size = filesize($input)/1024;
     $size = round($size,3);
     if($size >= 1024){
        $size = round($size/1024,2).' MB';
