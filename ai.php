@@ -1002,8 +1002,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             id = zname[1];
 
             var xhr = new XMLHttpRequest();
-            var encname = encodeURIComponent(name).replace("%20","+");
-            var url = "ajax-server.php?idexl=copymus:"+encname;
+            var url = "ajax-server.php?idexl=copymus:"+name;
             
             xhr.onloadstart = function () {
                 document.title = "Copying...";
@@ -1012,6 +1011,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
+                     alert(this.responseText);
                      ';
                      echo "
                      if (ubahtitle) {

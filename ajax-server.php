@@ -74,38 +74,28 @@ elseif (isset($_GET['idexl'])) {
        if ($exl[1] == "audio")  {
            $xfiles = $exl[2];
 
-           $xbase = basename($exl[2]);
-           $encbase = basename($exl[2]);
+           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
+           $xbase = get_basename($xfiles);
+           $encname = get_basename($xfiles);
 
-           $encbase = trim(preg_replace('/\s\s+/', ' ', $encbase));
-           
-
-           $xfiles = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $xfiles); // replace unicode path and name
-           $encname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $encbase);
-
-           $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
+           $encname = trim(preg_replace('/\s\s+/', ' ', $encname));
           
-           exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.basename($xfiles).'.jpg');
+           exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$encname.'.jpg');
            
-           $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
-           $tes = $newtext;
-           $xdir = dirname($newtext);
-           $newtext = get_basename($newtext);
-           $oldtext = $xbase;
-
-           $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
+           $newname = delete_text_line("playlist.txt", 0); // jangan akses dua kali
+           $newdir = get_dirname($newname);
+           $newname = get_basename($newname);
+           $oldtext = get_basename($exl[2]);
 
            $data = [  
-                      "new" => $newtext,
+                      "new" => $newname,
                       "old" => $oldtext,
                       "size" => fsize($exl[2]),
                       "jalbum" => getinfomedia($xfiles),
-                      "encpath" => $encpath,
-                      "encname" => $encname,
-                      "path" => $xdir,
-                      "urlencpath" =>  urlencode(dirname($exl[2])),
+                      "path" => $newdir,
+                      "urlencpath" =>  urlencode(get_dirname($exl[2])),
                       "urlencname" =>  urlencode(get_basename($exl[2])),
-                      "tes" => get_basename($tes),
+                      "tes" => get_basename($exl[2]),
            ];
 
            echo json_encode($data);
@@ -184,7 +174,6 @@ elseif (isset($_GET['idexl'])) {
         $path = urldecode($path);
         $name = urldecode($name);
 
-        $name = trim(preg_replace('/\s\s+/', ' ', $name));
         copy($path.'/'.$name, 'thumbs/'.$name);
 
         echo $name;
