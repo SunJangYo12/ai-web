@@ -212,9 +212,6 @@ elseif (isset($_GET['idexl'])) {
         $path = urldecode($exl[1]);
         $name = urldecode($exl[2]);
 
-        $path = trim(preg_replace('/\s\s+/', ' ', $path));
-        $name = trim(preg_replace('/\s\s+/', ' ', $name));
-
         $input = $path."/".$name;
         $input = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $input);
         $objmusic = json_decode(shell_exec('ffprobe -v quiet -print_format json -show_format -show_streams '.$input));  
@@ -230,9 +227,6 @@ elseif (isset($_GET['idexl'])) {
     elseif ($exl[0] == "musedit") {
         $path = urldecode($exl[1]);
         $name = urldecode($exl[2]);
-
-        $path = trim(preg_replace('/\s\s+/', ' ', $path));
-        $name = trim(preg_replace('/\s\s+/', ' ', $name));
 
         $input = $path."/".$name;
         $input = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $input);
@@ -252,6 +246,16 @@ elseif (isset($_GET['idexl'])) {
             </head>';
         echo "<form method=POST action=''>";
         echo "<h3>Song info editing<h3/>";
+        echo '
+            <style>
+                img {
+                    border: 4px solid #575D63;
+                    padding: 10px;
+                }
+            </style>';
+        echo "<img width=300 height=300 src='thumbs/".$name.".jpg' />";
+        $iminfo = getimagesize("thumbs/".$name.".jpg"); 
+        echo "<t>".$iminfo[0]." x ".$iminfo[1]."</t>";
 
         echo "<pre><b>";
         if ($title != null) echo "Title<br><input type=edit name=title value=".'"'.$title.'"'." /><br><br>";
@@ -320,9 +324,15 @@ function getinfomedia($input) {
     $date = $objmusic->{'format'}->{'tags'}->{'date'};
 
     if ($title != null) $output .= "<font color=white>Tittle : </font>".$title."<br>";
-    if ($title == null) $output .= "<font color=red>Tittle file : </font>".get_basename($input)."<br>";
+    if ($title == null) $output .= "<font color=red>File : </font>".get_basename($input)."<br>";
 
-    if ($artist != null) $output .= "<font color=white>Artist : </font>".$artist."<br>";
+    if ($artist != null) {
+        $best = explode('best', $artist);
+        if ($best[1] != null)
+            $output .= "<font color=white>Artist : </font><font color=blue>".$artist."</font><br>";
+        else
+            $output .= "<font color=white>Artist : </font>".$artist."<br>";
+    }
     if ($album != null) $output .= "<font color=white>Album : </font>".$album."<br>";
     if ($track != null) $output .= "<font color=white>Track : </font>".$track."<br>";
     if ($disk != null) $output .= "<font color=white>Disk : </font>".$disk."<br>";

@@ -1030,10 +1030,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.open("GET", url, true);
             xhr.send();
         }
-        var countsuk = 0;
         function sukses() {
-            alert("play sukses: "+countsuk);
-            countsuk += 1;
+            //alert("play sukses: ");
         }
         procffmpeg('."'".$gdata."'".', 0);
         </script>';
