@@ -727,7 +727,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             if (is_file($files[$i])) 
             {
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
-                if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv") 
+                if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv" || $mime == "webm") 
                 {
                     $outfiles[$j] = $files[$i];
 
