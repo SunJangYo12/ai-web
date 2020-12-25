@@ -224,6 +224,17 @@ elseif (isset($_GET['idexl'])) {
         echo "<pre>";
         print_r($objmusic);
     }
+    elseif ($exl[0] == "musfavorite") {
+        $path = urldecode($exl[1]);
+        $name = urldecode($exl[2]);
+
+        $input = $path."/".$name;
+        $input = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $input);
+        $objmusic = json_decode(shell_exec('ffprobe -v quiet -print_format json -show_format -show_streams '.$input));  
+        $artist = $objmusic->{'format'}->{'tags'}->{'artist'};
+
+        songedit($path, $name, "artist", "best ".$artist);
+    }
     elseif ($exl[0] == "musedit") {
         $path = urldecode($exl[1]);
         $name = urldecode($exl[2]);
@@ -240,6 +251,10 @@ elseif (isset($_GET['idexl'])) {
         $comment = $objmusic->{'format'}->{'tags'}->{'comment'};
         $genre = $objmusic->{'format'}->{'tags'}->{'genre'};
         $date = $objmusic->{'format'}->{'tags'}->{'date'};
+        $encoder = $objmusic->{'format'}->{'tags'}->{'encoder'};
+        $iTunPGAP = $objmusic->{'format'}->{'tags'}->{'iTunPGAP'};
+        $iTunNORM = $objmusic->{'format'}->{'tags'}->{'iTunNORM'};
+        $iTunSMPB = $objmusic->{'format'}->{'tags'}->{'iTunSMPB'};
 
         echo '<head>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabe=no"/>
@@ -258,17 +273,34 @@ elseif (isset($_GET['idexl'])) {
         echo "<t>".$iminfo[0]." x ".$iminfo[1]."</t>";
 
         echo "<pre><b>";
-        if ($title != null) echo "Title<br><input type=edit name=title value=".'"'.$title.'"'." /><br><br>";
-        if ($artist != null) echo "Artist<br><input type=edit name=artist value=".'"'.$artist.'"'." /><br><br>";
-        if ($album != null) echo "Album<br><input type=edit name=album value=".'"'.$album.'"'." /><br><br>";
-        if ($album_artist != null) echo "Album artist<br><input type=edit name=album_artist value=".'"'.$album_artist.'"'." /><br><br>";
-        if ($track != null) echo "Track<br><input type=edit name=track value=".'"'.$track.'"'." /><br><br>";
-        if ($disk != null) echo "Disk<br><input type=edit name=disk value=".'"'.$disk.'"'." /><br><br>";
-        if ($comment != null) echo "Comment<br><input type=edit name=comment value=".'"'.$comment.'"'." /><br><br>";
-        if ($genre != null) echo "Genre<br><input type=edit name=genre value=".'"'.$genre.'"'." /><br><br>";
-        if ($date != null) echo "Date<br><input type=edit name=date value=".'"'.$date.'"'." /><br><br>";
+        echo "Title<br><input type=edit name=title value=".'"'.$title.'"'." /><br><br>";
+        echo "Artist<br><input type=edit name=artist value=".'"'.$artist.'"'." /><br><br>";
+        echo "Album<br><input type=edit name=album value=".'"'.$album.'"'." /><br><br>";
+        echo "Album artist<br><input type=edit name=album_artist value=".'"'.$album_artist.'"'." /><br><br>";
+        echo "Track<br><input type=edit name=track value=".'"'.$track.'"'." /><br><br>";
+        echo "Disk<br><input type=edit name=disk value=".'"'.$disk.'"'." /><br><br>";
+        echo "Comment<br><input type=edit name=comment value=".'"'.$comment.'"'." /><br><br>";
+        echo "Genre<br><input type=edit name=genre value=".'"'.$genre.'"'." /><br><br>";
+        echo "Date<br><input type=edit name=date value=".'"'.$date.'"'." /><br><br>";
+        echo "Encoder<br><input type=edit name=encoder value=".'"'.$encoder.'"'." /><br><br>";
+        echo "iTunPGAP<br><input type=edit name=iTunPGAP value=".'"'.$iTunPGAP.'"'." /><br><br>";
+        echo "iTunNORM<br><input type=edit name=iTunNORM value=".'"'.$iTunNORM.'"'." /><br><br>";
+        echo "iTunSMPB<br><input type=edit name=iTunSMPB value=".'"'.$iTunSMPB.'"'." /><br><br>";
+       
         echo "<h3><input type=submit name=mussave value=Save </input></h3>";
-        echo "<h3><input type=hidden name=pathname value=".$input." </input></h3>";
+        echo "<h3><input type=hidden name=name value=".urlencode($name)." ></input></h3>";
+        echo "<h3><input type=hidden name=path value=".urlencode($path)." ></input></h3>";
+
+        echo "<input type=hidden name=last_title value=".urlencode($title)." ></input>";
+        echo "<input type=hidden name=last_artist value=".urlencode($artist)." ></input>";
+        echo "<input type=hidden name=last_album value=".urlencode($album)." ></input>";
+        echo "<input type=hidden name=last_album_artist value=".urlencode($album_artist)." ></input>";
+        echo "<input type=hidden name=last_track value=".urlencode($track)." ></input>";
+        echo "<input type=hidden name=last_disk value=".urlencode($disk)." ></input>";
+        echo "<input type=hidden name=last_comment value=".urlencode($comment)." ></input>";
+        echo "<input type=hidden name=last_genre value=".urlencode($genre)." ></input>";
+        echo "<input type=hidden name=last_date value=".urlencode($date)." ></input>";
+        
         echo "</pre></b>";
         echo "</form>";
     }
@@ -288,27 +320,77 @@ elseif (isset($_GET['idexl'])) {
 }
 
 if (isset($_POST['mussave'])) {
-    if (isset($_POST['artist'])) $artist = $_POST['artist'];
-    if (isset($_POST['album'])) $album = $_POST['album'];
-    if (isset($_POST['album_artist'])) $album_artist = $_POST['album_artist'];
-    if (isset($_POST['track'])) $track = $_POST['track'];
-    if (isset($_POST['disk'])) $disk = $_POST['disk'];
-    if (isset($_POST['comment'])) $comment = $_POST['comment'];
-    if (isset($_POST['genre'])) $genre = $_POST['genre'];
-    if (isset($_POST['date'])) $date = $_POST['date'];
+    $title = $_POST['title'];
+    $artist = $_POST['artist'];
+    $album = $_POST['album'];
+    $album_artist = $_POST['album_artist'];
+    $track = $_POST['track'];
+    $disk = $_POST['disk'];
+    $comment = $_POST['comment'];
+    $genre = $_POST['genre'];
+    $date = $_POST['date'];
 
-    $pathname = $_POST['pathname'];
+    $name = urldecode($_POST['name']);
+    $path = urldecode($_POST['path']);
 
-    if ($artist != null) {
-        echo "<script>alert('Edit Artist: ".$artist."');</script>";
-        //exec('ffmpeg -y -i "'.$pathname.'" -c copy -metadata artist="'.$artist.'" "'.$pathname.'"');
+    $last_title = urldecode($_POST['last_title']);
+    $last_artist = urldecode($_POST['last_artist']);
+    $last_album = urldecode($_POST['last_album']);
+    $last_album_artist = urldecode($_POST['last_album_artist']);
+    $last_track = urldecode($_POST['last_track']);
+    $last_disk = urldecode($_POST['last_disk']);
+    $last_comment = urldecode($_POST['last_comment']);
+    $last_genre = urldecode($_POST['last_genre']);
+    $last_date = urldecode($_POST['last_date']);
+
+    if ($title != $last_title) {
+        songedit($path, $name, "title", $title);
     }
-    if ($album != null) {
-        echo "<script>alert('Edit Album: ".$album."');</script>";
+    elseif ($artist != $last_artist) {
+        songedit($path, $name, "artist", $artist);
     }
-
+    elseif ($album != $last_album) {
+        songedit($path, $name, "album", $album);
+    }
+    elseif ($album_artist != $last_album_artist) {
+        songedit($path, $name, "album_artist", $album_artist);
+    }
+    elseif ($track != $last_track) {
+        songedit($path, $name, "track", $track);
+    }
+    elseif ($disk != $last_disk) {
+        songedit($path, $name, "disk", $disk);
+    }
+    elseif ($comment != $last_comment) {
+        songedit($path, $name, "comment", $comment);
+    }
+    elseif ($genre != $last_genre) {
+        songedit($path, $name, "genre", $genre);
+    }
+    elseif ($date != $last_date) {
+        songedit($path, $name, "date", $date);
+    }
 }
 
+function songedit($path, $name, $metadata, $isimeta) {
+    $xname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $name);
+    exec("ffmpeg -y -i thumbs/'".$name."' -c copy -metadata ".$metadata."='".$isimeta."' thumbs/edit.".$xname);
+
+    if (file_exists('thumbs/edit.'.$name)) {
+        if (!file_exists('backup')) {
+            echo "<script>alert('Directory backup created');</script>";
+            mkdir('backup', 0777, true);
+        }
+        copy($path.'/'.$name, 'backup/'.$name);
+        unlink($path.'/'.$name);
+        copy('thumbs/edit.'.$name, $path.'/'.$name);
+            
+        echo "<script>alert('Success Edit ".$metadata."');</script>";
+    }
+    else {
+        echo "<script>alert('Failed Edit Songs');</script>";
+    }
+}
 
 function getinfomedia($input) {
     $output = "";
@@ -329,7 +411,7 @@ function getinfomedia($input) {
     if ($artist != null) {
         $best = explode('best', $artist);
         if ($best[1] != null)
-            $output .= "<font color=white>Artist : </font><font color=blue>".$artist."</font><br>";
+            $output .= "<font color=white>Artist : </font><font color=#FF69B4>".$artist."</font><br>";
         else
             $output .= "<font color=white>Artist : </font>".$artist."<br>";
     }

