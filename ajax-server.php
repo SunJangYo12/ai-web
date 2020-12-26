@@ -233,7 +233,16 @@ elseif (isset($_GET['idexl'])) {
         $objmusic = json_decode(shell_exec('ffprobe -v quiet -print_format json -show_format -show_streams '.$input));  
         $artist = $objmusic->{'format'}->{'tags'}->{'artist'};
 
-        songedit($path, $name, "artist", "best ".$artist);
+        if ($artist == null) 
+            $artist = $objmusic->{'format'}->{'tags'}->{'ARTIST'};
+
+        if ($artist == null) 
+            $artist = $objmusic->{'format'}->{'tags'}->{'Artist'};
+
+        if ($artist == null) 
+            echo "<script>alert('Failed Edit : tidak ditemukan metadata artist');</script>";
+        else
+            songedit($path, $name, "artist", "best ".$artist);
     }
     elseif ($exl[0] == "musedit") {
         $path = urldecode($exl[1]);
@@ -242,19 +251,6 @@ elseif (isset($_GET['idexl'])) {
         $input = $path."/".$name;
         $input = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $input);
         $objmusic = json_decode(shell_exec('ffprobe -v quiet -print_format json -show_format -show_streams '.$input));  
-        $title = $objmusic->{'format'}->{'tags'}->{'title'};
-        $artist = $objmusic->{'format'}->{'tags'}->{'artist'};
-        $album_artist = $objmusic->{'format'}->{'tags'}->{'album_artist'};
-        $album = $objmusic->{'format'}->{'tags'}->{'album'};
-        $track = $objmusic->{'format'}->{'tags'}->{'track'};
-        $disk = $objmusic->{'format'}->{'tags'}->{'disc'};
-        $comment = $objmusic->{'format'}->{'tags'}->{'comment'};
-        $genre = $objmusic->{'format'}->{'tags'}->{'genre'};
-        $date = $objmusic->{'format'}->{'tags'}->{'date'};
-        $encoder = $objmusic->{'format'}->{'tags'}->{'encoder'};
-        $iTunPGAP = $objmusic->{'format'}->{'tags'}->{'iTunPGAP'};
-        $iTunNORM = $objmusic->{'format'}->{'tags'}->{'iTunNORM'};
-        $iTunSMPB = $objmusic->{'format'}->{'tags'}->{'iTunSMPB'};
 
         echo '<head>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabe=no"/>
@@ -272,35 +268,29 @@ elseif (isset($_GET['idexl'])) {
         $iminfo = getimagesize("thumbs/".$name.".jpg"); 
         echo "<t>".$iminfo[0]." x ".$iminfo[1]."</t>";
 
+        $meta = "";
+        $last_meta = "";
+        $my_key = "";
+        $i = 0;
+
         echo "<pre><b>";
-        echo "Title<br><input type=edit name=title value=".'"'.$title.'"'." /><br><br>";
-        echo "Artist<br><input type=edit name=artist value=".'"'.$artist.'"'." /><br><br>";
-        echo "Album<br><input type=edit name=album value=".'"'.$album.'"'." /><br><br>";
-        echo "Album artist<br><input type=edit name=album_artist value=".'"'.$album_artist.'"'." /><br><br>";
-        echo "Track<br><input type=edit name=track value=".'"'.$track.'"'." /><br><br>";
-        echo "Disk<br><input type=edit name=disk value=".'"'.$disk.'"'." /><br><br>";
-        echo "Comment<br><input type=edit name=comment value=".'"'.$comment.'"'." /><br><br>";
-        echo "Genre<br><input type=edit name=genre value=".'"'.$genre.'"'." /><br><br>";
-        echo "Date<br><input type=edit name=date value=".'"'.$date.'"'." /><br><br>";
-        echo "Encoder<br><input type=edit name=encoder value=".'"'.$encoder.'"'." /><br><br>";
-        echo "iTunPGAP<br><input type=edit name=iTunPGAP value=".'"'.$iTunPGAP.'"'." /><br><br>";
-        echo "iTunNORM<br><input type=edit name=iTunNORM value=".'"'.$iTunNORM.'"'." /><br><br>";
-        echo "iTunSMPB<br><input type=edit name=iTunSMPB value=".'"'.$iTunSMPB.'"'." /><br><br>";
-       
+
+        foreach ($objmusic->{'format'} as $value) {
+            foreach ($value as $key=>$value) {
+                $meta .= $key."<br><input type=edit name=meta_".$i." value=".'"'.$value.'"'." /><br><br>";
+                $last_meta .= "<input type=hidden name=last_".$i." value=".urlencode($value)." ></input>";
+                $my_key .= "<input type=hidden name=key_".$i." value=".urlencode($key)." ></input>";
+                $i += 1;
+            }
+        }
+        echo $meta;
+        echo $last_meta;
+        echo $my_key;
+        
         echo "<h3><input type=submit name=mussave value=Save </input></h3>";
         echo "<h3><input type=hidden name=name value=".urlencode($name)." ></input></h3>";
         echo "<h3><input type=hidden name=path value=".urlencode($path)." ></input></h3>";
 
-        echo "<input type=hidden name=last_title value=".urlencode($title)." ></input>";
-        echo "<input type=hidden name=last_artist value=".urlencode($artist)." ></input>";
-        echo "<input type=hidden name=last_album value=".urlencode($album)." ></input>";
-        echo "<input type=hidden name=last_album_artist value=".urlencode($album_artist)." ></input>";
-        echo "<input type=hidden name=last_track value=".urlencode($track)." ></input>";
-        echo "<input type=hidden name=last_disk value=".urlencode($disk)." ></input>";
-        echo "<input type=hidden name=last_comment value=".urlencode($comment)." ></input>";
-        echo "<input type=hidden name=last_genre value=".urlencode($genre)." ></input>";
-        echo "<input type=hidden name=last_date value=".urlencode($date)." ></input>";
-        
         echo "</pre></b>";
         echo "</form>";
     }
@@ -320,55 +310,22 @@ elseif (isset($_GET['idexl'])) {
 }
 
 if (isset($_POST['mussave'])) {
-    $title = $_POST['title'];
-    $artist = $_POST['artist'];
-    $album = $_POST['album'];
-    $album_artist = $_POST['album_artist'];
-    $track = $_POST['track'];
-    $disk = $_POST['disk'];
-    $comment = $_POST['comment'];
-    $genre = $_POST['genre'];
-    $date = $_POST['date'];
-
     $name = urldecode($_POST['name']);
     $path = urldecode($_POST['path']);
 
-    $last_title = urldecode($_POST['last_title']);
-    $last_artist = urldecode($_POST['last_artist']);
-    $last_album = urldecode($_POST['last_album']);
-    $last_album_artist = urldecode($_POST['last_album_artist']);
-    $last_track = urldecode($_POST['last_track']);
-    $last_disk = urldecode($_POST['last_disk']);
-    $last_comment = urldecode($_POST['last_comment']);
-    $last_genre = urldecode($_POST['last_genre']);
-    $last_date = urldecode($_POST['last_date']);
+    for ($i=0; $i<100; $i++) {
+        if (isset($_POST['last_'.$i])) {
+            $last_value = urldecode($_POST['last_'.$i]);
+            $value = urldecode($_POST['meta_'.$i]);
+            $key = urldecode($_POST['key_'.$i]);
 
-    if ($title != $last_title) {
-        songedit($path, $name, "title", $title);
-    }
-    elseif ($artist != $last_artist) {
-        songedit($path, $name, "artist", $artist);
-    }
-    elseif ($album != $last_album) {
-        songedit($path, $name, "album", $album);
-    }
-    elseif ($album_artist != $last_album_artist) {
-        songedit($path, $name, "album_artist", $album_artist);
-    }
-    elseif ($track != $last_track) {
-        songedit($path, $name, "track", $track);
-    }
-    elseif ($disk != $last_disk) {
-        songedit($path, $name, "disk", $disk);
-    }
-    elseif ($comment != $last_comment) {
-        songedit($path, $name, "comment", $comment);
-    }
-    elseif ($genre != $last_genre) {
-        songedit($path, $name, "genre", $genre);
-    }
-    elseif ($date != $last_date) {
-        songedit($path, $name, "date", $date);
+            if ($last_value != $value) {
+                songedit($path, $name, $key, $value);
+            }
+        }
+        else {
+            break;
+        }
     }
 }
 
@@ -395,33 +352,18 @@ function songedit($path, $name, $metadata, $isimeta) {
 function getinfomedia($input) {
     $output = "";
     $objmusic = json_decode(shell_exec('ffprobe -v quiet -print_format json -show_format -show_streams '.$input));  
-    $title = $objmusic->{'format'}->{'tags'}->{'title'};
-    $artist = $objmusic->{'format'}->{'tags'}->{'artist'};
-    $album_artist = $objmusic->{'format'}->{'tags'}->{'album_artist'};
-    $album = $objmusic->{'format'}->{'tags'}->{'album'};
-    $track = $objmusic->{'format'}->{'tags'}->{'track'};
-    $disk = $objmusic->{'format'}->{'tags'}->{'disc'};
-    $comment = $objmusic->{'format'}->{'tags'}->{'comment'};
-    $genre = $objmusic->{'format'}->{'tags'}->{'genre'};
-    $date = $objmusic->{'format'}->{'tags'}->{'date'};
 
-    if ($title != null) $output .= "<font color=white>Tittle : </font>".$title."<br>";
-    if ($title == null) $output .= "<font color=red>File : </font>".get_basename($input)."<br>";
-
-    if ($artist != null) {
-        $best = explode('best', $artist);
-        if ($best[1] != null)
-            $output .= "<font color=white>Artist : </font><font color=#FF69B4>".$artist."</font><br>";
-        else
-            $output .= "<font color=white>Artist : </font>".$artist."<br>";
+    foreach ($objmusic->{'format'} as $value) {
+        foreach ($value as $key=>$value) {
+            if ($key != "iTunPGAP" && $key != "iTunNORM" && $key != "iTunSMPB" && $key != "encoder") {
+                $exl = explode('best', $value);
+                if ($exl[1] != null)
+                    $output .= "<font color=white>".$key." : </font><font color=#FF69B4>".$value."</font><br>";
+                else
+                    $output .= "<font color=white>".$key." : </font>".$value."<br>";
+            }
+        }
     }
-    if ($album != null) $output .= "<font color=white>Album : </font>".$album."<br>";
-    if ($track != null) $output .= "<font color=white>Track : </font>".$track."<br>";
-    if ($disk != null) $output .= "<font color=white>Disk : </font>".$disk."<br>";
-    if ($comment != null) $output .= "<font color=white>Comment : </font>".$comment."<br>";
-    if ($album_artist != null) $output .= "<font color=white>Album Artist : </font>".$album_artist."<br>";
-    if ($genre != null) $output .= "<font color=white>Genre : </font>".$genre."<br>";
-    if ($date != null) $output .= "<font color=white>Date : </font>".$date."<br>";
 
     return $output;
 }
