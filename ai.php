@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v2.3";
+$version = "v2.4";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -125,7 +125,13 @@ border-radius:5px;
             </a>&nbsp;&nbsp;&nbsp;&nbsp;
 
 </center><br><br>
-<table width="700" border="0" cellpadding="3" cellspacing="1" align="center">
+';
+
+if(!isset($_GET['option']) && $_POST['other'] != 'gal-musik') 
+{
+    echo '<table id="oke" width="700" border="0" cellpadding="3" cellspacing="1" align="center">';
+}
+echo '
 <tr><td>';
 }
 
@@ -860,11 +866,33 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         mkdir('thumbs', 0777, true);
         echo '
             <style>
+                .post-container {
+                    margin: 20px 20px 0 0;  
+                    overflow: auto
+                }
+                .post-thumb {
+                    float: left
+                }
+                .post-thumb img {
+                    border: 5px solid #333;
+                    margin-right: 20px;
+                    display: block;
+                    width: 300px;
+                    height: 300px
+                }
+                .post-content {
+                    margin-left: 210px
+                }
+                .post-title {
+                    font-weight: bold;
+                    font-size: 200%
+                }
                 img {
                     border: 4px solid #575D63;
                     padding: 10px;
                 }
-            </style>';
+            </style>
+            ';
         echo '<div id="galshowimg"></div>';
 
         $files = dir_scan($path);
@@ -899,6 +927,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <script>
         var proccount = 0;
         var ubahtitle = false;
+        
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
         function procffmpeg(name, full)
         {
             var xhr = new XMLHttpRequest();
@@ -925,7 +956,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     document.title = "Music AI Gallery total: "+'.count($outfiles).';
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
-                    childencdataold.innerHTML = "<br><a id="+encdataold+".jpg onclick=saveimg(this.id)>"+';
+
+                    if (isMobile) {
+                        childencdataold.innerHTML = "<br><a id="+encdataold+".jpg onclick=saveimg(this.id)>"+';
                              echo "
                              '<img width=300 height=300 src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+";
                              echo '
@@ -933,7 +966,18 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              data.jalbum+
                              "</h5><b>Size: "+data.size+"</b></font>"+
                              "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />";
-                    
+                    }
+                    else {
+                        childencdataold.innerHTML = "<div class=post-container>"+
+                            "<div class=post-thumb><a id="+encdataold+".jpg onclick=saveimg(this.id)>"+';
+                             echo "
+                             '<img src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a></div>'+";
+                             echo '
+                             "<div class=post-content><font color=yellow><h5>"+
+                             data.jalbum+
+                             "</h5><b>Size: "+data.size+"</b></font>"+
+                             "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) /></div></div>";
+                    }
                     hasil.appendChild(childencdataold);
                     proccount += 1;
 
@@ -994,13 +1038,14 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             }  
         }
         position = 0;
+        open = true;
         title = "";
         function scrolltitle() {
-            document.title = title.substring(position, title.length) + title.substring(0, position); 
+            document.title = title.substring(position, title.length); 
             position++;
             if (position > title.length) position = 0;
         
-            titleScroll = window.setTimeout(scrolltitle,170);
+            titleScroll = window.setTimeout(scrolltitle, 270);
         }
         function play(xname) {
             zname = xname.split("-jin-");
@@ -1020,14 +1065,17 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                      
                      ';
                      echo "
-                     if (ubahtitle) {
-                        title = this.responseText+'                              ';
+                     title = this.responseText;
+                     position = 0;
+                     
+                     if (ubahtitle && open) {
+                        open = false;
                         scrolltitle();
                      }
-                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
+                     document.getElementById(id).innerHTML += '<br><input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
-                     document.getElementById(id).innerHTML += '<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
+                     document.getElementById(id).innerHTML += '&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
                      ";
                      echo '
                      
