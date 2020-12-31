@@ -127,8 +127,10 @@ border-radius:5px;
 </center><br><br>
 ';
 
-if(!isset($_GET['option']) && $_POST['other'] != 'gal-musik') 
+if(isset($_GET['option']) && $_POST['other'] == 'gal-musik') 
 {
+    echo '';
+}else {
     echo '<table id="oke" width="700" border="0" cellpadding="3" cellspacing="1" align="center">';
 }
 echo '
@@ -890,6 +892,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 img {
                     border: 4px solid #575D63;
                     padding: 10px;
+                    width: 300px;
+                    height: 300px
                 }
             </style>
             ';
@@ -958,9 +962,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
 
                     if (isMobile) {
-                        childencdataold.innerHTML = "<br><a id="+encdataold+".jpg onclick=saveimg(this.id)>"+';
+                        childencdataold.innerHTML ="<br><a id="+encdataold+".jpg onclick=saveimg(this.id)>"+';
                              echo "
-                             '<img width=300 height=300 src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+";
+                             '<img src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+";
                              echo '
                              "<font color=yellow><h5>"+
                              data.jalbum+
@@ -1013,21 +1017,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     "ajax-server.php?idexl=infomedia:"+encname,
                     "_blank"
                 );
-            
-            /*alert("Request Music to server... Please wait");
-
-            var xhr = new XMLHttpRequest();
-            var url = "ajax-server.php?idexl=infomedia:"+encname;
-
-            xhr.onreadystatechange = function() {
-                if (this.responseText !== "" && this.readyState == 4) 
-                {
-                   // alert(this.responseText);
-                    prompt("Data json", this.responseText);
-                }
-            };
-            xhr.open("GET", url, true);
-            xhr.send();*/
         }
         function saveimg(name) {
             if (confirm("Simpan Gambar ini?")) {
@@ -1038,7 +1027,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             }  
         }
         position = 0;
-        open = true;
+        xopen = true;
         title = "";
         function scrolltitle() {
             document.title = title.substring(position, title.length); 
@@ -1068,11 +1057,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                      title = this.responseText;
                      position = 0;
                      
-                     if (ubahtitle && open) {
-                        open = false;
+                     if (ubahtitle && xopen) {
+                        xopen = false;
                         scrolltitle();
                      }
-                     document.getElementById(id).innerHTML += '<br><input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
+                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
