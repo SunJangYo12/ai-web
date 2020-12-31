@@ -878,7 +878,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 .post-thumb img {
                     border: 5px solid #333;
                     margin-right: 20px;
-                    margin-left: 280px;
+                    margin-left: 200px;
                     display: block;
                     width: 300px;
                     height: 300px
@@ -891,7 +891,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     font-size: 200%
                 }
                 .kiri {
-                    margin-left: 280px;
+                    margin-left: 200px;
                 }
                 img {
                     border: 4px solid #575D63;
