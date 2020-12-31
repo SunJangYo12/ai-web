@@ -869,7 +869,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         echo '
             <style>
                 .post-container {
-                    margin: 20px 20px 0 0;  
+                    margin: 80px 20px 0 0;  
                     overflow: auto
                 }
                 .post-thumb {
@@ -878,6 +878,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 .post-thumb img {
                     border: 5px solid #333;
                     margin-right: 20px;
+                    margin-left: 280px;
                     display: block;
                     width: 300px;
                     height: 300px
@@ -888,6 +889,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 .post-title {
                     font-weight: bold;
                     font-size: 200%
+                }
+                .kiri {
+                    margin-left: 280px;
                 }
                 img {
                     border: 4px solid #575D63;
@@ -1061,7 +1065,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                         xopen = false;
                         scrolltitle();
                      }
-                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
+                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input class=kiri type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
                      document.getElementById(id).innerHTML += '&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
