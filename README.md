@@ -11,12 +11,12 @@ penambahan galery untuk membuka kumpulan gambar musik dan video
 fitur ini bisa dibuka dengan klik filemanager other lalu pilih
 galery image atau yang lain.
 
-#Update aiv1.10
+# Update aiv1.10
 Penambahan gallery document untuk membuka file pdf, fitur ini
 bisa dibuka di filemanager sama seperti gallery yang lain
 
-#Update aiv2.4
-versi stabil, file tar untuk mendapatkan release<br>
+# Update aiv2.4
+versi stabil, file tar untuk mendapatkan release
 
 ![](output.gif)
 
