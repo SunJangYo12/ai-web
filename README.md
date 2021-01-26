@@ -11,6 +11,13 @@ penambahan galery untuk membuka kumpulan gambar musik dan video
 fitur ini bisa dibuka dengan klik filemanager other lalu pilih
 galery image atau yang lain.
 
+#Update aiv1.10
+Penambahan gallery document untuk membuka file pdf, fitur ini
+bisa dibuka di filemanager sama seperti gallery yang lain
+
+#Update aiv2.4
+versi stabil, file tar untuk mendapatkan release<br>
+
 ![](output.gif)
 
 # Requitments
@@ -22,8 +29,4 @@ galery image atau yang lain.
 1). copy folder ai-web ke server <br>
 2). tes menggunakan localhost/ai-web/ai.php <br>
 3). finish <br>
-
-#Update aiv1.10
-Penambahan gallery document untuk membuka file pdf, fitur ini
-bisa dibuka di filemanager sama seperti gallery yang lain
 

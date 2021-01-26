@@ -355,7 +355,14 @@ function getinfomedia($input) {
 
     foreach ($objmusic->{'format'} as $value) {
         foreach ($value as $key=>$value) {
-            if ($key != "iTunPGAP" && $key != "iTunNORM" && $key != "iTunSMPB" && $key != "encoder") {
+            if ($key == "TITLE" || $key == "Title" || $key == "title" ||
+                $key == "ARTIST" || $key == "Artist" || $key == "artist" ||
+                $key == "ALBUM_ARTIST" || $key == "Album_artist" || $key == "album_artist" ||
+                $key == "GENRE" || $key == "Genre" || $key == "genre" ||
+                $key == "DATE" || $key == "Date" || $key == "date" ||
+                $key == "TRACK" || $key == "Track" || $key == "track"
+                ) {
+
                 $exl = explode('best', $value);
                 if ($exl[1] != null)
                     $output .= "<font color=white>".$key." : </font><font color=#FF69B4>".$value."</font><br>";
