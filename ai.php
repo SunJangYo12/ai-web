@@ -127,7 +127,7 @@ border-radius:5px;
 </center><br><br>
 ';
 
-if(isset($_GET['option']) && isset($_POST['other']) == 'gal-musik') 
+if(isset($_GET['option']) && $_POST['other'] == 'gal-musik') 
 {
     echo '';
 }else {
@@ -598,19 +598,19 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
         echo("<script>location.href = '/ai-web/ai.php?path=$path';</script>");
     }
-    elseif(isset($_GET['option']) && isset($_POST['other']) == 'file' ) {
+    elseif(isset($_GET['option']) && $_POST['other'] == 'file' ) {
         echo '<form method="POST" action="">New File : 
         <input name="newfile" type="text" size="20" value="'.$path.'" />
         <input type="hidden" name="path" value="'.$_POST['path'].'">
         <input type="submit" name="newgofile" value="Go" /></form>';
     }
-    elseif(isset($_GET['option']) && isset($_POST['other']) == 'folder' ) {
+    elseif(isset($_GET['option']) && $_POST['other'] == 'folder' ) {
         echo '<form method="POST" action="">New Folder : 
         <input name="newfolder" type="text" size="20" value="'.$path.'" />
         <input type="hidden" name="path" value="'.$_POST['path'].'">
         <input type="submit" name="newgofolder" value="Go" /></form>';
     }
-    elseif(isset($_GET['option']) && isset($_POST['other']) == 'stime' ) {
+    elseif(isset($_GET['option']) && $_POST['other'] == 'stime' ) {
         $vartime = $_SESSION['stime'];
         if ($vartime == '') {
             $_SESSION['stime'] = 'oke';
@@ -620,7 +620,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         }
         echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
     }
-    elseif(isset($_GET['option']) && isset($_POST['other']) == 'gal-image') {
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
         fm_rdelete('thumbs');
         unlink("playlist.txt");
         mkdir('thumbs', 0777, true);
@@ -713,7 +713,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         procffmpeg('."'".$gdata."'".', 0);
         </script>';
     }
-    elseif(isset($_GET['option']) && isset($_POST['other']) == 'gal-video') {
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-video') {
         fm_rdelete('thumbs');
         unlink("playlist.txt");
         mkdir('thumbs', 0777, true);
@@ -861,7 +861,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         procffmpeg('."'".$gdata."'".', 0);
         </script>';
     }
-    elseif(isset($_GET['option']) && isset($_POST['other']) == 'gal-musik') {
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik') {
         fm_rdelete('thumbs');
         unlink("playlist.txt");
         mkdir('thumbs', 0777, true);
@@ -1082,7 +1082,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         procffmpeg('."'".$gdata."'".', 0);
         </script>';
     }
-    elseif(isset($_GET['option']) && isset($_POST['other']) == 'gal-doc') {
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-doc') {
         fm_rdelete('thumbs');
         unlink("playlist.txt");
         mkdir('thumbs', 0777, true);
