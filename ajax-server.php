@@ -165,6 +165,30 @@ elseif (isset($_GET['idexl'])) {
            echo json_encode($data);
        }
     }
+    elseif ($exl[0] == "copyprocpdf") {
+        copy($exl[1], 'thumbs/open.pdf');
+
+        echo 'sukses';
+    }
+    elseif ($exl[0] == "copyprocimg") {
+        copy($exl[1], 'thumbs/open.jpg');
+
+        echo 'sukses';
+    }
+    elseif ($exl[0] == "copyprocvid") {
+        copy($exl[1], 'thumbs/open.mp4');
+
+        echo 'sukses';
+    }
+    elseif ($exl[0] == "convertprocvid") {
+        $conv = 'thumbs/open.mp4';
+        
+        copy($exl[1], $conv);
+
+        exec('ffmpeg -i '.$conv.' -f mp3 -ab 192000 -vn thumbs/convert.mp3');
+
+        echo 'sukses';
+    }
     elseif ($exl[0] == "copymus") {
         array_map('unlink', glob("thumbs/*.mp3"));
        
@@ -420,6 +444,8 @@ function get_dirname($filename)
 }
 
 function fsize($input) {
+    $input = trim(preg_replace('/\s\s+/', ' ', $input));
+
     $size = filesize($input)/1024;
     $size = round($size,3);
     if($size >= 1024){
