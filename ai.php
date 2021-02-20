@@ -378,9 +378,7 @@ if (isset($_FILES['file']['name'])) {
         if(!empty($value)){ 
             $filename = $value;
 
-            mkdir($_SESSION['path'].'/folder');
-
-            $add = $_SESSION['path']."/folder/$filename";
+            $add = $_SESSION['path']."/$filename";
             
             if(copy($_FILES['file']['tmp_name'][$key], $add))
             {
