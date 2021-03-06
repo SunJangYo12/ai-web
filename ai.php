@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v2.5";
+$version = "v2.6";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -636,6 +636,25 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             </style>';
         echo '<div id="galshowimg"></div>';
 
+        echo "
+            <script>
+                function goodbye(e) {
+                    if(!e)
+                        e = window.event;
+                    //e.cancelBubble is supported by IE - this will kill the bubbling process.
+                    e.cancelBubble = true;
+                    e.returnValue = 'You sure you want to leave?'; //This is displayed on the dialog
+                    //e.stopPropagation works in Firefox.
+                    
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                }
+                window.onbeforeunload=goodbye; 
+            </script>
+        ";
+
         $files = dir_scan($path);
         $outfiles = array();
         $j = 0;
@@ -728,6 +747,25 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 }
             </style>';
         echo '<div id="galshowimg"></div>';
+
+        echo "
+            <script>
+                function goodbye(e) {
+                    if(!e)
+                        e = window.event;
+                    //e.cancelBubble is supported by IE - this will kill the bubbling process.
+                    e.cancelBubble = true;
+                    e.returnValue = 'You sure you want to leave?'; //This is displayed on the dialog
+                    //e.stopPropagation works in Firefox.
+                    
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                }
+                window.onbeforeunload=goodbye; 
+            </script>
+        ";
 
         $files = dir_scan($path);
         $outfiles = array();
@@ -905,6 +943,25 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             ';
         echo '<div id="galshowimg"></div>';
 
+        echo "
+            <script>
+                function goodbye(e) {
+                    if(!e)
+                        e = window.event;
+                    //e.cancelBubble is supported by IE - this will kill the bubbling process.
+                    e.cancelBubble = true;
+                    e.returnValue = 'You sure you want to leave?'; //This is displayed on the dialog
+                    //e.stopPropagation works in Firefox.
+                    
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                }
+                window.onbeforeunload=goodbye; 
+            </script>
+        ";
+
         $files = dir_scan($path);
         $outfiles = array();
         $j = 0;
@@ -1067,10 +1124,18 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                         xopen = false;
                         scrolltitle();
                      }
-                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input class=kiri type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
-                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
-                     document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
-                     document.getElementById(id).innerHTML += '&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
+                     if (isMobile) {
+                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
+                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
+                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
+                        document.getElementById(id).innerHTML += '<br><br>&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
+                     }
+                     else {
+                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input class=kiri type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
+                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
+                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
+                        document.getElementById(id).innerHTML += '&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
+                     }
                      ";
                      echo '
                      
@@ -1097,6 +1162,25 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 }
             </style>';
         echo '<div id="galshowimg"></div>';
+
+        echo "
+            <script>
+                function goodbye(e) {
+                    if(!e)
+                        e = window.event;
+                    //e.cancelBubble is supported by IE - this will kill the bubbling process.
+                    e.cancelBubble = true;
+                    e.returnValue = 'You sure you want to leave?'; //This is displayed on the dialog
+                    //e.stopPropagation works in Firefox.
+                    
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                }
+                window.onbeforeunload=goodbye; 
+            </script>
+        ";
 
         $files = dir_scan($path);
         $outfiles = array();
