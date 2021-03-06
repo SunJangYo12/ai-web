@@ -558,6 +558,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <option value="stime">Show Time</time>
         <option value="file">Create File</option>
         <option value="folder">Create Folder</option>
+        <option value="gal-thread">Create Thread Gallery</option>
         <option value="gal-image">Galery Image</option>
         <option value="gal-video">Galery Video</option>
         <option value="gal-musik">Galery Musik</option>
@@ -622,6 +623,27 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             unset($_SESSION['stime']);
         }
         echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
+    }
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-thread') {
+        $thname = "../ai-webTHREAD";          
+        $thscanname = $thname;
+        $thcount = 1;
+        while (file_exists($thscanname)){
+            $thscanname = $thname . $thcount;
+            $thcount++;
+        }
+        mkdir($thscanname);
+        copy("ai.php", "$thscanname/ai.php");
+        copy("ajax-client.js", "$thscanname/ajax-client.js");
+        copy("ajax-server.php", "$thscanname/ajax-server.php");
+        copy("download.php", "$thscanname/download.php");
+        copy("miniProxy.php", "$thscanname/miniProxy.php");
+        copy("pdf.js", "$thscanname/pdf.js");
+        copy("pdf.worker.js", "$thscanname/pdf.worker.js");
+        copy("pdfuse.js", "$thscanname/pdfuse.js");
+        exec("cp -R editarea ../$thscanname");
+
+        echo "<font color=green><h2>Thread created.. <a target=_blank href=$thscanname/ai.php>go</a></h></font>";
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
         fm_rdelete('thumbs');
