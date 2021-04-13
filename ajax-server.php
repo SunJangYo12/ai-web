@@ -123,6 +123,8 @@ elseif (isset($_GET['idexl'])) {
 
            $encpath = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xdir);
 
+           $pathname = trim(preg_replace('/\s\s+/', ' ', $exl[2])); // hapus enter
+
            $data = [  
                       "new" => $newtext,
                       "old" => $oldtext,
@@ -132,7 +134,7 @@ elseif (isset($_GET['idexl'])) {
                       "path" => $xdir,
                       "urlencpath" =>  urlencode(dirname($exl[2])),
                       "urlencname" =>  urlencode(basename($exl[2])),
-                      "tes" => dirname($xfiles),
+                      "pathname" => urlencode($pathname),
            ];
 
            echo json_encode($data);

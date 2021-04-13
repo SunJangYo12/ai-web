@@ -61,8 +61,11 @@
                     &nbsp<input type="number" id="edtgo">
                     &nbsp<input type="submit" value="Go" onclick="onGotoPage()">
                 </div>
+                
+                <div id="mydiv"></div>
+
                 <div>
-                    <canvas id="the-canvas" style="width:600px; height:700px border:0px solid black"></canvas>
+                    <canvas id="the-canvas"></canvas>
                 </div>
                 <script type="text/javascript" src="pdf.js"></script>
                 <script type="text/javascript" src="pdfuse.js"></script>
