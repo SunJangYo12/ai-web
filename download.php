@@ -24,6 +24,11 @@
         echo $content;
         exit();
     }
+    elseif ($aksi[0] == 'pdfobj') {
+        copy($aksi[1], "thumbs/open1.pdf");
+        echo '<script>document.title = "'.basename($aksi[1]).'";</script>';
+        echo '<embed type="application/pdf" src="thumbs/open1.pdf" width="1200" height="800"></embed>';
+    }
     elseif ($aksi[0] == 'pdf') {
         $pdf = $aksi[1];
         $his = $aksi[2];

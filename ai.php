@@ -1249,6 +1249,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              data.old+
                              "</h5><b>Size: "+data.size+"</b></font>"+
                              "&nbsp&nbsp<input type=submit value=Open id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />"+
+                             "&nbsp&nbsp<input type=submit value=Object id="+data.pathname+"-jin-"+encodeURIComponent(data.old)+" onclick=playIframe(this.id) />"+
                              "&nbsp&nbsp<input type=submit value=Download id="+data.pathname+"-jin-"+encodeURIComponent(data.old)+" onclick=playDownload(this.id) />";
                     
                     hasil.appendChild(childencdataold);
@@ -1279,6 +1280,16 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     "_blank"
                 );
             }  
+        }
+        function playIframe(xname) {
+            zname = xname.split("-jin-");
+            name = zname[0];
+            id = zname[1];
+
+            window.open(
+                        "download.php?id=pdfobj:"+name,
+                        "_blank"
+                        );
         }
         function playDownload(xname) {
             zname = xname.split("-jin-");
