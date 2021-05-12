@@ -800,6 +800,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         var proccount = 0;
         var ubahtitle = false;
 
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
         function procffmpeg(name, full)
         {            
             var xhr = new XMLHttpRequest();
@@ -863,7 +865,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var url = "ajax-server.php?idexl=copyvid:"+encname;
 
             xhr.onloadstart = function () {
-                document.title = "Copying...";
+                alert("Copying\r\rPlease wait ...");
             }
 
             xhr.onreadystatechange = function() {
@@ -874,30 +876,20 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     ';
                     
                     echo "
-                    document.getElementById(id).innerHTML = '<video width=340 height=280  controls><source src=".'"'."thumbs/'+this.responseText+'".'"'."/></video>'+
+                        vname = this.response;
+                        vname = encodeURIComponent(vname).replace('%20','+');
+                        window.open(
+                            'download.php?id=videoview:'+vname+':'+vsize+':'+isMobile+':'+name,
+                            '_blank'
+                        );
                     ";
 
+
                     echo '
-                    "<font color=yellow><p>Title: <marquee>"+vname+"</marquee>"+
-                    "<br><br>Size: "+vsize+
-                    "&nbsp&nbsp<input type=submit value=Rincian id="+name+" onclick=rincian(this.id) />"+
-                    "</p></font><br><br>";
                 }
             };
             xhr.open("GET", url, true);
             xhr.send();
-        }
-        function rincian(name) {
-            var encname = encodeURIComponent(name).replace("%20","+");
-
-            window.open(
-                    "ajax-server.php?idexl=infomedia:"+encname,
-                    "_blank"
-                );
-            
-        }
-        function sukses() {
-            alert("play sukses");
         }
         procffmpeg('."'".$gdata."'".', 0);
         </script>';
