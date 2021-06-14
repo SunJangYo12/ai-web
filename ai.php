@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v2.6";
+$version = "v2.7";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -976,6 +976,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 }
             }
         }
+        copy("playlist.txt", "playliststart.txt");
         
         $gdata = $outfiles[0];
         
@@ -1049,38 +1050,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.open("GET", url, true);
             xhr.send();
         }
-        function favorite(name) {
-            var encname = encodeURIComponent(name).replace("%20","+");
-
-            window.open(
-                    "ajax-server.php?idexl=musfavorite:"+encname,
-                    "_blank"
-                );
-        }
-        function edit(name) {
-            var encname = encodeURIComponent(name).replace("%20","+");
-
-            window.open(
-                    "ajax-server.php?idexl=musedit:"+encname,
-                    "_blank"
-                );
-        }
-        function rincian(name) {
-            var encname = encodeURIComponent(name).replace("%20","+");
-
-            window.open(
-                    "ajax-server.php?idexl=infomedia:"+encname,
-                    "_blank"
-                );
-        }
-        function saveimg(name) {
-            if (confirm("Simpan Gambar ini?")) {
-                window.open(
-                    "download.php?id=thumbs/"+name,
-                    "_blank"
-                );
-            }  
-        }
+        
         position = 0;
         xopen = true;
         title = "";
@@ -1091,51 +1061,18 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         
             titleScroll = window.setTimeout(scrolltitle, 270);
         }
+
         function play(xname) {
             zname = xname.split("-jin-");
-            name = zname[0];
+            pathname = zname[0];
             id = zname[1];
 
-            var xhr = new XMLHttpRequest();
-            var url = "ajax-server.php?idexl=copymus:"+name;
-            
-            xhr.onloadstart = function () {
-                document.title = "Copying...";
-            }
-
-            xhr.onreadystatechange = function() {
-                if (this.responseText !== "" && this.readyState == 4) 
-                {
-                     
-                     ';
-                     echo "
-                     title = this.responseText;
-                     position = 0;
-                     
-                     if (ubahtitle && xopen) {
-                        xopen = false;
-                        scrolltitle();
-                     }
-                     if (isMobile) {
-                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
-                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
-                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
-                        document.getElementById(id).innerHTML += '<br><br>&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
-                     }
-                     else {
-                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input class=kiri type=submit value=Favorite id='+name+' onclick=favorite(this.id) />';
-                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Rincian id='+name+' onclick=rincian(this.id) />';
-                        document.getElementById(id).innerHTML += '&nbsp&nbsp<input type=submit value=Edit id='+name+' onclick=edit(this.id) />';
-                        document.getElementById(id).innerHTML += '&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source src=".'"'."thumbs/'+this.responseText+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
-                     }
-                     ";
-                     echo '
-                     
-                }
-            };
-            xhr.open("GET", url, true);
-            xhr.send();
+            window.open(
+                            "download.php?id=musicview:"+pathname,
+                            "_blank"
+                        );
         }
+        
         function sukses() {
             //alert("play sukses: ");
         }

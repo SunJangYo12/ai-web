@@ -71,6 +71,27 @@ elseif (isset($_GET['idexl'])) {
 
            echo json_encode($data);
        }
+       if ($exl[1] == "audioinfo") {
+           $xfiles = $exl[2];
+
+           $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
+           $name = basename($exl[2]);
+           $name = trim(preg_replace('/\s\s+/', ' ', $name));
+
+           array_map('unlink', glob("thumbs/*.mp3"));
+           array_map('unlink', glob("thumbs/*.flac"));
+           array_map('unlink', glob("thumbs/*.m4a"));
+
+           copy($exl[2], "thumbs/".$name);
+
+           $data = [  
+                      "size" => fsize($exl[2]),
+                      "playname" => "thumbs/".$name,
+                      "jalbum" => getinfomedia($xfiles),
+           ];
+
+           echo json_encode($data);
+       }
        if ($exl[1] == "audio")  {
            $xfiles = $exl[2];
 
@@ -333,6 +354,32 @@ elseif (isset($_GET['idexl'])) {
 
         echo "saved";
     }
+    elseif ($exl[0] == "nextaudio") {
+        $path = $exl[1];
+        $name = $exl[2];
+
+        $getNPAudio = getPlayAudio($path."/".$name."\n", "next");
+
+        $data = [  
+            "nextpath" => get_dirname($getNPAudio),
+            "nextname" => get_basename($getNPAudio),
+        ];
+
+        echo json_encode($data);
+    }
+    elseif ($exl[0] == "prevaudio") {
+        $path = $exl[1];
+        $name = $exl[2];
+
+        $getNPAudio = getPlayAudio($path."/".$name."\n", "prev");
+
+        $data = [  
+            "prevpath" => get_dirname($getNPAudio),
+            "prevname" => get_basename($getNPAudio),
+        ];
+
+        echo json_encode($data);
+    }
 }
 
 if (isset($_POST['mussave'])) {
@@ -399,6 +446,51 @@ function getinfomedia($input) {
     }
 
     return $output;
+}
+
+function getPlayAudio($strfind, $key) {
+  $handle = fopen("playliststart.txt", "r");
+  $arr = array();
+  $i = 0;
+  $result = "kosong";
+  $resultNext = "kosong";
+  $resultPrev = "kosong";
+  $resultline = 0;
+
+  if ($handle) {
+      while (($line = fgets($handle)) !== false) {
+          $arr[$i] = $line;
+
+          if ($line == $strfind) {
+            $result = $line;
+            $resultline = $i;
+          }
+          $i++;
+      }
+      fclose($handle);
+  } else {
+      echo "file no found";
+  }
+
+  if ($key == "result") {
+    $out = trim(preg_replace('/\s\s+/', ' ', $result));
+    return $out;
+  }
+  elseif ($key == "next") {
+    $out = trim(preg_replace('/\s\s+/', ' ', $arr[$resultline+1]));
+    return $out;
+  }
+  elseif ($key == "prev") {
+    $out = trim(preg_replace('/\s\s+/', ' ', $arr[$resultline-1]));
+    return $out;
+  }
+  elseif ($key == "line") {
+    $out = trim(preg_replace('/\s\s+/', ' ', $resultline));
+    return $out;
+  }
+  else {
+    return "key unkown";
+  }
 }
 
 function delete_text_line($filepath, $num) {

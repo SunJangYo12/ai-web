@@ -1,7 +1,71 @@
 <?php
 
     $dfile = $_GET['id'];
+    $version = "2.7";
     $aksi = explode(":", $dfile);
+
+    if ($aksi[0] == 'musicview' || $aksi[0] == 'videoview') {
+        echo '
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabe=no"/>
+
+
+    <link href="" rel="stylesheet" type="text/css">
+        <title>AI Project '.$version.'</title>
+            <style>
+
+                #bar_blank {
+                    border: solid 1px #FFF;
+                    height: 20px;
+                    width: 300px;
+                }
+                #bar_color {
+                    background-color: #00AA00;
+                    height: 20px;
+                    width: 0px;
+                }
+                #bar_blank, #hidden_iframe {
+                    display: none;
+                }
+                body{
+                    background-color: black;
+                    color:white;
+                }
+                #content tr:hover{
+                    background-color: red;
+                    text-shadow:0px 0px 10px #fff;
+                }
+                #content .first{
+                    background-color: red;
+                }
+                table{
+                    border: 1px #000000 dotted;
+                }
+                a{
+                    color:white;
+                    text-decoration: none;
+                }
+                a:hover{
+                    color:blue;
+                    text-shadow:0px 0px 10px #ffffff;
+                }
+                input,select,textarea{
+                    border: 1px #000000 solid;
+                    -moz-border-radius: 5px;
+                    -webkit-border-radius:5px;
+                    border-radius:5px;
+                }
+                img {
+                    border: 4px solid #575D63;
+                    padding: 10px;
+                    width: 300px;
+                    height: 300px
+                }
+            </style>
+        </head>
+        ';
+    }
 
     if ($aksi[0] == 'gambar') {
         $image = $aksi[1]; 
@@ -24,64 +88,152 @@
         echo $content;
         exit();
     }
-    elseif ($aksi[0] == 'videoview') {
+    elseif ($aksi[0] == 'musicview') {
+        $path = $aksi[1];
+        $name = $aksi[2];
 
         echo '
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabe=no"/>
+            <a onclick=saveimg()><img src="thumbs/'.$name.'.jpg" alt=""></img></a>
+            <div id="hasil"></div>
+            <div class="fab-container">
+                <span onclick=prev() class="fab-label">Prev</span>
+                <span onclick=next() class="fab-label">Next</span><br><br>
+            </div>
 
+            <script>
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            </script>
 
-<link href="" rel="stylesheet" type="text/css">
-<title>AI Project '.$version.'</title>
-<style>
+            <style>
+                .fab-container {
+                    position: fixed;
+                    bottom: 115px;
+                    right: 50px;
+                    z-index: 999;
+                    cursor: pointer;
+                }
+                .fab-label {
+                    padding: 2px 5px;
+                    align-self: center;
+                    user-select: none;
+                    white-space: nowrap;
+                    border-radius: 3px;
+                    font-size: 19px;
+                    background: #666666;
+                    color: #ffffff;
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+                    margin-right: 10px;
+                }
+            </style>
 
-#bar_blank {
-    border: solid 1px #FFF;
-    height: 20px;
-    width: 300px;
-}
-#bar_color {
-    background-color: #00AA00;
-    height: 20px;
-    width: 0px;
-}
-#bar_blank, #hidden_iframe {
-    display: none;
-}
+            <script>
 
+            function next() {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=nextaudio:"+"'.$path.':'.$name.'";
+                xhr.onloadstart = function () {
+                }
 
-body{
-background-color: black;
-color:white;
-}
-#content tr:hover{
-background-color: red;
-text-shadow:0px 0px 10px #fff;
-}
-#content .first{
-background-color: red;
-}
-table{
-border: 1px #000000 dotted;
-}
-a{
-color:white;
-text-decoration: none;
-}
-a:hover{
-color:blue;
-text-shadow:0px 0px 10px #ffffff;
-}
-input,select,textarea{
-border: 1px #000000 solid;
--moz-border-radius: 5px;
--webkit-border-radius:5px;
-border-radius:5px;
-}
-</style>
-</head>
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+                        location.href = "download.php?id=musicview:"+data.nextpath+":"+data.nextname;
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+            function prev() {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=prevaudio:"+"'.$path.':'.$name.'";
+                xhr.onloadstart = function () {
+                }
+
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+                        location.href = "download.php?id=musicview:"+data.prevpath+":"+data.prevname;
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+
+            function favorite() {
+                var name = "'.$path.':'.$name.'";
+
+                window.open(
+                    "ajax-server.php?idexl=musfavorite:"+name,
+                    "_blank"
+                );
+            }
+            function edit() {
+                var name = "'.$path.':'.$name.'";
+
+                window.open(
+                    "ajax-server.php?idexl=musedit:"+name,
+                    "_blank"
+                );
+            }
+            function rincian() {
+                var name = "'.$path.':'.$name.'";
+
+                window.open(
+                    "ajax-server.php?idexl=infomedia:"+name,
+                    "_blank"
+                );
+            }
+            function saveimg() {
+                var name = "'.$name.'.jpg";
+
+                if (confirm("Simpan Gambar ini?")) {
+                    window.open(
+                        "download.php?id=thumbs/"+name,
+                        "_blank"
+                    );
+                }  
+            }
+
+            function getAudio(name) {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=ffmpeg:audioinfo:"+name;
+                xhr.onloadstart = function () {
+                }
+
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+
+                        document.getElementById("hasil").innerHTML += "<font color=yellow><h5>"+data.jalbum+"</h5><b>Size: "+data.size+"</b></font>";
+                        document.getElementById("hasil").innerHTML += "&nbsp&nbsp<input type=submit value=Favorite onclick=favorite() />";
+                        document.getElementById("hasil").innerHTML += "&nbsp&nbsp<input type=submit value=Rincian onclick=rincian() />";
+                        document.getElementById("hasil").innerHTML += "&nbsp&nbsp<input type=submit value=Edit onclick=edit() />";
+                        ';
+
+                        echo "
+
+                        document.getElementById('hasil').innerHTML += '<br><br>&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source <source <source src=".'"'."'+data.playname+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
+
+                        ";
+
+                        echo '
+
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+            getAudio("'.$path.'/'.$name.'");
+
+            </script>
+
         ';
+
+    }
+    elseif ($aksi[0] == 'videoview') {
 
         echo '<script>document.title = "'.$aksi[1].'"</script>';
 
