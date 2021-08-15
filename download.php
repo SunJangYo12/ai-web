@@ -1,7 +1,7 @@
 <?php
 
     $dfile = $_GET['id'];
-    $version = "2.7";
+    $version = "2.8";
     $aksi = explode(":", $dfile);
 
     if ($aksi[0] == 'musicview' || $aksi[0] == 'videoview') {
@@ -195,6 +195,9 @@
                     );
                 }  
             }
+            function sukses() {
+                next();
+            }
 
             function getAudio(name) {
                 var xhr = new XMLHttpRequest();
@@ -215,7 +218,7 @@
 
                         echo "
 
-                        document.getElementById('hasil').innerHTML += '<br><br>&nbsp&nbsp<audio id=playmusgal onended=sukses() controls> <source <source <source src=".'"'."'+data.playname+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
+                        document.getElementById('hasil').innerHTML += '<br><br>&nbsp&nbsp<audio id=playmusgal onended=sukses() autoplay controls> <source <source <source src=".'"'."'+data.playname+'".'"'." type=audio/mpeg> Browser Error </audio><br><br>';
 
                         ";
 
