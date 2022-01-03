@@ -26,6 +26,7 @@ if (isset($_GET['id']))
         }
     }
 }
+
 elseif (isset($_GET['idexl'])) {
     $exl = explode(":", $_GET['idexl']);
 
@@ -42,15 +43,21 @@ elseif (isset($_GET['idexl'])) {
            $xfiles = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xfiles);
            $encname = preg_replace("/ |'|\(|\)|\&/", '\\\${0}', $xbase);
 
-           $iminfo = getimagesize($xfiles); 
-           $x = $iminfo[0] / 2;
-           $y = $iminfo[1] / 2;
+           $xfilesize = trim(preg_replace('/\s\s+/', ' ', $exl[2]));
+
+           $iminfo = getimagesize($xfilesize); 
+           $x = $iminfo[0];
+           $y = $iminfo[1];
 
            while ($x >= 420 || $y >= 380) {
               $x = $x / 2;
               $y = $y / 2;
            }
-           
+
+           /*$_data = fopen("tees.txt", "w");
+           fwrite($_data, "$x ff");
+           fclose($_data);*/
+
            exec('ffmpeg -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
            
            $newtext = delete_text_line("playlist.txt", 0);
@@ -135,7 +142,7 @@ elseif (isset($_GET['idexl'])) {
 
            $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
           
-           exec('pdftoppm -l 1 -scale-to 500 -jpeg '.$xfiles.' > thumbs/'.basename($xfiles).'.jpg');
+           exec('/usr/bin/pdftoppm -l 1 -scale-to 500 -jpeg '.$xfiles.' > thumbs/'.basename($xfiles).'.jpg');
 
            $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $xdir = dirname($newtext);
