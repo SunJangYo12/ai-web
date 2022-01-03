@@ -835,7 +835,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     echo "
                     childencdataold.innerHTML = '<a id='+data.urlencpath+':'+data.urlencname+'-jin-'+encodeURIComponent(data.old)+'-jin-'+playname+'-jin-'+data.size+' onclick=play(this.id)>'+
-                                                '<img width=300 height=230 src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+
+                                                '<img src=".'"'."'+imgsrc+'".'"'." alt=".'"'."'+imgsrc+'".'"'."></img></a>'+
                     ";
 
                     echo '

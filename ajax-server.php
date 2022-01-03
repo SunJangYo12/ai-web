@@ -176,7 +176,7 @@ elseif (isset($_GET['idexl'])) {
 
            $encname = trim(preg_replace('/\s\s+/', ' ', $encname));
 
-           exec('ffmpeg -ss 30 -t 3 -i '.$xfiles.' -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
+           exec('ffmpeg -ss 2 -t 3 -i '.$xfiles.' -vf "fps=10,scale=220:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
 
            $newname = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $newdir = get_dirname($newname);
