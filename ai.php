@@ -776,7 +776,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             if (is_file($files[$i])) 
             {
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
-                if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv" || $mime == "webm") 
+                if ($mime == "3gp" || $mime == "mp4" || $mime == "mkv" || $mime == "webm" || $mime == "avi") 
                 {
                     $outfiles[$j] = $files[$i];
 
@@ -871,6 +871,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
+                    window.close();
                     if (ubahtitle)
                         document.title = vname;
                     ';
@@ -1362,6 +1363,33 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             $arsource = $path."/".$_POST['name'];
 
             echo '
+            <html>
+            <div id="spinner" class="loading"></div>
+            </html>
+            <style type="text/css">
+                #spinner {
+                    display: none;
+                }
+                .loading {
+                    border: 20px solid #ccc;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    border-top-color: #1ecd97;
+                    border-left-color: #1ecd97;
+                    animation: spin 1s infinite ease-in;
+                }
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+            </style>';
+
+            echo '
             <script>
             var name = "'.$arsource.'";
             var xhr = new XMLHttpRequest();
@@ -1370,6 +1398,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             
             xhr.onloadstart = function () {
                 document.title = "Mounting...";
+                document.getElementById("spinner").style.display = "block";
             }
 
             xhr.onreadystatechange = function() {
@@ -1379,10 +1408,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var data = JSON.parse(this.responseText);
                     //alert(data.status);
 
-                    window.open(
-                        location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/mount",
-                        "_blank"
-                        );
+                    location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/mount";
                 }
             };
             xhr.open("GET", url, true);
