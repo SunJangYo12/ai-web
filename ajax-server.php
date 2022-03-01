@@ -387,6 +387,30 @@ elseif (isset($_GET['idexl'])) {
 
         echo json_encode($data);
     }
+    elseif ($exl[0] == "mount_ar") {
+        $path = $exl[1];
+
+        if (!file_exists('mount')) {
+            mkdir('mount', 0777, true);
+        }
+
+        if (foldervoid('mount') == 1) {
+            shell_exec('umount mount');
+        }
+
+        $pathname = $path;
+        $pathname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $pathname); // replace unicode path and name
+        $pathname = trim(preg_replace('/\s\s+/', ' ', $pathname)); // hapus enter
+
+        $status = shell_exec('fuse-archive '.$pathname." mount");
+
+        $data = [  
+            "status" => $status,
+            "pathname" => $pathname,
+        ];
+
+        echo json_encode($data);
+    }
 }
 
 if (isset($_POST['mussave'])) {
@@ -406,6 +430,16 @@ if (isset($_POST['mussave'])) {
         else {
             break;
         }
+    }
+}
+
+function foldervoid($path)
+{
+    if ($files = glob($path . "/*")) {
+        //print_r($files);
+      return 1;
+    } else {
+      return 0;
     }
 }
 

