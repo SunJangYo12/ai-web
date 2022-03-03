@@ -562,6 +562,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <option value="gal-video">Galery Video</option>
         <option value="gal-musik">Galery Musik</option>
         <option value="gal-doc">Galery Document</option>
+        <option value="settings">Settings</option>
         </select>
         <input type="submit" value=">">
         </form></td>';
@@ -601,6 +602,17 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
         echo("<script>location.href = '/ai-web/ai.php?path=$path';</script>");
     }
+    elseif(isset($_POST['setThumbsVideogall'])) {
+        $data = $_POST['data'];
+        
+        if ($data == "gif" || $data == "png") {
+            $_SESSION['thumbsVideogall'] = $data;
+            echo '<script>alert("set format '.$data.' successfully");</script>';
+        }
+        else {
+            echo '<script>alert("invalid value thumbs format, you can change png or gif");</script>';
+        }
+    }
     elseif(isset($_GET['option']) && $_POST['other'] == 'file' ) {
         echo '<form method="POST" action="">New File : 
         <input name="newfile" type="text" size="20" value="'.$path.'" />
@@ -622,6 +634,18 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             unset($_SESSION['stime']);
         }
         echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
+    }
+    elseif(isset($_GET['option']) && $_POST['other'] == 'settings') 
+    {
+        if (!isset($_SESSION['thumbsVideogall'])) {
+            $_SESSION['thumbsVideogall'] ='png';
+        }
+        
+        $tgallvid = $_SESSION['thumbsVideogall'];
+
+        echo '<br><br><form method="POST" action="">Video Gallery thumbs : 
+        <input name="data" type="text" size="20" value="'.$tgallvid.'" />
+        <input type="submit" name="setThumbsVideogall" value="Change" /></form>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
         fm_rdelete('thumbs');
@@ -791,6 +815,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         }
         
         $gdata = $outfiles[0];
+        $format = "png";
+
+        if (isset($_SESSION['thumbsVideogall'])) {
+            $format = $_SESSION['thumbsVideogall'];
+        }
         
         echo '
         <font color=yellow><h3>Total: '.count($outfiles).'</h3></font>
@@ -799,6 +828,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <script>
         var proccount = 0;
         var ubahtitle = false;
+        var format = "'.$format.'";
 
         var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -807,7 +837,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var xhr = new XMLHttpRequest();
             encname = encodeURIComponent(name).replace("%20","+");
 
-            var url = "ajax-server.php?idexl=ffmpeg:video:"+encname;
+            var url = "ajax-server.php?idexl=ffmpeg:video:"+encname+":"+format;
             var idhasil = "kosong";
 
             xhr.onloadstart = function () {
@@ -830,7 +860,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
                     document.title = "Video AI Gallery total: "+'.count($outfiles).';
 
-                    imgsrc = "download.php?id=gambar:thumbs/"+data.urlencname+".gif";
+                    imgsrc = "download.php?id=gambar:thumbs/"+data.urlencname+"."+format;
                     ';
 
                     echo "

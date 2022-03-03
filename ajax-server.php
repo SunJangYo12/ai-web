@@ -176,8 +176,14 @@ elseif (isset($_GET['idexl'])) {
 
            $encname = trim(preg_replace('/\s\s+/', ' ', $encname));
 
-           exec('ffmpeg -ss 2 -t 3 -i '.$xfiles.' -vf "fps=10,scale=220:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
+           $format = $exl[3];
 
+           if ($format == "gif") {
+              exec('ffmpeg -ss 2 -t 3 -i '.$xfiles.' -vf "fps=10,scale=220:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
+           }
+           else if ($format == "png"){
+              exec('ffmpeg -i '.$xfiles.' -vf "scale=320:320:force_original_aspect_ratio=decrease" -ss 00:00:01.000 -vframes 1 thumbs/'.$encname.'.png');
+           }
            $newname = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $newdir = get_dirname($newname);
            $newname = get_basename($newname);
