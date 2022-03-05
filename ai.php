@@ -1059,8 +1059,13 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         }
         copy("playlist.txt", "playliststart.txt");
         
-        $gdata = $outfiles[0];
-        
+        if ($runtext != "") {
+            $ldata = file("playlist.txt");
+            $gdata = explode("\n", $ldata[0])[0];
+        }
+        else {
+            $gdata = $outfiles[0];
+        }
         echo '
         <font color=yellow><h3><marquee>Total: '.count($outfiles).'</marquee></h3></font>
         <div id=hasil></div>
@@ -1985,10 +1990,7 @@ function gal_musik_txt() {
         if (!isset($_SESSION['musiktxt'])) {
             $_SESSION['musiktxt'] = '/mnt/C/Users/taku/Desktop/Best Media';
         }
-        if (!isset($_SESSION['musiktxtrun'])) {
-            $_SESSION['musiktxtrun'] = 'desktop.txt';
-            echo "<script>alert('select default musikrun')</script>";
-        }
+        
 
         echo '<form method=post action=""><h3><font color=yellow>Recent file</font>';
         echo '&nbsp&nbsp&nbsp<input type=text name=musiktxt value="'.$_SESSION['musiktxt'].'"></input>';
@@ -2022,6 +2024,23 @@ function gal_musik_txt() {
             xhr.open("GET", url, true);
             xhr.send();
         }
+        function deselect() {
+            var xhr = new XMLHttpRequest();
+            var url = "ajax-server.php?idexl=musiktxtsel:deselect";
+
+            xhr.onloadstart = function () {
+                document.title = "Deselecting...";
+            }
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    alert(this.responseText);
+                    location.reload();
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
         function proc(name, total, title, count) 
         {
             var xhr = new XMLHttpRequest();
@@ -2045,7 +2064,7 @@ function gal_musik_txt() {
 
                     if (name == selectedname) {
                         name = "<font color=yellow>⊛ </font>"+selectedname;
-                        tanggal = "<font color=yellow>Selected</font>";
+                        tanggal = "<font color=yellow>Selected</font>&nbsp&nbsp<input type=submit value=Deselect onclick=deselect()></input>";
                     }
 
                     document.getElementById("namefile").innerHTML += name+"&nbsp&nbsp<b><font color=red >"+data.line+" line</font></b>";

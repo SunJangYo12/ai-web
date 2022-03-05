@@ -202,8 +202,14 @@ elseif (isset($_GET['idexl'])) {
        }
     }
     elseif ($exl[0] == "musiktxtsel") {
-        $_SESSION['musiktxtrun'] = $exl[1];
-        echo $_SESSION['musiktxtrun'];
+        if ($exl[1] == 'deselect') {
+            unset($_SESSION['musiktxtrun']);
+            echo 'success deselect';
+        }
+        else {
+            $_SESSION['musiktxtrun'] = $exl[1];
+            echo $_SESSION['musiktxtrun'];
+        }
     }
     elseif ($exl[0] == "getstr") {
         $line = $exl[2];
@@ -213,12 +219,19 @@ elseif (isset($_GET['idexl'])) {
         $lines = file($path);
         $filtersearch = get_basename($lines[$line]);
         
-        $result = search_file($targetpath, $filtersearch);
+        $xresult = find($targetpath, $filtersearch);
+        $result = "";
 
-        if ($result == null) {
+        if ($xresult == null) {
            $result = "<font color=red>Null</font>";
         }
+        elseif(count($xresult) > 2) {
+           $result = "<font color=yellow>multiple ".count($xresult)." file</font>";
+        }
         else {
+            $result = $xresult[0];
+            if ($result == "") $result = "<font color=red>Null</font>";
+
             $file = fopen($path.".update", "a");
             fwrite($file , $result."\n");
             fclose($file);
@@ -490,6 +503,14 @@ if (isset($_POST['mussave'])) {
 function tanggal($filepath) {
     return date("H:i:s d-M-Y", fileatime($filepath));
 }
+
+function find($path, $name) {
+  $name = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $name);
+  $result = explode("\n", shell_exec('find "'.$path.'" -name "'.$name.'"'));
+
+  return $result;
+}
+
 function search_file($dir, $file_to_search)
 {
   $files = scandir($dir);
@@ -499,7 +520,7 @@ function search_file($dir, $file_to_search)
       if(!is_dir($path)) {
           if($file_to_search == $value)
           {
-            return $path;
+            return "$path";
             break;
           }
       }
