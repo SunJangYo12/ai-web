@@ -1,0 +1,67 @@
+<style>
+
+#bar_blank {
+    border: solid 1px #FFF;
+    height: 20px;
+    width: 300px;
+}
+#bar_color {
+    background-color: #00AA00;
+    height: 20px;
+    width: 0px;
+}
+#bar_blank, #hidden_iframe {
+    display: none;
+}
+
+
+body{
+background-color: black;
+color:white;
+}
+#content tr:hover{
+background-color: red;
+text-shadow:0px 0px 10px #fff;
+}
+#content .first{
+background-color: red;
+}
+table{
+border: 1px #000000 dotted;
+}
+a{
+color:white;
+text-decoration: none;
+}
+a:hover{
+color:blue;
+text-shadow:0px 0px 10px #ffffff;
+}
+input,select,textarea{
+border: 1px #000000 solid;
+-moz-border-radius: 5px;
+-webkit-border-radius:5px;
+border-radius:5px;
+}
+
+#spinner {
+                    display: none;
+                }
+                .loading {
+                    border: 20px solid #ccc;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    border-top-color: #1ecd97;
+                    border-left-color: #1ecd97;
+                    animation: spin 1s infinite ease-in;
+                }
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+</style>

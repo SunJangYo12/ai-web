@@ -1,7 +1,7 @@
 <?php
 
     $dfile = $_GET['id'];
-    $version = "2.8";
+    $version = "3.0";
     $aksi = explode(":", $dfile);
 
     if ($aksi[0] == 'musicview' || $aksi[0] == 'videoview') {
@@ -87,6 +87,60 @@
         header('Content-Type: audio/mpeg');
         echo $content;
         exit();
+    }
+    elseif ($aksi[0] == 'musictextview') {
+
+        echo '
+            <link rel="stylesheet" type="text/css" href="bg.css">
+            <center>
+            <div id="spinner" class="loading"></div><br>
+            <div id="header"></div>
+            <div id="hasil"></div>
+            </center>
+            <script>
+
+            var total = "'.$aksi[2].'";
+            var total = total - 1;
+            var targetpath = "'.$aksi[3].'";
+
+            function task(name, pathname, line) 
+            {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=getstr:"+pathname+":"+line+":"+targetpath;
+
+                xhr.onloadstart = function () {
+                    document.getElementById("spinner").style.display = "block";
+                    document.getElementById("header").innerHTML = "<h1><font color=yellow>"+name+"&nbsp&nbsp"+line+"/"+total+"</font></h1>";
+                }
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+                        var content = document.createElement("p");
+                        
+                        content.innerHTML = "<font color=yellow>"+data.line+"</font>&nbsp"+data.strdata+"&nbsp&nbsp<font color=yellow>|</font>&nbsp&nbsp"+data.strfix;
+                        document.getElementById("hasil").append(content);
+
+                        if (line != total)
+                        {
+                            line += 1;
+                            task(name, pathname, line);
+                        }
+                        else {
+                            document.getElementById("spinner").style.display = "";
+                            document.getElementById("header").innerHTML += "<h2><font color=green>Finish process</font></h2><form method=post action=ai.php><input type=submit name=updmusiktxt value=Update></input><input type=hidden name=updmusiktxtdata value="+pathname+"></input></form>";
+                        }
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+
+            task("'.basename($aksi[1]).'", "'.$aksi[1].'", 0);
+            </script>
+        ';
+
+
     }
     elseif ($aksi[0] == 'musicview') {
         $path = $aksi[1];

@@ -201,6 +201,54 @@ elseif (isset($_GET['idexl'])) {
            echo json_encode($data);
        }
     }
+    elseif ($exl[0] == "musiktxtsel") {
+        $_SESSION['musiktxtrun'] = $exl[1];
+        echo $_SESSION['musiktxtrun'];
+    }
+    elseif ($exl[0] == "getstr") {
+        $line = $exl[2];
+        $path = $exl[1];
+        $targetpath = $exl[3];
+
+        $lines = file($path);
+        $filtersearch = get_basename($lines[$line]);
+        
+        $result = search_file($targetpath, $filtersearch);
+
+        if ($result == null) {
+           $result = "<font color=red>Null</font>";
+        }
+        else {
+            $file = fopen($path.".update", "a");
+            fwrite($file , $result."\n");
+            fclose($file);
+        }
+
+        $data = [  "line" => $line,
+                   "strdata" => $filtersearch,
+                   "strfix" => $result,
+        ];
+
+        echo json_encode($data);
+    }
+    elseif ($exl[0] == "getline") {
+        $fh = fopen($exl[1],'r');
+        $arr = array();
+        $i = 0;
+        while ($line = fgets($fh)) {
+           //echo($line);
+           $i++;
+        }
+        fclose($fh);
+
+        $data = [  "line" => $i,
+                   "pathname" => $exl[1],
+                   "tanggal" => "<b>".tanggal($exl[1])."</b>",
+                   "name" => basename($exl[1]),
+        ];
+
+        echo json_encode($data);
+    }
     elseif ($exl[0] == "copyprocpdf") {
         copy($exl[1], 'thumbs/open.pdf');
 
@@ -437,6 +485,28 @@ if (isset($_POST['mussave'])) {
             break;
         }
     }
+}
+
+function tanggal($filepath) {
+    return date("H:i:s d-M-Y", fileatime($filepath));
+}
+function search_file($dir, $file_to_search)
+{
+  $files = scandir($dir);
+  foreach($files as $key => $value)
+  {
+      $path = realpath($dir.DIRECTORY_SEPARATOR.$value);
+      if(!is_dir($path)) {
+          if($file_to_search == $value)
+          {
+            return $path;
+            break;
+          }
+      }
+      else if($value != "." && $value != "..") {
+          search_file($path, $file_to_search);
+      }  
+  } 
 }
 
 function foldervoid($path)

