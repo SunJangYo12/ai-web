@@ -230,11 +230,13 @@ elseif (isset($_GET['idexl'])) {
         }
         else {
             $result = $xresult[0];
-            if ($result == "") $result = "<font color=red>Null</font>";
-
-            $file = fopen($path.".update", "a");
-            fwrite($file , $result."\n");
-            fclose($file);
+            if ($result == "")
+                $result = "<font color=red>Null</font>";
+            else {
+                $file = fopen($path.".update", "a");
+                fwrite($file , $result."\n");
+                fclose($file);
+            }
         }
 
         $data = [  "line" => $line,

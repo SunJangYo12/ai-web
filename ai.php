@@ -498,12 +498,18 @@ if (isset($_POST['musiktxt'])) {
 }
 if (isset($_POST['updmusiktxt'])) {
     $file = $_POST['updmusiktxtdata'];
-    unlink($file);
-    if (rename($file.".update", $file)) {
-        echo '<script>alert("Success updated")</script>';
+
+    if (file_exists($file.".update")) {
+        unlink($file);
+        if (rename($file.".update", $file)) {
+            echo '<script>alert("Success updated")</script>';
+        }
+        else {
+            echo '<script>alert("Failed rename update")</script>';
+        }
     }
     else {
-        echo '<script>alert("Failed rename update")</script>';
+        echo '<script>alert("Failed Update")</script>';
     }
 }
 
