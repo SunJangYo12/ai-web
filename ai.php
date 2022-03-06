@@ -500,7 +500,7 @@ if (isset($_POST['updmusiktxt'])) {
     $file = $_POST['updmusiktxtdata'];
 
     if (file_exists($file.".update")) {
-        unlink($file);
+        rename($file, $file."xupdate");
         if (rename($file.".update", $file)) {
             echo '<script>alert("Success updated")</script>';
         }
@@ -1065,15 +1065,18 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         }
         copy("playlist.txt", "playliststart.txt");
         
+        $total = "".count($outfiles);
+        
         if ($runtext != "") {
             $ldata = file("playlist.txt");
             $gdata = explode("\n", $ldata[0])[0];
+            $total = $_SESSION['musiktxttotal'];
         }
         else {
             $gdata = $outfiles[0];
         }
         echo '
-        <font color=yellow><h3><marquee>Total: '.count($outfiles).'</marquee></h3></font>
+        <font color=yellow><h3><marquee>Total: '.$total.'</marquee></h3></font>
         <div id=hasil></div>
 
         <script>
@@ -1994,7 +1997,7 @@ function gal_musik_txt() {
             mkdir("musiktxt", 0777, true);
         }
         if (!isset($_SESSION['musiktxt'])) {
-            $_SESSION['musiktxt'] = '/mnt/C/Users/taku/Desktop/Best Media';
+            $_SESSION['musiktxt'] = $_SESSION['path'];
         }
         
 
@@ -2074,7 +2077,7 @@ function gal_musik_txt() {
                     }
 
                     document.getElementById("namefile").innerHTML += name+"&nbsp&nbsp<b><font color=red >"+data.line+" line</font></b>";
-                    document.getElementById("namefile").innerHTML += "&nbsp&nbsp<input id="+title+" onclick=run(this.id) type=submit value=Select></input>&nbsp&nbsp&nbsp&nbsp&nbsp <input type=submit id="+encid+" onclick=refind(this.id) value=ReFind></input>&nbsp&nbsp"+tanggal+"<br><br>";
+                    document.getElementById("namefile").innerHTML += "&nbsp&nbsp<input id="+title+":"+data.line+" onclick=run(this.id) type=submit value=Select></input>&nbsp&nbsp&nbsp&nbsp&nbsp <input type=submit id="+encid+" onclick=refind(this.id) value=ReFind></input>&nbsp&nbsp"+tanggal+"<br><br>";
                 }
             };
             xhr.open("GET", url, true);
@@ -2085,6 +2088,7 @@ function gal_musik_txt() {
 
         $files = dir_scan("musiktxt");
 
+        $ifile = 0;
         for ($i=0; $i<count($files); $i++) 
         {
             if (is_file($files[$i])) 
@@ -2092,7 +2096,8 @@ function gal_musik_txt() {
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
                 if ($mime == "txt") 
                 {
-                    echo '<script>proc("'.$files[$i].'", '.count($files).',"'.basename($files[$i]).'", '.$i.');</script>';
+                	$ifile++;
+                    echo '<script>proc("'.$files[$i].'", '.$ifile.',"'.basename($files[$i]).'", '.$i.');</script>';
                 }
             }
         }

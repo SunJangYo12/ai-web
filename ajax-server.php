@@ -208,6 +208,7 @@ elseif (isset($_GET['idexl'])) {
         }
         else {
             $_SESSION['musiktxtrun'] = $exl[1];
+            $_SESSION['musiktxttotal'] = $exl[2];
             echo $_SESSION['musiktxtrun'];
         }
     }

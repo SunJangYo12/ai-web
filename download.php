@@ -116,7 +116,7 @@
                     if (this.responseText !== "" && this.readyState == 4) 
                     {
                         var data = JSON.parse(this.responseText);
-                        var content = document.createElement("p");
+                        var content = document.createElement("h5");
                         
                         content.innerHTML = "<font color=yellow>"+data.line+"</font>&nbsp"+data.strdata+"&nbsp&nbsp<font color=yellow>|</font>&nbsp&nbsp"+data.strfix;
                         document.getElementById("hasil").append(content);
@@ -147,6 +147,7 @@
         $name = $aksi[2];
 
         echo '
+            <link rel = "icon" type = "thumbs/'.$name.'.jpg" href = "name-of-image.png">
             <a onclick=saveimg()><img src="thumbs/'.$name.'.jpg" alt=""></img></a>
             <div id="hasil"></div>
             <div class="fab-container">
@@ -156,6 +157,8 @@
 
             <script>
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            document.title = "'.$name.'";
+            //document.alt = "thumbs/'.$name.'.jpg";
             </script>
 
             <style>
