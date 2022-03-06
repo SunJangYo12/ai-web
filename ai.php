@@ -1093,7 +1093,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var url = "ajax-server.php?idexl=ffmpeg:audio:"+encname;
 
             xhr.onloadstart = function () {
-                document.title = "Loading...["+proccount+"/'.count($outfiles).'] Music AI Gallery total: "+'.count($outfiles).' ;
+                document.title = "Loading...["+proccount+"/'.$total.'] Music AI Gallery total: "+'.$total.' ;
             }
 
             xhr.onreadystatechange = function() {
@@ -1108,7 +1108,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     childencdataold = document.createElement("div");
                     childencdataold.id = encodeURIComponent(data.old);
 
-                    document.title = "Music AI Gallery total: "+'.count($outfiles).';
+                    document.title = "Music AI Gallery total: "+'.$total.';
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold+".jpg";
 
@@ -1171,7 +1171,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         function sukses() {
             //alert("play sukses: ");
         }
-        procffmpeg('."'".$gdata."'".', 0);
+        procffmpeg("'.$gdata.'", 0);
         </script>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-doc') {
@@ -2096,7 +2096,7 @@ function gal_musik_txt() {
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
                 if ($mime == "txt") 
                 {
-                	$ifile++;
+                    $ifile++;
                     echo '<script>proc("'.$files[$i].'", '.$ifile.',"'.basename($files[$i]).'", '.$i.');</script>';
                 }
             }
