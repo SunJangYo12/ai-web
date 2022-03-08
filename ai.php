@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v3.0";
+$version = "v3.1";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -802,9 +802,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         </script>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-video') {
-        fm_rdelete('thumbs');
+        //fm_rdelete('thumbs');
         unlink("playlist.txt");
-        mkdir('thumbs', 0777, true);
+        if (!file_exists('thumbs'))
+            mkdir('thumbs', 0777, true);
         echo '
             <style>
                 img {
@@ -911,7 +912,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     ";
 
                     echo '
-                             "<font color=yellow><h5>Title: "+dataold+"<br>Size: "+atob(data.size)+"</h5></font>";
+                             "<font color=yellow><h5>Title: "+dataold+"<br>Size: "+atob(data.size)+"&nbsp"+data.cache+"</h5></font>";
                     
                     hasil.appendChild(childencdataold);
                     proccount += 1;
@@ -971,9 +972,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         gal_musik_txt();
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-musik') {
-        fm_rdelete('thumbs');
+        //fm_rdelete('thumbs');
         unlink("playlist.txt");
-        mkdir('thumbs', 0777, true);
+
+        if (!file_exists('thumbs'))
+            mkdir('thumbs', 0777, true);
         echo '
             <style>
                 .post-container {
@@ -1119,7 +1122,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              echo '
                              "<font color=yellow><h5>"+
                              data.jalbum+
-                             "</h5><b>Size: "+data.size+"</b></font>"+
+                             "</h5><b>Size: "+data.size+"&nbsp&nbsp"+data.symbol+"</b></font>"+
                              "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />";
                     }
                     else {
@@ -1130,7 +1133,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              echo '
                              "<div class=post-content><font color=yellow><h5>"+
                              data.jalbum+
-                             "</h5><b>Size: "+data.size+"</b></font>"+
+                             "</h5><b>Size: "+data.size+"&nbsp&nbsp"+data.symbol+"</b></font>"+
                              "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) /></div></div>";
                     }
                     hasil.appendChild(childencdataold);
@@ -1653,7 +1656,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             else
                 $icon = "<img src='icon/unkown.gif'></img>&nbsp";            
 
-            if ($_SESSION['stime'] == '') {
+            if (isset($_SESSION['stime']) == '') {
                 echo '<tr>
                 <td>'.$icon.'<a href="?filesrc='.$path.'/'.$file.'&path='.$path.'">'.$file.'</a></td>
                 <td><center>'.$size.'</center></td>

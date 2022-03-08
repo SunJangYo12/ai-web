@@ -108,8 +108,30 @@ elseif (isset($_GET['idexl'])) {
 
            $encname = trim(preg_replace('/\s\s+/', ' ', $encname));
           
-           exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$encname.'.jpg');
-           
+           $crenew = "";
+           $infomedia = "";
+           $datamedia = 'thumbs/'.get_basename($exl[2]).'.txt';
+
+           if (!file_exists($datamedia)) {
+              $infomedia = getinfomedia($xfiles);
+
+              $file = fopen($datamedia, "w");
+              fwrite($file , $infomedia);
+              fclose($file);
+           }
+           else {
+              $file = fopen($datamedia, 'r');
+              $infomedia = fgets($file);
+           }
+
+           if (!file_exists('thumbs/'.get_basename($exl[2]).'.jpg')) {
+              $crenew = "<font color=white>●</font>";
+              exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$encname.'.jpg');
+           }
+           else {
+              $crenew = "<font color=#00AA00>●</font>";
+           }
+
            $newname = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $newdir = get_dirname($newname);
            $newname = get_basename($newname);
@@ -119,11 +141,12 @@ elseif (isset($_GET['idexl'])) {
                       "new" => $newname,
                       "old" => $oldtext,
                       "size" => fsize($exl[2]),
-                      "jalbum" => getinfomedia($xfiles),
+                      "jalbum" => $infomedia,
                       "path" => $newdir,
                       "urlencpath" =>  urlencode(get_dirname($exl[2])),
                       "urlencname" =>  urlencode(get_basename($exl[2])),
-                      "tes" => get_basename($exl[2]),
+                      "symbol" => $crenew,
+                      "tes" => "sd",
            ];
 
            echo json_encode($data);
@@ -178,8 +201,12 @@ elseif (isset($_GET['idexl'])) {
 
            $format = $exl[3];
 
+           $createnew = "<font color=#00AA00>●</font>";
            if ($format == "gif") {
-              exec('ffmpeg -ss 2 -t 3 -i '.$xfiles.' -vf "fps=10,scale=220:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
+              if (!file_exists('thumbs/'.get_basename($exl[2]).'.gif')) {
+                $createnew = "<font color=white>●</font>";
+                exec('ffmpeg -ss 2 -t 3 -i '.$xfiles.' -vf "fps=10,scale=220:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 thumbs/'.$encname.'.gif');
+              }
            }
            else if ($format == "png"){
               exec('ffmpeg -i '.$xfiles.' -vf "scale=320:320:force_original_aspect_ratio=decrease" -ss 00:00:01.000 -vframes 1 thumbs/'.$encname.'.png');
@@ -195,7 +222,7 @@ elseif (isset($_GET['idexl'])) {
                       "path" => $newdir,
                       "urlencpath" =>  urlencode(get_dirname($exl[2])),
                       "urlencname" =>  urlencode(get_basename($exl[2])),
-                      "tes" => get_dirname($exl[2]),
+                      "cache" => $createnew,
            ];
 
            echo json_encode($data);
