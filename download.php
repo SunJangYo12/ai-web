@@ -89,6 +89,7 @@
         exit();
     }
     elseif ($aksi[0] == 'musictextview') {
+        unlink($aksi[1].".update");
 
         echo '
             <link rel="stylesheet" type="text/css" href="bg.css">

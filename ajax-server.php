@@ -254,7 +254,14 @@ elseif (isset($_GET['idexl'])) {
            $result = "<font color=red>Null</font>";
         }
         elseif(count($xresult) > 2) {
-           $result = "<font color=yellow>multiple ".count($xresult)." file</font>";
+           $multiple = count($xresult) - 1;
+           $result = "<font color=yellow>multiple ".$multiple." file</font>";
+
+           for ($i=0; $i<count($xresult)-1; $i++) {
+                $file = fopen($path.".update", "a");
+                fwrite($file , $xresult[$i]."\n");
+                fclose($file);
+           }
         }
         else {
             $result = $xresult[0];

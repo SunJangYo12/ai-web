@@ -1999,10 +1999,6 @@ function gal_musik_txt() {
         if (!file_exists("musiktxt")) {
             mkdir("musiktxt", 0777, true);
         }
-        if (!isset($_SESSION['musiktxt'])) {
-            $_SESSION['musiktxt'] = $_SESSION['path'];
-        }
-        
 
         echo '<form method=post action=""><h3><font color=yellow>Recent file</font>';
         echo '&nbsp&nbsp&nbsp<input type=text name=musiktxt value="'.$_SESSION['musiktxt'].'"></input>';
