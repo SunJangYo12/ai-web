@@ -148,19 +148,13 @@
         $name = $aksi[2];
 
         echo '
-            <link rel = "icon" type = "thumbs/'.$name.'.jpg" href = "name-of-image.png">
-            <a onclick=saveimg()><img src="thumbs/'.$name.'.jpg" alt=""></img></a>
+            <link rel = "icon" type=png href="thumbs/'.$name.'.jpg">
+            <a onclick=saveimg()><img style=float:left; src="thumbs/'.$name.'.jpg" alt=""></img></a>
             <div id="hasil"></div>
             <div class="fab-container">
                 <span onclick=prev() class="fab-label">Prev</span>
                 <span onclick=next() class="fab-label">Next</span><br><br>
             </div>
-
-            <script>
-            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            document.title = "'.$name.'";
-            //document.alt = "thumbs/'.$name.'.jpg";
-            </script>
 
             <style>
                 .fab-container {
@@ -186,6 +180,8 @@
 
             <script>
 
+            document.title = "'.$name.'";
+            
             function next() {
                 var xhr = new XMLHttpRequest();
                 var url = "ajax-server.php?idexl=nextaudio:"+"'.$path.':'.$name.'";
@@ -268,7 +264,7 @@
                     {
                         var data = JSON.parse(this.responseText);
 
-                        document.getElementById("hasil").innerHTML += "<font color=yellow><h5>"+data.jalbum+"</h5><b>Size: "+data.size+"</b></font>";
+                        document.getElementById("hasil").innerHTML += "&nbsp<font color=yellow><h5>"+data.jalbum+"</h5><b>Size: "+data.size+"</b></font>";
                         document.getElementById("hasil").innerHTML += "&nbsp&nbsp<input type=submit value=Favorite onclick=favorite() />";
                         document.getElementById("hasil").innerHTML += "&nbsp&nbsp<input type=submit value=Rincian onclick=rincian() />";
                         document.getElementById("hasil").innerHTML += "&nbsp&nbsp<input type=submit value=Edit onclick=edit() />";
