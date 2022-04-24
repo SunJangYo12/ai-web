@@ -140,8 +140,83 @@
             task("'.basename($aksi[1]).'", "'.$aksi[1].'", 0);
             </script>
         ';
+    }
+    elseif ($aksi[0] == 'musictextviewText') {
+        unlink($aksi[1].".dup");
+
+        echo '
+            <link rel="stylesheet" type="text/css" href="bg.css">
+            <center>
+            <div id="spinner" class="loading"></div><br>
+            <div id="header"></div>
+            <div id="hasil"></div>
+            </center>
+            <script>
+
+            var total = "'.$aksi[2].'";
+            var total = total - 1;
+            var targetpath = "'.$aksi[3].'";
+            var onestrdup = 0;
+
+            function taskWriteDuplicate(name, pathname, line) 
+            {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=getstrtextwrite:"+pathname+":"+line+":"+targetpath;
+
+                xhr.onloadstart = function () {
+                }
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+
+            function task(name, pathname, line) 
+            {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=getstrtext:"+pathname+":"+line+":"+targetpath;
+
+                xhr.onloadstart = function () {
+                    document.getElementById("spinner").style.display = "block";
+                    document.getElementById("header").innerHTML = "<h1><font color=yellow>"+name+"&nbsp&nbsp"+line+"/"+total+"</font></h1>";
+                }
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+                        var content = document.createElement("h5");
+
+                        if (data.strdup != "nothing" && onestrdup == 0) {
+                            taskWriteDuplicate(name, pathname, line);
+                            onestrdup += 1;
+                        }
 
 
+                        content.innerHTML = "<font color=yellow>"+data.line+"</font>&nbsp"+data.strdata;
+                        document.getElementById("hasil").append(content);
+
+                        if (line != total)
+                        {
+                            line += 1;
+                            task(name, pathname, line);
+                        }
+                        else {
+                            document.getElementById("spinner").style.display = "";
+                            document.getElementById("header").innerHTML += "<h2><font color=green>Finish process</font></h2><form method=post action=ai.php><input type=submit name=updmusiktxtstr value=Update_text></input><input type=hidden name=updmusiktxtdatastr value="+pathname+"></input></form>";
+                        }
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+
+            task("'.basename($aksi[1]).'", "'.$aksi[1].'", 0);
+            </script>
+        ';
     }
     elseif ($aksi[0] == 'musicview') {
         $path = $aksi[1];

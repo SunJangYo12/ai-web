@@ -281,6 +281,58 @@ elseif (isset($_GET['idexl'])) {
 
         echo json_encode($data);
     }
+    elseif ($exl[0] == "getstrtextwrite") {
+        $line = $exl[2];
+        $path = $exl[1];
+        $targetpath = $exl[3];
+
+        $lines = file($path);
+
+        $file = fopen($path.".dup", "a");
+        fwrite($file , $lines[$line]);
+        fclose($file);
+    }
+    elseif ($exl[0] == "getstrtext") {
+        $line = $exl[2];
+        $path = $exl[1];
+        $targetpath = $exl[3];
+
+        $lines = file($path);
+        $filtersearch = get_basename($lines[$line]);
+        
+        $result = "";
+        $idup = 0;
+        $strdup = "";
+        $fh = fopen($path, 'r');
+
+        while ($res = fgets($fh)) {
+            if ($lines[$line] == $res) {
+                $result = "<font color=red> duplicate: ".$idup."</font>";
+                $idup += 1;
+            }
+            else {
+                $result = "<font color=green>not duplicate</font>";
+
+            }
+        }
+
+        if ($idup == 1) {
+            $file = fopen($path.".dup", "a");
+            fwrite($file , $lines[$line]);
+            fclose($file);
+            $strdup = "nothing";
+        }
+        else {
+            $strdup = $lines[$line];
+        }
+
+        $data = [  "line" => $line,
+                   "strdata" => $filtersearch." ".$result,
+                   "strdup" => $strdup
+        ];
+
+        echo json_encode($data);
+    }
     elseif ($exl[0] == "getline") {
         $fh = fopen($exl[1],'r');
         $arr = array();
@@ -538,7 +590,8 @@ if (isset($_POST['mussave'])) {
 }
 
 function tanggal($filepath) {
-    return date("H:i:s d-M-Y", fileatime($filepath));
+    $out = explode('/', shell_exec('ls -lah '.$filepath));
+    return $out[0];
 }
 
 function find($path, $name) {
@@ -547,6 +600,7 @@ function find($path, $name) {
 
   return $result;
 }
+
 
 function search_file($dir, $file_to_search)
 {

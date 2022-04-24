@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v3.1";
+$version = "v3.2";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -512,6 +512,22 @@ if (isset($_POST['updmusiktxt'])) {
         echo '<script>alert("Failed Update")</script>';
     }
 }
+if (isset($_POST['updmusiktxtstr'])) {
+    $file = $_POST['updmusiktxtdatastr'];
+    unlink($file);
+
+    if (file_exists($file.".dup")) {
+        if (rename($file.".dup", $file)) {
+            echo '<script>alert("Success updated")</script>';
+        }
+        else {
+            echo '<script>alert("Failed rename update")</script>';
+        }
+    }
+    else {
+        echo '<script>alert("Failed Update")</script>';
+    }
+}
 
 
 
@@ -690,9 +706,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <input type="submit" name="setThumbsVideogall" value="Change" /></form>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
-        fm_rdelete('thumbs');
+        //fm_rdelete('thumbs');
         unlink("playlist.txt");
-        mkdir('thumbs', 0777, true);
+        if (!file_exists('thumbs'))
+            mkdir('thumbs', 0777, true);
         echo '
             <style>
                 img {
@@ -1180,7 +1197,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-doc') {
         fm_rdelete('thumbs');
         unlink("playlist.txt");
-        mkdir('thumbs', 0777, true);
+        if (!file_exists('thumbs'))
+            mkdir('thumbs', 0777, true);
         echo '
             <style>
                 img {
@@ -1505,7 +1523,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var data = JSON.parse(this.responseText);
                     //alert(data.status);
 
-                    location.href = "/ai-web/ai.php?path=/mnt1/simpan/htdocs/ai-web/mount";
+                    location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/mount";
                 }
             };
             xhr.open("GET", url, true);
@@ -2019,6 +2037,13 @@ function gal_musik_txt() {
                             "_blank"
                         );
         }
+        function retext(id) {
+            var decid = atob(id);
+            window.open(
+                            "download.php?id=musictextviewText:"+decid,
+                            "_blank"
+                        );
+        }
         function run(id) {
             var xhr = new XMLHttpRequest();
             var url = "ajax-server.php?idexl=musiktxtsel:"+id;
@@ -2080,7 +2105,7 @@ function gal_musik_txt() {
                     }
 
                     document.getElementById("namefile").innerHTML += name+"&nbsp&nbsp<b><font color=red >"+data.line+" line</font></b>";
-                    document.getElementById("namefile").innerHTML += "&nbsp&nbsp<input id="+title+":"+data.line+" onclick=run(this.id) type=submit value=Select></input>&nbsp&nbsp&nbsp&nbsp&nbsp <input type=submit id="+encid+" onclick=refind(this.id) value=ReFind></input>&nbsp&nbsp"+tanggal+"<br><br>";
+                    document.getElementById("namefile").innerHTML += "&nbsp&nbsp<input id="+title+":"+data.line+" onclick=run(this.id) type=submit value=Select></input>&nbsp&nbsp&nbsp&nbsp&nbsp <input type=submit id="+encid+" onclick=refind(this.id) value=ReFind></input>&nbsp&nbsp&nbsp&nbsp&nbsp <input type=submit id="+encid+" onclick=retext(this.id) value=CekDuplcateText> </input>&nbsp&nbsp"+tanggal+"<br><br>";
                 }
             };
             xhr.open("GET", url, true);
