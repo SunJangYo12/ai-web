@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v3.2";
+$version = "v3.4";
 
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
@@ -629,10 +629,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
 
     if(isset($_GET['filesrc'])){
-        echo "<tr><td>Current File : ";
-        echo $_GET['filesrc'];
-        echo '</tr></td></table><br />';
-        echo('<pre>'.htmlspecialchars(file_get_contents($_GET['filesrc'])).'</pre>');
+        $path = $_GET['filesrc'];
+        echo("<script>location.href ='/ai-web/download.php?id=$path';</script>");
     }
     //action other
     elseif(isset($_POST['newgofile'])) {
@@ -671,6 +669,12 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             echo '<script>alert("invalid value thumbs format, you can change png or gif");</script>';
         }
     }
+    elseif(isset($_POST['setmimecopydownload'])) {
+        $data = $_POST['data'];
+        
+        $_SESSION['mimecopydownload'] = $data;
+        echo '<script>alert("set mime '.$data.' successfully");</script>';
+    }
     elseif(isset($_GET['option']) && $_POST['other'] == 'file' ) {
         echo '<form method="POST" action="">New File : 
         <input name="newfile" type="text" size="20" value="'.$path.'" />
@@ -698,12 +702,20 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         if (!isset($_SESSION['thumbsVideogall'])) {
             $_SESSION['thumbsVideogall'] ='png';
         }
+        if (!isset($_SESSION['mimecopydownload'])) {
+            $_SESSION['mimecopydownload'] ='mhtml';
+        }
         
         $tgallvid = $_SESSION['thumbsVideogall'];
+        $mimed = $_SESSION['mimecopydownload'];
 
         echo '<br><br><form method="POST" action="">Video Gallery thumbs : 
         <input name="data" type="text" size="20" value="'.$tgallvid.'" />
         <input type="submit" name="setThumbsVideogall" value="Change" /></form>';
+
+        echo '<br><br><form method="POST" action="">Mime download copy : 
+        <input name="data" type="text" size="20" value="'.$mimed.'" />
+        <input type="submit" name="setmimecopydownload" value="Change" /></form>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
         //fm_rdelete('thumbs');
@@ -760,6 +772,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 }
             }
         }
+        copy("playlist.txt", "playliststartimg.txt");
         
         $gdata = $outfiles[0];
 
@@ -790,7 +803,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     encdataold = encodeURIComponent(dataold).replace("%20","+");
 
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold;
-                    imgsrcfull = "download.php?id=gambar:"+data.oldpath+"/"+encdataold;
+                    imgsrcfull = "download.php?id=imageview:"+data.oldpath+"/"+encdataold;
 
                     title.innerHTML = "<a target=_blank href='."'".'"+imgsrcfull+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
 
@@ -850,6 +863,33 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 window.onbeforeunload=goodbye; 
             </script>
         ";
+        
+         echo '
+            <html>
+            <div id="spinner" class="loading"></div>
+            </html>
+            <style type="text/css">
+                #spinner {
+                    display: none;
+                }
+                .loading {
+                    border: 20px solid #ccc;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    border-top-color: #1ecd97;
+                    border-left-color: #1ecd97;
+                    animation: spin 1s infinite ease-in;
+                }
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+            </style>';
 
         $files = dir_scan($path);
         $outfiles = array();
@@ -955,12 +995,16 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var url = "ajax-server.php?idexl=copyvid:"+encname;
 
             xhr.onloadstart = function () {
-                alert("Copying\r\rPlease wait ...");
+            	document.title = "Copying...";
+                document.getElementById("spinner").style.display = "block";
             }
+            
 
             xhr.onreadystatechange = function() {
                 if (this.responseText !== "" && this.readyState == 4) 
                 {
+                    document.getElementById("spinner").style.display = "";
+
                     window.close();
                     if (ubahtitle)
                         document.title = vname;
@@ -974,6 +1018,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                             '_blank'
                         );
                     ";
+
 
 
                     echo '
@@ -1095,8 +1140,9 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         else {
             $gdata = $outfiles[0];
         }
+        xwriteFile("freespace.txt", hdd()->free."/".hdd()->size);
         echo '
-        <font color=yellow><h3><marquee>Total: '.$total.'</marquee></h3></font>
+        <font color=yellow><h3><marquee>Total: '.$total."&nbsp&nbsp <font color=green>Free space: ".hdd()->free."&nbsp/&nbsp".hdd()->size.'</font></marquee></h3></font>
         <div id=hasil></div>
 
         <script>
@@ -1452,7 +1498,13 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             $path = $_POST['path'];
             echo("<script>location.href ='/ai-web/download.php?id=$path';</script>");
 
-        }elseif($_POST['opt'] == 'copy') {
+        }
+        elseif($_POST['opt'] == 'download_c') {
+            $path = $_POST['path'];
+            copy($path, "thumbs/filedownload.".$_SESSION['mimecopydownload']);
+            echo("<script>location.href ='/ai-web/download.php?id=thumbs/filedownload.".$_SESSION['mimecopydownload']."';</script>");
+        }
+        elseif($_POST['opt'] == 'copy') {
             $_SESSION['copy'] = $path.'/'.$_POST['name'];
             $_SESSION['copy_name'] = $_POST['name'];
             echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
@@ -1463,16 +1515,61 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
 
         }elseif($_POST['opt'] == 'zip') {
-            $zipper = new FM_Zipper();
-            $zipsource = $path."/".$_POST['name'];
+            $arsource = $path."/".$_POST['name'];
+
+            echo '
+            <html>
+            <div id="spinner" class="loading"></div>
+            </html>
+            <style type="text/css">
+                #spinner {
+                    display: none;
+                }
+                .loading {
+                    border: 20px solid #ccc;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    border-top-color: #1ecd97;
+                    border-left-color: #1ecd97;
+                    animation: spin 1s infinite ease-in;
+                }
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+            </style>';
+
+            echo '
+            <script>
+            var name = "'.$arsource.'";
+            var xhr = new XMLHttpRequest();
+            var encname = encodeURIComponent(name).replace("%20","+");
+            var url = "ajax-server.php?idexl=compres:"+encname;
             
-            $res = $zipper->create($zipsource.".zip", $zipsource);
-            if ($res) {
-                echo "<script>alert('Archive sukses ".$zipsource.".zip');</script>";
-                echo("<script>location.href = '/ai-web/ai.php?path=".$_SESSION['path']."';</script>");
-            }else{
-                echo "<font color='red'>gagal pack folder</font>";
+            xhr.onloadstart = function () {
+                document.title = "Compressing...";
+                document.getElementById("spinner").style.display = "block";
             }
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    document.title = "Compressing success";
+                    var data = JSON.parse(this.responseText);
+                    alert(data.status);
+
+                    location.href = "/ai-web/ai.php?path='.$path.'";
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+            </script>
+            ';
         
         }elseif($_POST['opt'] == 'mount') {
             $arsource = $path."/".$_POST['name'];
@@ -1709,6 +1806,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <option value="copy">Copy</option>
                 <option value="move">Move</option>
                 <option value="download">Download</option>
+                <option value="download_c">Download Copy</option>
                 </select>
                 <input type="hidden" name="type" value="file">
                 <input type="hidden" name="name" value="'.$file.'">
@@ -1731,6 +1829,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <option value="copy">Copy</option>
                 <option value="move">Move</option>
                 <option value="download">Download</option>
+                <option value="download_c">Download Copy</option>
                 </select>
                 <input type="hidden" name="type" value="file">
                 <input type="hidden" name="name" value="'.$file.'">
@@ -1752,6 +1851,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <option value="copy">Copy</option>
                 <option value="move">Move</option>
                 <option value="download">Download</option>
+                <option value="download_c">Download Copy</option>
                 </select>
                 <input type="hidden" name="type" value="file">
                 <input type="hidden" name="name" value="'.$file.'">
@@ -1773,6 +1873,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <option value="copy">Copy</option>
                 <option value="move">Move</option>
                 <option value="download">Download</option>
+                <option value="download_c">Download Copy</option>
                 </select>
                 <input type="hidden" name="type" value="file">
                 <input type="hidden" name="name" value="'.$file.'">
@@ -1794,6 +1895,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <option value="copy">Copy</option>
                 <option value="move">Move</option>
                 <option value="download">Download</option>
+                <option value="download_c">Download Copy</option>
                 </select>
                 <input type="hidden" name="type" value="file">
                 <input type="hidden" name="name" value="'.$file.'">
@@ -1815,6 +1917,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <option value="copy">Copy</option>
                 <option value="move">Move</option>
                 <option value="download">Download</option>
+                <option value="download_c">Download Copy</option>
                 </select>
                 <input type="hidden" name="type" value="file">
                 <input type="hidden" name="name" value="'.$file.'">
@@ -2284,13 +2387,13 @@ function getdomainname() {
 
 function hddsize($size) {
     if($size >= 1073741824)
-        return sprintf('%1.2f',$size / 1073741824 ).' GB';
+        return sprintf('%1.2f',$size / 1073741824 ).'GB';
     elseif($size >= 1048576)
-        return sprintf('%1.2f',$size / 1048576 ) .' MB';
+        return sprintf('%1.2f',$size / 1048576 ) .'MB';
     elseif($size >= 1024)
-        return sprintf('%1.2f',$size / 1024 ) .' KB';
+        return sprintf('%1.2f',$size / 1024 ) .'KB';
     else
-        return $size .' B';
+        return $size .'B';
 }
 function hdd() {
     $hdd['size'] = hddsize(disk_total_space("/"));

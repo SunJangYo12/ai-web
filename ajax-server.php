@@ -58,7 +58,7 @@ elseif (isset($_GET['idexl'])) {
            fwrite($_data, "$x ff");
            fclose($_data);*/
 
-           exec('ffmpeg -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
+           exec('ffmpeg -y -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
            
            $newtext = delete_text_line("playlist.txt", 0);
            $xdir = dirname($newtext);
@@ -125,8 +125,38 @@ elseif (isset($_GET['idexl'])) {
            }
 
            if (!file_exists('thumbs/'.get_basename($exl[2]).'.jpg')) {
-              $crenew = "<font color=white>●</font>";
-              exec('ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$encname.'.jpg');
+              
+              $cmd = 'ffmpeg -i '.$xfiles.' -an -vcodec copy thumbs/'.$encname.'.jpg';
+           
+              exec($cmd, $output, $status);
+
+              if ($status == 1) {
+                
+                $dirfail = get_dirname($exl[2]);
+                $dirfail = bersihPath($dirfail);
+
+                $output = findImg($dirfail, "png");
+
+                if (count($output) >= 1) {
+                    copy($output[0], "thumbs/".get_basename($exl[2]).".jpg");
+                    $crenew = "<font color=cyan>●</font>";
+                }
+                elseif (count($output) == 0) {
+                    $output = findImg($dirfail, "jpg");
+
+                    if (count($output) >= 1) {
+                        copy($output[0], "thumbs/".get_basename($exl[2]).".jpg");
+                        $crenew = "<font color=cyan>●</font>";
+                    }
+                    else {
+                        $crenew = "<font color=red>●</font>";
+                    }
+                }
+              }
+              else {
+                $crenew = "<font color=white>●</font>";
+              }
+
            }
            else {
               $crenew = "<font color=#00AA00>●</font>";
@@ -517,6 +547,32 @@ elseif (isset($_GET['idexl'])) {
 
         echo "saved";
     }
+    elseif ($exl[0] == "nextimage") {
+        $path = $exl[1];
+        $name = $exl[2];
+
+        $getNPImage = getPlayImage($path."/".$name."\n", "next");
+
+        $data = [  
+            "nextpath" => get_dirname($getNPImage),
+            "nextname" => get_basename($getNPImage),
+        ];
+
+        echo json_encode($data);
+    }
+    elseif ($exl[0] == "previmage") {
+        $path = $exl[1];
+        $name = $exl[2];
+
+        $getNPImage = getPlayImage($path."/".$name."\n", "prev");
+
+        $data = [  
+            "prevpath" => get_dirname($getNPImage),
+            "prevname" => get_basename($getNPImage),
+        ];
+        echo json_encode($data);
+    }
+     
     elseif ($exl[0] == "nextaudio") {
         $path = $exl[1];
         $name = $exl[2];
@@ -559,6 +615,26 @@ elseif (isset($_GET['idexl'])) {
         $pathname = trim(preg_replace('/\s\s+/', ' ', $pathname)); // hapus enter
 
         $status = shell_exec('fuse-archive '.$pathname." mount");
+
+        $data = [  
+            "status" => $status,
+            "pathname" => $pathname,
+        ];
+
+        echo json_encode($data);
+    }
+    elseif ($exl[0] == "compres") {
+        $path = $exl[1];
+
+        $pathname = $path;
+        $pathname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $pathname); // replace unicode path and name
+        $pathname = trim(preg_replace('/\s\s+/', ' ', $pathname)); // hapus enter
+
+        $cmd = 'tar cf '.$pathname.".tar ".$pathname;
+        exec($cmd, $output, $status);
+
+        if ($status == 0) $status = "sukses exec";
+        else $status = "failed exec";
 
         $data = [  
             "status" => $status,
@@ -666,8 +742,9 @@ function getinfomedia($input) {
                 ) {
 
                 $exl = explode('best', $value);
-                if ($exl[1] != null)
+                if ($exl[1] != null) {
                     $output .= "<font color=white>".$key." : </font><font color=#FF69B4>".$value."</font><br>";
+                }
                 else
                     $output .= "<font color=white>".$key." : </font>".$value."<br>";
             }
@@ -679,6 +756,51 @@ function getinfomedia($input) {
 
 function getPlayAudio($strfind, $key) {
   $handle = fopen("playliststart.txt", "r");
+  $arr = array();
+  $i = 0;
+  $result = "kosong";
+  $resultNext = "kosong";
+  $resultPrev = "kosong";
+  $resultline = 0;
+
+  if ($handle) {
+      while (($line = fgets($handle)) !== false) {
+          $arr[$i] = $line;
+
+          if ($line == $strfind) {
+            $result = $line;
+            $resultline = $i;
+          }
+          $i++;
+      }
+      fclose($handle);
+  } else {
+      echo "file no found";
+  }
+
+  if ($key == "result") {
+    $out = trim(preg_replace('/\s\s+/', ' ', $result));
+    return $out;
+  }
+  elseif ($key == "next") {
+    $out = trim(preg_replace('/\s\s+/', ' ', $arr[$resultline+1]));
+    return $out;
+  }
+  elseif ($key == "prev") {
+    $out = trim(preg_replace('/\s\s+/', ' ', $arr[$resultline-1]));
+    return $out;
+  }
+  elseif ($key == "line") {
+    $out = trim(preg_replace('/\s\s+/', ' ', $resultline));
+    return $out;
+  }
+  else {
+    return "key unkown";
+  }
+}
+
+function getPlayImage($strfind, $key) {
+  $handle = fopen("playliststartimg.txt", "r");
   $arr = array();
   $i = 0;
   $result = "kosong";
@@ -778,5 +900,20 @@ function fsize($input) {
     }
 
     return $size;
+}
+
+function findImg($dirfail, $mime) 
+{
+  $cmd = "find $dirfail -name '*.$mime'";
+  exec($cmd, $output, $status);
+
+  return $output;
+}
+
+function bersihPath($in) {
+  $out = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $in); // replace unicode path and name
+  $out = trim(preg_replace('/\s\s+/', ' ', $out)); // hapus enter
+         
+  return $out;
 }
 ?>

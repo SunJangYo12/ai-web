@@ -222,6 +222,12 @@
         $path = $aksi[1];
         $name = $aksi[2];
 
+        $_data = fopen("freespace.txt", "r") or die("Gagal membuka file!");
+        $data = fread($_data, filesize("freespace.txt"));
+        fclose($_data);
+
+        $free = $data;
+
         echo '
             <link rel = "icon" type=png href="thumbs/'.$name.'.jpg">
             <a onclick=saveimg()><img style=float:left; src="thumbs/'.$name.'.jpg" alt=""></img></a>
@@ -293,10 +299,11 @@
             function favorite() {
                 var name = "'.$path.':'.$name.'";
 
-                window.open(
+                /*window.open(
                     "ajax-server.php?idexl=musfavorite:"+name,
                     "_blank"
-                );
+                );*/
+                alert("disable function karena file rentan rusak, size space saat ini: '.$free.'");
             }
             function edit() {
                 var name = "'.$path.':'.$name.'";
@@ -453,6 +460,84 @@
             </body>
         ';
     }
+    else if ($aksi[0] == 'imageview') {
+        $path = get_dirname($aksi[1]);
+        $name = get_basename($aksi[1]);
+
+        echo '
+            <link rel = "icon" type=png href="thumbs/'.$name.'.jpg">
+            <a onclick=saveimg()><img style=float:left; src="thumbs/'.$name.'.jpg" alt=""></img></a>
+            <div id="hasil"></div>
+            <div class="fab-container">
+                <span onclick=prev() class="fab-label">Prev</span>
+                <span onclick=next() class="fab-label">Next</span><br><br>
+            </div>
+
+            <style>
+                .fab-container {
+                    position: fixed;
+                    bottom: 115px;
+                    right: 50px;
+                    z-index: 999;
+                    cursor: pointer;
+                }
+                .fab-label {
+                    padding: 2px 5px;
+                    align-self: center;
+                    user-select: none;
+                    white-space: nowrap;
+                    border-radius: 3px;
+                    font-size: 69px;
+                    background: #666666;
+                    color: #ffffff;
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+                    margin-right: 10px;
+                }
+            </style>
+
+            <script>
+
+            document.title = "'.$name.'";
+            
+            function next() {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=nextimage:"+"'.$path.':'.$name.'";
+                xhr.onloadstart = function () {
+                }
+
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+                        location.href = "download.php?id=imageview:"+data.nextpath+"/"+data.nextname;
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+            function prev() {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=previmage:"+"'.$path.':'.$name.'";
+                xhr.onloadstart = function () {
+                }
+
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+                        location.href = "download.php?id=imageview:"+data.prevpath+"/"+data.prevname;
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+
+            imgsrcfull = "download.php?id=gambar:"+"'.$path."/".$name.'";
+
+            document.getElementById("hasil").innerHTML += "<img src="+imgsrcfull+" onclick=next()></img>";
+            </script>
+        ';
+    }
     else {
         $mime = strtolower(pathinfo($dfile, PATHINFO_EXTENSION));
         $filename = basename($dfile);
@@ -470,4 +555,32 @@
         readfile($dfile);
         exit;
     }
+
+
+function get_basename($filename)
+{
+    $exl = explode('/', $filename);
+    $count = count($exl);
+
+    $out = $exl[$count - 1];
+    $delent = explode("\n", $out);
+    $out = $delent[0];
+
+    return $out;
+}
+function get_dirname($filename)
+{
+  $exl = explode('/', $filename);
+  $count = count($exl);
+  $out = "";
+
+  for($i=0; $i<$count; $i++) {
+    if ($i != $count -1) {
+      $out .= $exl[$i]."/";
+    }
+  }
+  $out = substr($out, 0, -1); // delete last string
+
+  return $out;
+}
 ?>
