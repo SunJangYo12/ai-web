@@ -828,7 +828,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             xhr.open("GET", url, true);
             xhr.send();
         }
-        procffmpeg('."'".$gdata."'".', 0);
+        if ('.count($outfiles).' != 0)
+            procffmpeg('."'".$gdata."'".', 0);
+        else
+            alert("no image found!")
         </script>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-video') {

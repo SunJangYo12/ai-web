@@ -54,12 +54,9 @@ elseif (isset($_GET['idexl'])) {
               $y = $y / 2;
            }
 
-           /*$_data = fopen("tees.txt", "w");
-           fwrite($_data, "$x ff");
-           fclose($_data);*/
+           if (!file_exists("thumbs/".get_basename($exl[2])))
+              exec('ffmpeg -y -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
 
-           exec('ffmpeg -y -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
-           
            $newtext = delete_text_line("playlist.txt", 0);
            $xdir = dirname($newtext);
            $newtext = basename($newtext);
@@ -73,7 +70,7 @@ elseif (isset($_GET['idexl'])) {
                       "encname" => $encname,
                       "path" => $xdir,
                       "oldpath" => urlencode(dirname($exl[2])),
-                      "tes" => $xdir,
+                      "tes" => "sds",
            ];
 
            echo json_encode($data);
@@ -195,7 +192,8 @@ elseif (isset($_GET['idexl'])) {
 
            $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
           
-           exec('/usr/bin/pdftoppm -l 1 -scale-to 500 -jpeg '.$xfiles.' > thumbs/'.basename($xfiles).'.jpg');
+           if (!file_exists("thumbs/".get_basename($exl[2])))
+              exec('/usr/bin/pdftoppm -l 1 -scale-to 500 -jpeg '.$xfiles.' > thumbs/'.basename($xfiles).'.jpg');
 
            $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $xdir = dirname($newtext);
@@ -239,7 +237,8 @@ elseif (isset($_GET['idexl'])) {
               }
            }
            else if ($format == "png"){
-              exec('ffmpeg -i '.$xfiles.' -vf "scale=320:320:force_original_aspect_ratio=decrease" -ss 00:00:01.000 -vframes 1 thumbs/'.$encname.'.png');
+              if (!file_exists("thumbs/".get_basename($exl[2]).".png"))
+                  exec('ffmpeg -i '.$xfiles.' -vf "scale=320:320:force_original_aspect_ratio=decrease" -ss 00:00:01.000 -vframes 1 thumbs/'.$encname.'.png');
            }
            $newname = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $newdir = get_dirname($newname);
