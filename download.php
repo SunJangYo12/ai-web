@@ -532,7 +532,13 @@
                 xhr.send();
             }
 
-            imgsrcfull = "download.php?id=gambar:"+"'.$path."/".$name.'";
+            var path = "'.$path.'".replace( /[\r\n]+/gm, "" );
+            encpath = encodeURIComponent(path).replace("%20","+");
+
+            var name = "'.$name.'".replace( /[\r\n]+/gm, "" );
+            encname = encodeURIComponent(name).replace("%20","+");
+
+            imgsrcfull = "download.php?id=gambar:"+encpath+"/"+encname;
 
             document.getElementById("hasil").innerHTML += "<img src="+imgsrcfull+" onclick=next()></img>";
             </script>

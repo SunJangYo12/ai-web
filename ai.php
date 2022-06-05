@@ -802,11 +802,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var dataold = data.old.replace( /[\r\n]+/gm, "" );
                     encdataold = encodeURIComponent(dataold).replace("%20","+");
 
-                    var dataoldpath = data.oldpath.replace( /[\r\n]+/gm, "" );
-                    encdataoldpath = encodeURIComponent(dataoldpath).replace("%20","+");
-
                     imgsrc = "download.php?id=gambar:thumbs/"+encdataold;
-                    imgsrcfull = "download.php?id=imageview:"+encdataoldpath+"/"+encdataold;
+                    imgsrcfull = "download.php?id=imageview:"+data.oldpath+"/"+data.old;
 
                     title.innerHTML = "<a target=_blank href='."'".'"+imgsrcfull+"'."'".'><img src='."'".'"+imgsrc+"'."'".' alt='."'".'"+imgsrc+"'."'".'></img></a>";
 
