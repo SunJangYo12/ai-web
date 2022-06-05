@@ -5,6 +5,11 @@ date_default_timezone_set("Asia/Jakarta");
 
 $version = "v3.4";
 
+if (!file_exists("settings.txt"))
+{
+    setSettings(null);
+}
+
 if(isset($_GET['rat-android-siapa'])) {
         $path = dirname(__FILE__)."/rat/android/";
         $siapa = $_GET['rat-android-siapa'];
@@ -658,22 +663,21 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
 
         echo("<script>location.href = '/ai-web/ai.php?path=$path';</script>");
     }
-    elseif(isset($_POST['setThumbsVideogall'])) {
-        $data = $_POST['data'];
-        
-        if ($data == "gif" || $data == "png") {
-            $_SESSION['thumbsVideogall'] = $data;
-            echo '<script>alert("set format '.$data.' successfully");</script>';
+    elseif(isset($_POST['setSettings'])) {
+        if (file_exists("settings.txt"))
+        {
+            $arr = array();
+            $arr[0] = $_POST['dataThumGalVid'];
+            $arr[1] = $_POST['dataMimeCopdow'];
+
+            setSettings($arr);
+
+            echo '<script>alert("set settings '.$data.' successfully");</script>';
         }
         else {
-            echo '<script>alert("invalid value thumbs format, you can change png or gif");</script>';
+            echo "file settings.txt not found";
         }
-    }
-    elseif(isset($_POST['setmimecopydownload'])) {
-        $data = $_POST['data'];
-        
-        $_SESSION['mimecopydownload'] = $data;
-        echo '<script>alert("set mime '.$data.' successfully");</script>';
+
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'file' ) {
         echo '<form method="POST" action="">New File : 
@@ -699,23 +703,22 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'settings') 
     {
-        if (!isset($_SESSION['thumbsVideogall'])) {
-            $_SESSION['thumbsVideogall'] ='png';
+        if (file_exists("settings.txt"))
+        {
+            $data = xreadFile("settings.txt");
+            $arrThumgv = explode("<thumbsVid>", $data);
+            $arrMime = explode("<mimecodow>", $data);
+
+            echo '<form method="POST" action="">
+            Video Gallery thumbs : <input name="dataThumGalVid" type="text" size="20" value="'.$arrThumgv[1].'" /><br><br>
+            Mime download copy : <input name="dataMimeCopdow" type="text" size="20" value="'.$arrMime[1].'" /><br><br>
+
+            <input type="submit" name="setSettings" value="Change" /></form>';
         }
-        if (!isset($_SESSION['mimecopydownload'])) {
-            $_SESSION['mimecopydownload'] ='mhtml';
+        else {
+            echo "file settings.txt not found";
         }
         
-        $tgallvid = $_SESSION['thumbsVideogall'];
-        $mimed = $_SESSION['mimecopydownload'];
-
-        echo '<br><br><form method="POST" action="">Video Gallery thumbs : 
-        <input name="data" type="text" size="20" value="'.$tgallvid.'" />
-        <input type="submit" name="setThumbsVideogall" value="Change" /></form>';
-
-        echo '<br><br><form method="POST" action="">Mime download copy : 
-        <input name="data" type="text" size="20" value="'.$mimed.'" />
-        <input type="submit" name="setmimecopydownload" value="Change" /></form>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-image') {
         //fm_rdelete('thumbs');
@@ -917,11 +920,15 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             }
         }
         
+
         $gdata = $outfiles[0];
         $format = "png";
-
-        if (isset($_SESSION['thumbsVideogall'])) {
-            $format = $_SESSION['thumbsVideogall'];
+        
+        if (file_exists("settings.txt"))
+        {
+            $arFor = xreadFile("settings.txt");
+            $arFormat = explode("<thumbsVid>", $arFor);
+            $format = $arFormat[1];
         }
         
         echo '
@@ -1504,8 +1511,17 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         }
         elseif($_POST['opt'] == 'download_c') {
             $path = $_POST['path'];
-            copy($path, "thumbs/filedownload.".$_SESSION['mimecopydownload']);
-            echo("<script>location.href ='/ai-web/download.php?id=thumbs/filedownload.".$_SESSION['mimecopydownload']."';</script>");
+            $mime = "zip";
+
+            if (file_exists("settings.txt"))
+            {
+                $data = xreadFile("settings.txt");
+                $arrMime = explode("<mimecodow>", $data);
+                $mime = $arrMime[1];
+            }
+          
+            copy($path, "thumbs/filedownload.".$mime);
+            echo("<script>location.href ='/ai-web/download.php?id=thumbs/filedownload.".$mime."';</script>");
         }
         elseif($_POST['opt'] == 'copy') {
             $_SESSION['copy'] = $path.'/'.$_POST['name'];
@@ -2455,6 +2471,22 @@ function reverse() {
     }
 
     return $url;
+}
+
+function setSettings($ardata)
+{
+    if ($ardata != null)
+    {
+        $defThumbsVideogall = "<thumbsVid>$ardata[0]<thumbsVid>\n";
+        $defMimeCopydownload = "<mimecodow>$ardata[1]<mimecodow>\n";
+
+        xwriteFile("settings.txt", $defThumbsVideogall.$defMimeCopydownload);
+    }
+    else {
+        $defThumbsVideogall = "<thumbsVid>png<thumbsVid>\n";
+        $defMimeCopydownload = "<mimecodow>mhtml<mimecodow>\n";
+        xwriteFile("settings.txt", $defThumbsVideogall.$defMimeCopydownload);
+    }
 }
 
 function getValue($param, $kata1, $kata2){
