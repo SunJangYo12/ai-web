@@ -1180,12 +1180,6 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var encdataold = encodeURIComponent(dataold).replace("%20","+");
                     var childencdataold = encodeURIComponent(dataold).replace("%20","+");
 
-                    var outname = data.urlencname.replace( /[\r\n]+/gm, "" );
-                    outname = encodeURIComponent(outname).replace("%20","+");
-
-                    var outpath = data.urlencpath.replace( /[\r\n]+/gm, "" );
-                    outpath = encodeURIComponent(outpath).replace("%20","+");
-
                     var hasil = document.getElementById("hasil");
                     childencdataold = document.createElement("div");
                     childencdataold.id = encodeURIComponent(data.old);
@@ -1202,7 +1196,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              "<font color=yellow><h5>"+
                              data.jalbum+
                              "</h5><b>Size: "+data.size+"&nbsp&nbsp"+data.symbol+"</b></font>"+
-                             "&nbsp&nbsp<input type=submit value=Play id="+outpath+":"+outname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />";
+                             "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) />";
                     }
                     else {
                         childencdataold.innerHTML = "<div class=post-container>"+
@@ -1213,7 +1207,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                              "<div class=post-content><font color=yellow><h5>"+
                              data.jalbum+
                              "</h5><b>Size: "+data.size+"&nbsp&nbsp"+data.symbol+"</b></font>"+
-                             "&nbsp&nbsp<input type=submit value=Play id="+outpath+":"+outname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) /></div></div>";
+                             "&nbsp&nbsp<input type=submit value=Play id="+data.urlencpath+":"+data.urlencname+"-jin-"+encodeURIComponent(data.old)+" onclick=play(this.id) /></div></div>";
                     }
                     hasil.appendChild(childencdataold);
                     proccount += 1;

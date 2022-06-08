@@ -265,7 +265,7 @@
             
             function next() {
                 var xhr = new XMLHttpRequest();
-                var url = "ajax-server.php?idexl=nextaudio:"+"'.$path.':'.$name.'";
+                var url = "ajax-server.php?idexl=nextaudio:"+"'.urlencode($path).':'.urlencode($name).'";
                 xhr.onloadstart = function () {
                 }
 
@@ -281,7 +281,7 @@
             }
             function prev() {
                 var xhr = new XMLHttpRequest();
-                var url = "ajax-server.php?idexl=prevaudio:"+"'.$path.':'.$name.'";
+                var url = "ajax-server.php?idexl=prevaudio:"+"'.urlencode($path).':'.urlencode($name).'";
                 xhr.onloadstart = function () {
                 }
 
@@ -297,7 +297,7 @@
             }
 
             function favorite() {
-                var name = "'.$path.':'.$name.'";
+                var name = "'.urlencode($path).':'.urlencode($name).'";
 
                 /*window.open(
                     "ajax-server.php?idexl=musfavorite:"+name,
@@ -306,7 +306,7 @@
                 alert("disable function karena file rentan rusak, size space saat ini: '.$free.'");
             }
             function edit() {
-                var name = "'.$path.':'.$name.'";
+                var name = "'.urlencode($path).':'.urlencode($name).'";
 
                 window.open(
                     "ajax-server.php?idexl=musedit:"+name,
@@ -314,7 +314,7 @@
                 );
             }
             function rincian() {
-                var name = "'.$path.':'.$name.'";
+                var name = "'.urlencode($path).':'.urlencode($name).'";
 
                 window.open(
                     "ajax-server.php?idexl=infomedia:"+name,
@@ -322,7 +322,7 @@
                 );
             }
             function saveimg() {
-                var name = "'.$name.'.jpg";
+                var name = "'.urlencode($name).'.jpg";
 
                 if (confirm("Simpan Gambar ini?")) {
                     window.open(
@@ -365,7 +365,7 @@
                 xhr.open("GET", url, true);
                 xhr.send();
             }
-            getAudio("'.$path.'/'.$name.'");
+            getAudio("'.urlencode($path).'/'.urlencode($name).'");
 
             </script>
 
