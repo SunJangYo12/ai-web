@@ -1239,7 +1239,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             id = zname[1];
 
             window.open(
-                            "download.php?id=musicview:"+pathname,
+                            "download.php?id=musicview:"+pathname+":"+isMobile,
                             "_blank"
                         );
         }
@@ -1251,8 +1251,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         </script>';
     }
     elseif(isset($_GET['option']) && $_POST['other'] == 'gal-doc') {
-        fm_rdelete('thumbs');
-        unlink("playlist.txt");
+        //fm_rdelete('thumbs');
+       // unlink("playlist.txt");
         if (!file_exists('thumbs'))
             mkdir('thumbs', 0777, true);
         echo '

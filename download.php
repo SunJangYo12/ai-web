@@ -221,6 +221,7 @@
     elseif ($aksi[0] == 'musicview') {
         $path = $aksi[1];
         $name = $aksi[2];
+        $isMobile = $aksi[3];
 
         $_data = fopen("freespace.txt", "r") or die("Gagal membuka file!");
         $data = fread($_data, filesize("freespace.txt"));
@@ -257,6 +258,22 @@
                     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
                     margin-right: 10px;
                 }
+            ';
+
+            if ($isMobile == "false")
+            {
+                echo '
+
+                body{
+                    background-image: url("thumbs/'.$name.'.jpg");
+                    background-repeat: no-repeat;
+                    background-attachment: fixed;
+                    background-size: cover;
+                }
+                ';
+            }
+
+            echo '
             </style>
 
             <script>
