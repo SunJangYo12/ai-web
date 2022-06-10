@@ -279,6 +279,8 @@
             <script>
 
             document.title = "'.$name.'";
+
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             
             function next() {
                 var xhr = new XMLHttpRequest();
@@ -290,7 +292,7 @@
                     if (this.responseText !== "" && this.readyState == 4) 
                     {
                         var data = JSON.parse(this.responseText);
-                        location.href = "download.php?id=musicview:"+data.nextpath+":"+data.nextname;
+                        location.href = "download.php?id=musicview:"+data.nextpath+":"+data.nextname+":"+isMobile;
                     }
                 };
                 xhr.open("GET", url, true);
@@ -306,7 +308,7 @@
                     if (this.responseText !== "" && this.readyState == 4) 
                     {
                         var data = JSON.parse(this.responseText);
-                        location.href = "download.php?id=musicview:"+data.prevpath+":"+data.prevname;
+                        location.href = "download.php?id=musicview:"+data.prevpath+":"+data.prevname+":"+isMobile;
                     }
                 };
                 xhr.open("GET", url, true);
