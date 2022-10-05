@@ -4,7 +4,7 @@
     $version = "3.0";
     $aksi = explode(":", $dfile);
 
-    if ($aksi[0] == 'musicview' || $aksi[0] == 'videoview' || aksi[0] == 'pdf') {
+    if ($aksi[0] == 'musicview' || $aksi[0] == 'videoview') {
         echo '
 <html>
 <head>
@@ -221,6 +221,13 @@
     elseif ($aksi[0] == 'musicview') {
         $path = $aksi[1];
         $name = $aksi[2];
+        $isMobile = $aksi[3];
+
+        $_data = fopen("freespace.txt", "r") or die("Gagal membuka file!");
+        $data = fread($_data, filesize("freespace.txt"));
+        fclose($_data);
+
+        $free = $data;
 
         echo '
             <link rel = "icon" type=png href="thumbs/'.$name.'.jpg">
@@ -251,15 +258,33 @@
                     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
                     margin-right: 10px;
                 }
+            ';
+
+            if ($isMobile == "false")
+            {
+                echo '
+
+                body{
+                    background-image: url("thumbs/'.$name.'.jpg");
+                    background-repeat: no-repeat;
+                    background-attachment: fixed;
+                    background-size: cover;
+                }
+                ';
+            }
+
+            echo '
             </style>
 
             <script>
 
             document.title = "'.$name.'";
+
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             
             function next() {
                 var xhr = new XMLHttpRequest();
-                var url = "ajax-server.php?idexl=nextaudio:"+"'.$path.':'.$name.'";
+                var url = "ajax-server.php?idexl=nextaudio:"+"'.urlencode($path).':'.urlencode($name).'";
                 xhr.onloadstart = function () {
                 }
 
@@ -267,7 +292,7 @@
                     if (this.responseText !== "" && this.readyState == 4) 
                     {
                         var data = JSON.parse(this.responseText);
-                        location.href = "download.php?id=musicview:"+data.nextpath+":"+data.nextname;
+                        location.href = "download.php?id=musicview:"+data.nextpath+":"+data.nextname+":"+isMobile;
                     }
                 };
                 xhr.open("GET", url, true);
@@ -275,7 +300,7 @@
             }
             function prev() {
                 var xhr = new XMLHttpRequest();
-                var url = "ajax-server.php?idexl=prevaudio:"+"'.$path.':'.$name.'";
+                var url = "ajax-server.php?idexl=prevaudio:"+"'.urlencode($path).':'.urlencode($name).'";
                 xhr.onloadstart = function () {
                 }
 
@@ -283,7 +308,7 @@
                     if (this.responseText !== "" && this.readyState == 4) 
                     {
                         var data = JSON.parse(this.responseText);
-                        location.href = "download.php?id=musicview:"+data.prevpath+":"+data.prevname;
+                        location.href = "download.php?id=musicview:"+data.prevpath+":"+data.prevname+":"+isMobile;
                     }
                 };
                 xhr.open("GET", url, true);
@@ -291,15 +316,16 @@
             }
 
             function favorite() {
-                var name = "'.$path.':'.$name.'";
+                var name = "'.urlencode($path).':'.urlencode($name).'";
 
-                window.open(
+                /*window.open(
                     "ajax-server.php?idexl=musfavorite:"+name,
                     "_blank"
-                );
+                );*/
+                alert("disable function karena file rentan rusak, size space saat ini: '.$free.'");
             }
             function edit() {
-                var name = "'.$path.':'.$name.'";
+                var name = "'.urlencode($path).':'.urlencode($name).'";
 
                 window.open(
                     "ajax-server.php?idexl=musedit:"+name,
@@ -307,7 +333,7 @@
                 );
             }
             function rincian() {
-                var name = "'.$path.':'.$name.'";
+                var name = "'.urlencode($path).':'.urlencode($name).'";
 
                 window.open(
                     "ajax-server.php?idexl=infomedia:"+name,
@@ -315,7 +341,7 @@
                 );
             }
             function saveimg() {
-                var name = "'.$name.'.jpg";
+                var name = "'.urlencode($name).'.jpg";
 
                 if (confirm("Simpan Gambar ini?")) {
                     window.open(
@@ -358,7 +384,7 @@
                 xhr.open("GET", url, true);
                 xhr.send();
             }
-            getAudio("'.$path.'/'.$name.'");
+            getAudio("'.urlencode($path).'/'.urlencode($name).'");
 
             </script>
 
@@ -430,7 +456,9 @@
             </script>
             <!DOCTYPE HTML>
             <html>
-            
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabe=no"/>
+            </head>
             <body>
                 <div>
                     <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
@@ -438,7 +466,6 @@
                     &nbsp<input type="submit" value=">" onclick="onNextPage()">
                     &nbsp<input type="number" id="edtgo">
                     &nbsp<input type="submit" value="Go" onclick="onGotoPage()">
-                    &nbspAlternatif next/prev page klik kiri/kanan pada sembarang page
                 </div>
                 
                 <div id="mydiv"></div>
@@ -450,6 +477,90 @@
                 <script type="text/javascript" src="pdfuse.js"></script>
 
             </body>
+        ';
+    }
+    else if ($aksi[0] == 'imageview') {
+        $path = get_dirname($aksi[1]);
+        $name = get_basename($aksi[1]);
+
+        echo '
+            <link rel = "icon" type=png href="thumbs/'.$name.'.jpg">
+            <a onclick=saveimg()><img style=float:left; src="thumbs/'.$name.'.jpg" alt=""></img></a>
+            <div id="hasil"></div>
+            <div class="fab-container">
+                <span onclick=prev() class="fab-label">Prev</span>
+                <span onclick=next() class="fab-label">Next</span><br><br>
+            </div>
+
+            <style>
+                .fab-container {
+                    position: fixed;
+                    bottom: 115px;
+                    right: 50px;
+                    z-index: 999;
+                    cursor: pointer;
+                }
+                .fab-label {
+                    padding: 2px 5px;
+                    align-self: center;
+                    user-select: none;
+                    white-space: nowrap;
+                    border-radius: 3px;
+                    font-size: 69px;
+                    background: #666666;
+                    color: #ffffff;
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+                    margin-right: 10px;
+                }
+            </style>
+
+            <script>
+
+            document.title = "'.$name.'";
+            
+            function next() {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=nextimage:"+"'.$path.':'.$name.'";
+                xhr.onloadstart = function () {
+                }
+
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+                        location.href = "download.php?id=imageview:"+data.nextpath+"/"+data.nextname;
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+            function prev() {
+                var xhr = new XMLHttpRequest();
+                var url = "ajax-server.php?idexl=previmage:"+"'.$path.':'.$name.'";
+                xhr.onloadstart = function () {
+                }
+
+                xhr.onreadystatechange = function() {
+                    if (this.responseText !== "" && this.readyState == 4) 
+                    {
+                        var data = JSON.parse(this.responseText);
+                        location.href = "download.php?id=imageview:"+data.prevpath+"/"+data.prevname;
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+
+            var path = "'.$path.'".replace( /[\r\n]+/gm, "" );
+            encpath = encodeURIComponent(path).replace("%20","+");
+
+            var name = "'.$name.'".replace( /[\r\n]+/gm, "" );
+            encname = encodeURIComponent(name).replace("%20","+");
+
+            imgsrcfull = "download.php?id=gambar:"+encpath+"/"+encname;
+
+            document.getElementById("hasil").innerHTML += "<img src="+imgsrcfull+" onclick=next()></img>";
+            </script>
         ';
     }
     else {
@@ -469,4 +580,32 @@
         readfile($dfile);
         exit;
     }
+
+
+function get_basename($filename)
+{
+    $exl = explode('/', $filename);
+    $count = count($exl);
+
+    $out = $exl[$count - 1];
+    $delent = explode("\n", $out);
+    $out = $delent[0];
+
+    return $out;
+}
+function get_dirname($filename)
+{
+  $exl = explode('/', $filename);
+  $count = count($exl);
+  $out = "";
+
+  for($i=0; $i<$count; $i++) {
+    if ($i != $count -1) {
+      $out .= $exl[$i]."/";
+    }
+  }
+  $out = substr($out, 0, -1); // delete last string
+
+  return $out;
+}
 ?>
