@@ -601,19 +601,20 @@ elseif (isset($_GET['idexl'])) {
     elseif ($exl[0] == "mount_passwd") {
         $path = $exl[1];
 
-        if (!file_exists('mount')) {
-            mkdir('mount', 0777, true);
+        if (!file_exists('zip')) {
+            mkdir('zip', 0777, true);
         }
 
-        if (foldervoid('mount') == 1) {
-            shell_exec('umount mount');
+        if (foldervoid('zip') == 1) {
+            shell_exec('rm -rf zip');
         }
 
         $pathname = $path;
         $pathname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $pathname); // replace unicode path and name
         $pathname = trim(preg_replace('/\s\s+/', ' ', $pathname)); // hapus enter
 
-        $status = shell_exec('unzip -P "Telegram MEQIQU" '.$pathname." -d mount");
+        //$status = shell_exec('unzip -P "Telegram MEQIQU" '.$pathname." -d mount");
+        $status = shell_exec('unrar x '.$pathname." -o zip");
 
         $data = [  
             "status" => $status,
@@ -637,7 +638,8 @@ elseif (isset($_GET['idexl'])) {
         $pathname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $pathname); // replace unicode path and name
         $pathname = trim(preg_replace('/\s\s+/', ' ', $pathname)); // hapus enter
 
-        $status = shell_exec('fuse-archive '.$pathname." mount");
+        //$status = shell_exec('fuse-archive '.$pathname." mount");
+        $status = shell_exec('rar2fs '.$pathname." mount");
 
         $data = [  
             "status" => $status,

@@ -1641,7 +1641,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                     var data = JSON.parse(this.responseText);
                     alert(data.status);
 
-                    location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/mount";
+                    location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/zip";
                 }
             };
             xhr.open("GET", url, true);
