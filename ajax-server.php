@@ -598,7 +598,7 @@ elseif (isset($_GET['idexl'])) {
 
         echo json_encode($data);
     }
-    elseif ($exl[0] == "mount_passwd") {
+    elseif ($exl[0] == "unzip_pass") {
         $path = $exl[1];
 
         if (!file_exists('zip')) {
@@ -613,7 +613,33 @@ elseif (isset($_GET['idexl'])) {
         $pathname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $pathname); // replace unicode path and name
         $pathname = trim(preg_replace('/\s\s+/', ' ', $pathname)); // hapus enter
 
-        //$status = shell_exec('unzip -P "Telegram MEQIQU" '.$pathname." -d mount");
+        $data = xreadFile("settings.txt");
+        $zippass = explode("<zip>", $data);
+
+        $status = shell_exec('unzip -P "'.$zippass[1].'" '.$pathname." -d zip");
+
+        $data = [  
+            "status" => $status,
+            "pathname" => $pathname,
+        ];
+
+        echo json_encode($data);
+    }
+    elseif ($exl[0] == "unrar") {
+        $path = $exl[1];
+
+        if (!file_exists('zip')) {
+            mkdir('zip', 0777, true);
+        }
+
+        if (foldervoid('zip') == 1) {
+            shell_exec('rm -rf zip');
+        }
+
+        $pathname = $path;
+        $pathname = preg_replace("/ |'|\(|\)|\&|\[|\]/", '\\\${0}', $pathname); // replace unicode path and name
+        $pathname = trim(preg_replace('/\s\s+/', ' ', $pathname)); // hapus enter
+
         $status = shell_exec('unrar x '.$pathname." -o zip");
 
         $data = [  
@@ -940,5 +966,12 @@ function bersihPath($in) {
   $out = trim(preg_replace('/\s\s+/', ' ', $out)); // hapus enter
          
   return $out;
+}
+function xreadFile($src) {
+    $_data = fopen($src, "r") or die("Gagal membuka file!");
+    $data = fread($_data, filesize($src));
+    fclose($_data);
+
+    return $data;
 }
 ?>

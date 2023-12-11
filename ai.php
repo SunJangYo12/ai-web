@@ -669,6 +669,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             $arr = array();
             $arr[0] = $_POST['dataThumGalVid'];
             $arr[1] = $_POST['dataMimeCopdow'];
+            $arr[2] = $_POST['zippassword'];
 
             setSettings($arr);
 
@@ -708,10 +709,12 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             $data = xreadFile("settings.txt");
             $arrThumgv = explode("<thumbsVid>", $data);
             $arrMime = explode("<mimecodow>", $data);
+            $zip = explode("<zip>", $data);
 
             echo '<form method="POST" action="">
             Video Gallery thumbs : <input name="dataThumGalVid" type="text" size="20" value="'.$arrThumgv[1].'" /><br><br>
             Mime download copy : <input name="dataMimeCopdow" type="text" size="20" value="'.$arrMime[1].'" /><br><br>
+            Zip Password : <input name="zippassword" type="text" size="20" value="'.$zip[1].'" /><br><br>
 
             <input type="submit" name="setSettings" value="Change" /></form>';
         }
@@ -1592,7 +1595,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             ';
         
         }
-        elseif($_POST['opt'] == 'mount_passwd') {
+        elseif($_POST['opt'] == 'unzip_pass') {
             $arsource = $path."/".$_POST['name'];
 
             echo '
@@ -1627,7 +1630,64 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             var name = "'.$arsource.'";
             var xhr = new XMLHttpRequest();
             var encname = encodeURIComponent(name).replace("%20","+");
-            var url = "ajax-server.php?idexl=mount_passwd:"+encname;
+            var url = "ajax-server.php?idexl=unzip_pass:"+encname;
+            
+            xhr.onloadstart = function () {
+                document.title = "Mounting...";
+                document.getElementById("spinner").style.display = "block";
+            }
+
+            xhr.onreadystatechange = function() {
+                if (this.responseText !== "" && this.readyState == 4) 
+                {
+                    document.title = "Mounting success";
+                    var data = JSON.parse(this.responseText);
+                    alert(data.status);
+
+                    location.href = "/ai-web/ai.php?path=/var/www/html/ai-web/zip";
+                }
+            };
+            xhr.open("GET", url, true);
+            xhr.send();
+            </script>
+            ';
+        }
+        elseif($_POST['opt'] == 'unrar') {
+            $arsource = $path."/".$_POST['name'];
+
+            echo '
+            <html>
+            <div id="spinner" class="loading"></div>
+            </html>
+            <style type="text/css">
+                #spinner {
+                    display: none;
+                }
+                .loading {
+                    border: 20px solid #ccc;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    border-top-color: #1ecd97;
+                    border-left-color: #1ecd97;
+                    animation: spin 1s infinite ease-in;
+                }
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+            </style>';
+
+            echo '
+            <script>
+            var name = "'.$arsource.'";
+            var xhr = new XMLHttpRequest();
+            var encname = encodeURIComponent(name).replace("%20","+");
+            var url = "ajax-server.php?idexl=unrar:"+encname;
             
             xhr.onloadstart = function () {
                 document.title = "Mounting...";
@@ -1881,7 +1941,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <select name="opt">
                 <option value="">Select</option>
                 <option value="mount">Mount</option>
-                <option value="mount_passwd">Mount Passwd</option>
+                <option value="unrar">Unrar</option>
+                <option value="unzip_pass">Unzip Pass</option>
                 <option value="delete">Delete</option>
                 <option value="chmod">Chmod</option>
                 <option value="rename">Rename</option>
@@ -2545,13 +2606,15 @@ function setSettings($ardata)
     {
         $defThumbsVideogall = "<thumbsVid>$ardata[0]<thumbsVid>\n";
         $defMimeCopydownload = "<mimecodow>$ardata[1]<mimecodow>\n";
+        $zippassword = "<zip>$ardata[2]<zip>\n";
 
-        xwriteFile("settings.txt", $defThumbsVideogall.$defMimeCopydownload);
+        xwriteFile("settings.txt", $defThumbsVideogall.$defMimeCopydownload.$zippassword);
     }
     else {
         $defThumbsVideogall = "<thumbsVid>png<thumbsVid>\n";
         $defMimeCopydownload = "<mimecodow>mhtml<mimecodow>\n";
-        xwriteFile("settings.txt", $defThumbsVideogall.$defMimeCopydownload);
+        $zippassword = "<zip>Telegram MEQIQU<zip>\n";
+        xwriteFile("settings.txt", $defThumbsVideogall.$defMimeCopydownload.$zippassword);
     }
 }
 
