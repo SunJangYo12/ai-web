@@ -68,6 +68,8 @@
     }
 
     if ($aksi[0] == 'gambar') {
+        
+
         $image = $aksi[1]; 
         $content = file_get_contents($image); 
         header('Content-Type: image/jpeg');
@@ -480,6 +482,12 @@
         ';
     }
     else if ($aksi[0] == 'imageview') {
+        echo '
+<html>
+<head>
+<meta name="viewport" content="width=device-width, maximum-scale=1, user-scalabe=no"/>
+
+';
         $path = get_dirname($aksi[1]);
         $name = get_basename($aksi[1]);
 
