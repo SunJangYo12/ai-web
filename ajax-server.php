@@ -193,7 +193,7 @@ elseif (isset($_GET['idexl'])) {
            $xfiles = trim(preg_replace('/\s\s+/', ' ', $xfiles)); // hapus enter
           
            if (!file_exists("thumbs/".get_basename($exl[2])))
-              exec('/usr/bin/pdftoppm -l 1 -scale-to 500 -jpeg '.$xfiles.' > thumbs/'.basename($xfiles).'.jpg');
+              exec('/usr/bin/pdftoppm -upw "Telegram MEQIQU" -l 1 -scale-to 500 -jpeg '.$xfiles.' > thumbs/'.basename($xfiles).'.jpg');
 
            $newtext = delete_text_line("playlist.txt", 0); // jangan akses dua kali
            $xdir = dirname($newtext);
@@ -601,12 +601,8 @@ elseif (isset($_GET['idexl'])) {
     elseif ($exl[0] == "unzip_pass") {
         $path = $exl[1];
 
-        if (!file_exists('zip')) {
-            mkdir('zip', 0777, true);
-        }
-
         if (foldervoid('zip') == 1) {
-            shell_exec('rm -rf zip');
+            shell_exec('rm -rf zip/*');
         }
 
         $pathname = $path;
