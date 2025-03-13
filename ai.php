@@ -765,7 +765,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             if (is_file($files[$i])) 
             {
                 $mime = strtolower(pathinfo($files[$i], PATHINFO_EXTENSION));
-                if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif") 
+                if ($mime == "png" || $mime == "jpg" || $mime == "jpeg" || $mime == "gif" || $mime == "webp") 
                 {
                     $outfiles[$j] = $files[$i];
 
@@ -1798,7 +1798,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         elseif($_POST['opt'] == 'open_native') {
         	$filesrc = $_POST['path'];
             echo('<pre>'.htmlspecialchars(file_get_contents($filesrc)).'</pre>');
-        	
+
         }
 
         echo '</center>';
