@@ -54,8 +54,7 @@ elseif (isset($_GET['idexl'])) {
               $y = $y / 2;
            }
 
-           if (!file_exists("thumbs/".get_basename($exl[2])))
-              exec('ffmpeg -y -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
+           exec('ffmpeg -y -i '.$xfiles.' -vf scale='.$x.':'.$y.' thumbs/'.$encname);
 
            $newtext = delete_text_line("playlist.txt", 0);
            $xdir = dirname($newtext);
