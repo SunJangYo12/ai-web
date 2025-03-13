@@ -495,10 +495,7 @@
             <link rel = "icon" type=png href="thumbs/'.$name.'.jpg">
             <a onclick=saveimg()><img style=float:left; src="thumbs/'.$name.'.jpg" alt=""></img></a>
             <div id="hasil"></div>
-            <div class="fab-container">
-                <span onclick=prev() class="fab-label">Prev</span>
-                <span onclick=next() class="fab-label">Next</span><br><br>
-            </div>
+            
 
             <style>
                 .fab-container {
