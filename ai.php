@@ -1831,6 +1831,8 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
         <td><center>Modify</peller></center></td>
         </tr>';
 
+        natsort($scandir);
+
         foreach($scandir as $dir){
             if(!is_dir($path.'/'.$dir) || $dir == '.' || $dir == '..') continue;
                 
@@ -2405,11 +2407,16 @@ function path() {
 function dir_scan($dir, &$results = array()) {
     $files = scandir($dir);
 
-    foreach ($files as $key => $value) {
+    natsort($files);
+
+    foreach ($files as $key => $value)
+    {
         $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
+
         if (!is_dir($path)) {
             $results[] = $path;
-        } else if ($value != "." && $value != "..") {
+        }
+        else if ($value != "." && $value != "..") {
             dir_scan($path, $results);
             $results[] = $path;
         }
