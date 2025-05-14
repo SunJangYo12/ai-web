@@ -36,6 +36,32 @@ NOTE: versi ini belum bisa edit text menggunakan warna
 
 ![](output.gif)
 
+# Config
+```
+$ nano /etc/php/7.4/apache2/php.ini
+;;;;;;;;;;;;;;;;
+; File Uploads ;
+;;;;;;;;;;;;;;;;
+
+; Whether to allow HTTP file uploads.
+; http://php.net/file-uploads
+file_uploads = On
+
+; Temporary directory for HTTP uploaded files (will use system default if not
+; specified).
+; http://php.net/upload-tmp-dir
+upload_tmp_dir = "/media/jin/4abb279b-6d65-4663-97c2-26987f64673a/home/yuna/.myruntime/tm>
+
+; Maximum allowed size for uploaded files.
+; http://php.net/upload-max-filesize
+upload_max_filesize = 20G
+post_max_size = 20G
+
+; Maximum number of files that can be uploaded via a single request
+max_file_uploads = 20
+
+```
+
 # Requitments
 1). php 7 keatas <br>
 2). ffmpeg <br>

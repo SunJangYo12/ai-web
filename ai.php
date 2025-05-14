@@ -461,7 +461,7 @@ if (isset($_GET['uploader']))
                         }
                         else {
                             toggleBarVisibility();
-                            document.getElementById("status").innerHTML = "Wait...";
+                            document.getElementById("status").innerHTML = "Done.";
                         }
                     }
                 }
