@@ -439,7 +439,7 @@ elseif (isset($_GET['idexl'])) {
     }
     elseif ($exl[0] == "copyvid") {
         array_map('unlink', glob("thumbs/*.mp4"));
-       
+
         $path = $exl[1];
         $name = $exl[2];
 
@@ -449,9 +449,15 @@ elseif (isset($_GET['idexl'])) {
         $path = str_replace("-jin-", ' ', $path);
         $name = str_replace("-jin-", ' ', $name);
 
+        $pathname = $path.'/'.$name;
 
-        copy($path.'/'.$name, 'thumbs/'.$name);
-        echo $name;
+        if (symlink($pathname, 'thumbs/'.$name)) {
+           echo $name;
+        }
+        else {
+           echo "gagal";
+        }
+
     }
     elseif ($exl[0] == "infomedia") {
         $path = urldecode($exl[1]);
