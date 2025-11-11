@@ -38,10 +38,13 @@ function procOpenVideo(name)
         if (this.responseText !== "" && this.readyState == 4) 
         {
             document.title = "sukses";
+            var vsize = 0;
+            var isMobile = true;
+            var vname = "open.mp4";
 
             if (confirm('Open Video?')) {
                 window.open(
-                    'download.php?id=video:thumbs/open.mp4',
+                    'download.php?id=videoview:'+vname+':'+vsize+':'+isMobile+':'+name,
                     '_blank'
                 );
             } 
