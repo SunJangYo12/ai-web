@@ -401,6 +401,18 @@ elseif (isset($_GET['idexl'])) {
         }
 
     }
+    elseif ($exl[0] == "copyprocvidcopy") {
+
+        unlink('thumbs/open.mp4');
+
+        if (copy($exl[1], 'thumbs/open.mp4')) {
+           echo "sukses";
+        }
+        else {
+           echo "gagal";
+        }
+
+    }
     elseif ($exl[0] == "convertprocvid") {
         $conv = 'thumbs/open.mp4';
         

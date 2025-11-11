@@ -24,10 +24,11 @@ function procOpenImage(name)
     xhr.send();
 }
 
-function procOpenVideo(name) 
+function procOpenVideo(name, copy=false) 
 {
     var xhr = new XMLHttpRequest();
     var url = "ajax-server.php?idexl=copyprocvid:"+name;
+
 
     xhr.onloadstart = function () {
         alert("Opening video...")
@@ -50,6 +51,15 @@ function procOpenVideo(name)
             } 
         }
     };
+
+    if (copy) {
+        url = "ajax-server.php?idexl=copyprocvidcopy:"+name;
+        alert("Copy!");
+    }
+    else {
+        alert("Symlink!");
+    }
+    
     xhr.open("GET", url, true);
     xhr.send();
 }

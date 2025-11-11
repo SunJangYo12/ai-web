@@ -1777,6 +1777,10 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
             $video = $path."/".$_POST['name'];
             echo '<script>procOpenVideo("'.$video.'");</script>';
         }
+        elseif($_POST['opt'] == 'open_video_copy') {
+            $video = $path."/".$_POST['name'];
+            echo '<script>procOpenVideo("'.$video.'", true);</script>';
+        }
         elseif($_POST['opt'] == 'open_pdf') {
             $pdf = $path."/".$_POST['name'];
             echo '<script>procOpenPdf("'.$pdf.'");</script>';
@@ -1967,6 +1971,7 @@ if(isset($_GET['path']) || isset($_GET['file_manager'])){
                 <select name="opt">
                 <option value="">Select</option>
                 <option value="open_video">Open Video</option>
+                <option value="open_video_copy">Open Video Copy</option>
                 <option value="convert_media">Convert to mp3</option>
                 <option value="delete">Delete</option>
                 <option value="chmod">Chmod</option>
