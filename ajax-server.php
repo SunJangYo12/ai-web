@@ -685,7 +685,8 @@ elseif (isset($_GET['idexl'])) {
         $pathname = trim(preg_replace('/\s\s+/', ' ', $pathname)); // hapus enter
 
         //$status = shell_exec('fuse-archive '.$pathname." mount");
-        $status = shell_exec('rar2fs '.$pathname." mount");
+        //$status = shell_exec('rar2fs '.$pathname." mount");
+        $status = shell_exec('archivemount '.$pathname." mount");
 
         $data = [  
             "status" => $status,
