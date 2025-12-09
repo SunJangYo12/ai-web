@@ -397,8 +397,19 @@
 
         echo '<script>document.title = "'.$aksi[1].'"</script>';
 
-        if ($aksi[3] == 'true') // mobile
-            echo '<video width=340 height=280 controls><source src="thumbs/'.$aksi[1].'"/></video>';
+        //mobile
+        if ($aksi[3] == 'true') {
+
+            // transparent background
+            echo '<style> video::cue { background-color: transparent !important; color: #fff;} </style>';
+
+            echo '<video width=340 height=280 controls>';
+            echo '<source src="thumbs/'.$aksi[1].'"/>';
+
+            echo '<track src="thumbs/subtitle.vtt" kind="subtitles" srclang="id" label="Indonesia" default>';
+            echo '<track src="thumbs/subtitle.vtt" kind="subtitles" srclang="en" label="English" default>'; //optional
+            echo '</video>';
+        }
         else
             echo '<video width=800 height=480 controls><source src="thumbs/'.$aksi[1].'"/></video>';
 
