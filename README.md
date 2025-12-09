@@ -72,3 +72,8 @@ max_file_uploads = 20
 2). tes menggunakan localhost/ai-web/ai.php <br>
 3). finish <br>
 
+# Video subtitle convert from srt to vtt
+```
+$ git clone https://github.com/sunjangyo12/ai-web-utils
+$ ai-web-utils/srt2vtt.py in.srt subtitle.vtt
+```
