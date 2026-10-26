@@ -1,2 +1,16 @@
-ln -s /media/jin/6a76baf7-5d55-4bae-ac03-6cb70d5d180d/.mycache/thumbs /var/www/html/ai-web/thumbs
-ln -s /media/jin/6a76baf7-5d55-4bae-ac03-6cb70d5d180d/.mycache/zip /var/www/html/ai-web/zip
+ln -s /media/jin/4abb279b-6d65-4663-97c2-26987f64673a/home/yuna/.mycache/thumbs /var/www/html/ai-web/thumbs
+ln -s /media/jin/4abb279b-6d65-4663-97c2-26987f64673a/home/yuna/.mycache/zip /var/www/html/ai-web/zip
+
+exit
+
+mkdir -p /dev/shm/thumbs
+mkdir -p /dev/shm/zip
+mkdir -p /dev/shm/mount
+
+unlink thumbs
+unlink zip
+unlink mount
+
+ln -s /dev/shm/thumbs thumbs
+ln -s /dev/shm/zip zip
+ln -s /dev/shm/mount mount

