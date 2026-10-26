@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Jakarta");
 
-$version = "v3.4";
+$version = "v3.5";
 
 if (!file_exists("settings.txt"))
 {
